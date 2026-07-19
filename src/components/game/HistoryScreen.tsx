@@ -54,9 +54,9 @@ export function HistoryScreen() {
       </div>
 
       <div className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
-        {/* Era timeline (horizontal on desktop, vertical on mobile) */}
+        {/* Era timeline */}
         <div className="mb-6 overflow-x-auto pb-2">
-          <div className="flex md:grid md:grid-cols-7 gap-2 min-w-[800px] md:min-w-0">
+          <div className="flex md:grid md:grid-cols-8 gap-2 min-w-[800px] md:min-w-0">
             {historyEras.map((era, idx) => (
               <button
                 key={era.id}
@@ -119,8 +119,6 @@ export function HistoryScreen() {
                   </p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>{selectedEra.events.length} رویداد کلیدی</span>
-                    <span>•</span>
-                    <span>{selectedEra.yearStart} - {selectedEra.yearEnd}</span>
                   </div>
                 </div>
               </div>
@@ -143,10 +141,10 @@ export function HistoryScreen() {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
                           <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ backgroundColor: selectedEra.color, color: "white" }}>
-                            {event.year}
+                            {event.shamsiYear}
                           </span>
-                          {event.date && (
-                            <span className="text-xs text-muted-foreground">{event.date}</span>
+                          {event.shamsiDate && (
+                            <span className="text-xs text-muted-foreground">{event.shamsiDate}</span>
                           )}
                           <span
                             className="text-xs px-2 py-0.5 rounded font-bold"

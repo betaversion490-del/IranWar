@@ -1,9 +1,8 @@
 import { create } from "zustand";
-import { iranCards, usCards, israelCards, allEnemyCards, type GameCard, type CardEffects } from "./cardsData";
+import { iranCards, usCards, israelCards, type GameCard, type CardEffects } from "./cardsData";
 import { determineEnding, type GameState as EngineState, type Ending } from "./endingsData";
 
 export type GameState = {
-  // Game flow
   phase: "splash" | "intro" | "history" | "game" | "ending";
   turn: number;
   maxTurns: number;
@@ -22,11 +21,13 @@ export type GameState = {
   nuclearBreakoutMult: number;
   regimeChangeMult: number;
   negotiationChanceMult: number;
-  // Cards
-  iranHand: GameCard[];
+  // Cards: ALL Iran cards available, but some marked as used (still playable, but at reduced novelty)
+  playedIranCardIds: string[]; // Track which cards player has used this game
   playedIranCard: GameCard | null;
   playedUsCard: GameCard | null;
   playedIsraelCard: GameCard | null;
+  // Card flip state
+  flippedCardId: string | null;
   // Log of moves
   moveLog: MoveEntry[];
   // Ending
@@ -51,22 +52,24 @@ const INITIAL_STATE = {
   phase: "splash" as const,
   turn: 1,
   maxTurns: 8,
-  nuclearProgress: 55,
-  regionalInfluence: 60,
-  economicStability: 35,
-  domesticSupport: 50,
-  militaryCapability: 65,
-  deterrence: 50,
-  usPressure: 65,
-  israelThreat: 70,
-  warEscalation: 35,
+  // Initial state reflects post-Esfand 1404 situation: war restarting
+  nuclearProgress: 60, // برنامه هسته‌ای آسیب دیده اما همچنان پیشرفته
+  regionalInfluence: 55, // محور مقاومت تضعیف شده اما زنده
+  economicStability: 30, // اقتصاد در تورم شدید
+  domesticSupport: 65, // حمایت داخلی به‌دلیل جنگ افزایش یافته
+  militaryCapability: 50, // توان نظامی آسیب دیده اما بازسازی می‌شود
+  deterrence: 45, // بازدارندگی متوسط
+  usPressure: 70, // فشار آمریکا بالا
+  israelThreat: 75, // تهدید اسرائیل بالا
+  warEscalation: 50, // جنگ سایه‌ای فعال
   nuclearBreakoutMult: 1.0,
   regimeChangeMult: 1.0,
   negotiationChanceMult: 1.0,
-  iranHand: [] as GameCard[],
+  playedIranCardIds: [] as string[],
   playedIranCard: null,
   playedUsCard: null,
   playedIsraelCard: null,
+  flippedCardId: null,
   moveLog: [] as MoveEntry[],
   ending: null,
   endingProbability: 0,
@@ -81,7 +84,6 @@ function clamp(value: number, min = 0, max = 100): number {
 
 function applyEffects(state: GameState, effects: CardEffects, isEnemy: boolean): Partial<GameState> {
   const next: Partial<GameState> = {};
-  // Direct stat changes
   if (effects.nuclearProgress) next.nuclearProgress = clamp(state.nuclearProgress + effects.nuclearProgress);
   if (effects.regionalInfluence) next.regionalInfluence = clamp(state.regionalInfluence + effects.regionalInfluence);
   if (effects.economicStability) next.economicStability = clamp(state.economicStability + effects.economicStability);
@@ -91,9 +93,8 @@ function applyEffects(state: GameState, effects: CardEffects, isEnemy: boolean):
   if (effects.usPressure) next.usPressure = clamp(state.usPressure + (isEnemy ? Math.abs(effects.usPressure) : effects.usPressure));
   if (effects.israelThreat) next.israelThreat = clamp(state.israelThreat + (isEnemy ? Math.abs(effects.israelThreat) : effects.israelThreat));
 
-  // Multipliers accumulate (just multiply directly)
   if (effects.warEscalation) {
-    const delta = (effects.warEscalation - 1) * 25; // Convert mult to escalation points
+    const delta = (effects.warEscalation - 1) * 25;
     next.warEscalation = clamp(state.warEscalation + delta);
   }
   if (effects.nuclearBreakout) {
@@ -108,40 +109,39 @@ function applyEffects(state: GameState, effects: CardEffects, isEnemy: boolean):
   return next;
 }
 
-// AI: select enemy cards based on current state
 function selectEnemyCards(state: GameState, iranCard: GameCard): { usCard: GameCard; israelCard: GameCard } {
-  // Determine which US cards are more likely given Iran's action
   const weightedUs = usCards.map((card) => {
     let weight = card.aiWeight ?? 10;
-    // Increase weight if it counters Iran's card
     if (card.counters?.includes(iranCard.id)) weight *= 2.5;
-    // Diplomacy card more likely if Iran plays diplomacy
     if (iranCard.category === "diplomatic" && card.category === "diplomatic") weight *= 2;
-    // Sanctions more likely if Iran escalates nuclear
     if (iranCard.category === "nuclear" && card.id === "us_sanctions") weight *= 1.8;
-    // Military strike more likely if Iran escalates nuclear significantly
-    if (iranCard.id === "iran_nuclear_breakout" && card.id === "us_military_strike") weight *= 1.5;
-    // Reduce war cards if warEscalation already high
-    if (card.category === "military" && state.warEscalation > 70) weight *= 0.7;
-    // Negotiation more likely if Iran plays diplomatically
+    if (iranCard.id === "iran_nuclear_breakout" && card.id === "us_military_strike") weight *= 2;
+    if (iranCard.id === "iran_nuclear_breakout" && card.id === "us_nuclear_strike") weight *= 3;
+    if (iranCard.id === "iran_ground_invasion" && card.id === "us_ground_invasion") weight *= 3;
+    if (iranCard.id === "iran_icbm" && card.id === "us_nuclear_strike") weight *= 4;
+    if (card.category === "extreme" && state.warEscalation < 70) weight *= 0.3;
+    if (iranCard.category === "extreme" && card.category === "extreme") weight *= 2;
     if (iranCard.id === "iran_diplomacy" && card.id === "us_negotiation") weight *= 3;
+    if (iranCard.id === "iran_russia_alliance" && card.id === "us_withdraw") weight *= 2;
     return { card, weight };
   });
 
   const weightedIsrael = israelCards.map((card) => {
     let weight = card.aiWeight ?? 10;
     if (card.counters?.includes(iranCard.id)) weight *= 2.5;
-    if (iranCard.id === "iran_proxy_hezbollah" && card.id === "israel_hezbollah_strike") weight *= 2.5;
-    if (iranCard.id === "iran_nuclear_breakout" && (card.id === "israel_nuclear_facility" || card.id === "israel_preemptive")) weight *= 2;
+    if (iranCard.id === "iran_hezbollah_full" && card.id === "israel_hezbollah_strike") weight *= 2.5;
+    if (iranCard.id === "iran_nuclear_breakout" && (card.id === "israel_nuclear_facility" || card.id === "israel_preemptive")) weight *= 2.5;
+    if (iranCard.id === "iran_nuclear_breakout" && card.id === "israel_nuclear_strike") weight *= 4;
+    if (iranCard.id === "iran_ground_invasion" && card.id === "israel_nuclear_strike") weight *= 3;
     if (iranCard.id === "iran_missile_strike" && card.id === "israel_air_strike") weight *= 2;
     if (iranCard.category === "cyber" && card.id === "israel_cyber") weight *= 2;
-    // Reduce preemptive probability unless really necessary
     if (card.id === "israel_preemptive" && state.warEscalation < 60) weight *= 0.5;
-    if (card.category === "military" && state.warEscalation > 80) weight *= 0.7;
+    if (card.id === "israel_nuclear_strike" && state.warEscalation < 90) weight *= 0.2;
+    if (card.category === "extreme" && state.warEscalation < 80) weight *= 0.3;
+    if (iranCard.category === "extreme" && card.category === "extreme") weight *= 2;
     return { card, weight };
   });
 
-  // Weighted random selection
   const pickWeighted = <T,>(items: Array<{ card: T; weight: number }>): T => {
     const total = items.reduce((s, i) => s + i.weight, 0);
     let r = Math.random() * total;
@@ -187,12 +187,6 @@ function effectsSummaryText(iranCard: GameCard, usCard: GameCard | null, israelC
   return parts.join("، ");
 }
 
-function drawIranHand(): GameCard[] {
-  // 5 random cards from Iran deck, with at least 1 diplomatic, 1 military, 1 asymmetric
-  const shuffled = [...iranCards].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 5);
-}
-
 export const useGameStore = create<GameState & {
   setPhase: (phase: GameState["phase"]) => void;
   startGame: () => void;
@@ -200,6 +194,7 @@ export const useGameStore = create<GameState & {
   playCard: (cardId: string) => void;
   nextTurn: () => void;
   setHistoryViewedEra: (eraId: string | null) => void;
+  flipCard: (cardId: string | null) => void;
 }>((set, get) => ({
   ...INITIAL_STATE,
 
@@ -209,7 +204,6 @@ export const useGameStore = create<GameState & {
     set({
       ...INITIAL_STATE,
       phase: "game",
-      iranHand: drawIranHand(),
     }),
 
   resetGame: () =>
@@ -220,25 +214,23 @@ export const useGameStore = create<GameState & {
 
   setHistoryViewedEra: (eraId) => set({ historyViewedEra: eraId }),
 
+  flipCard: (cardId) => set({ flippedCardId: cardId }),
+
   playCard: (cardId) => {
     const state = get();
     if (state.isResolving) return;
-    const iranCard = state.iranHand.find((c) => c.id === cardId);
+    const iranCard = iranCards.find((c) => c.id === cardId);
     if (!iranCard) return;
 
-    // Apply Iran card effects
     let newState = { ...state };
     const iranEffects = applyEffects(newState, iranCard.effects, false);
     newState = { ...newState, ...iranEffects };
 
-    // Enemy AI selects cards
     const { usCard, israelCard } = selectEnemyCards(newState, iranCard);
 
-    // Apply US card effects
     const usEffects = applyEffects(newState, usCard.effects, true);
     newState = { ...newState, ...usEffects };
 
-    // Apply Israel card effects
     const israelEffects = applyEffects(newState, israelCard.effects, true);
     newState = { ...newState, ...israelEffects };
 
@@ -259,7 +251,8 @@ export const useGameStore = create<GameState & {
       playedIranCard: iranCard,
       playedUsCard: usCard,
       playedIsraelCard: israelCard,
-      iranHand: newState.iranHand.filter((c) => c.id !== cardId),
+      playedIranCardIds: [...state.playedIranCardIds, cardId],
+      flippedCardId: null,
       isResolving: true,
       moveLog: [...state.moveLog, moveEntry],
     });
@@ -269,9 +262,7 @@ export const useGameStore = create<GameState & {
     const state = get();
     if (!state.isResolving) return;
 
-    // Check if game is over
     if (state.turn >= state.maxTurns) {
-      // Determine ending
       const engineState: EngineState = {
         nuclearProgress: state.nuclearProgress,
         regionalInfluence: state.regionalInfluence,
@@ -302,26 +293,12 @@ export const useGameStore = create<GameState & {
       return;
     }
 
-    // Draw a new card if hand is empty (typically not, since we draw 5 and play 8 turns)
-    let newHand = state.iranHand;
-    if (newHand.length === 0) {
-      newHand = drawIranHand();
-    } else if (newHand.length < 4 && Math.random() < 0.4) {
-      // Occasionally add a new card
-      const availableCards = iranCards.filter((c) => !newHand.find((h) => h.id === c.id));
-      if (availableCards.length > 0) {
-        const newCard = availableCards[Math.floor(Math.random() * availableCards.length)];
-        newHand = [...newHand, newCard];
-      }
-    }
-
     set({
       turn: state.turn + 1,
       isResolving: false,
       playedIranCard: null,
       playedUsCard: null,
       playedIsraelCard: null,
-      iranHand: newHand,
     });
   },
 }));

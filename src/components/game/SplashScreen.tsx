@@ -1,24 +1,34 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { useGameStore } from "@/lib/game/gameStore";
 
-type Particle = { x: number; y: number; duration: number; delay: number };
+// Pre-generated stable particle positions (avoid hydration mismatch with Math.random)
+const PARTICLES = [
+  { x: 100, y: 200, duration: 5, delay: 0.5 },
+  { x: 250, y: 400, duration: 6, delay: 1.2 },
+  { x: 400, y: 150, duration: 4.5, delay: 0.8 },
+  { x: 550, y: 350, duration: 7, delay: 2.0 },
+  { x: 700, y: 250, duration: 5.5, delay: 0.3 },
+  { x: 850, y: 450, duration: 6.5, delay: 1.5 },
+  { x: 1000, y: 200, duration: 5, delay: 2.3 },
+  { x: 1150, y: 350, duration: 7.5, delay: 0.7 },
+  { x: 150, y: 550, duration: 6, delay: 1.8 },
+  { x: 300, y: 700, duration: 5.5, delay: 0.4 },
+  { x: 450, y: 600, duration: 4.8, delay: 2.5 },
+  { x: 600, y: 750, duration: 6.2, delay: 1.1 },
+  { x: 750, y: 550, duration: 5.8, delay: 0.9 },
+  { x: 900, y: 650, duration: 7.2, delay: 1.7 },
+  { x: 1050, y: 700, duration: 5.3, delay: 2.2 },
+  { x: 200, y: 300, duration: 6.8, delay: 0.6 },
+  { x: 500, y: 250, duration: 5.6, delay: 1.9 },
+  { x: 800, y: 300, duration: 7.1, delay: 0.2 },
+  { x: 350, y: 500, duration: 5.9, delay: 1.4 },
+  { x: 650, y: 500, duration: 6.3, delay: 2.1 },
+];
 
 export function SplashScreen() {
   const setPhase = useGameStore((s) => s.setPhase);
-  const [particles, setParticles] = useState<Particle[]>([]);
-
-  useEffect(() => {
-    const next: Particle[] = Array.from({ length: 20 }, () => ({
-      x: Math.random() * 1200,
-      y: Math.random() * 800,
-      duration: 4 + Math.random() * 4,
-      delay: Math.random() * 5,
-    }));
-    setParticles(next);
-  }, []);
 
   return (
     <motion.div
@@ -32,7 +42,7 @@ export function SplashScreen() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
 
       {/* Floating particles */}
-      {particles.map((p, i) => (
+      {PARTICLES.map((p, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 rounded-full bg-primary/40"
@@ -102,7 +112,7 @@ export function SplashScreen() {
             onClick={() => setPhase("history")}
             className="px-8 py-4 glass rounded-xl font-bold text-lg hover:scale-105 active:scale-95 transition-all"
           >
-            مرور تاریخچه (۱۹۵۳-۲۰۲۵)
+            مرور تاریخچه (۱۳۳۲-۱۴۰۴)
           </button>
         </motion.div>
 
@@ -114,8 +124,8 @@ export function SplashScreen() {
         >
           {[
             { label: "۷۰+ سال", value: "تاریخچه مناسبات" },
-            { label: "۲۸ کارت", value: "استراتژیک" },
-            { label: "۸ پایان", value: "محتمل" },
+            { label: "۳۶ کارت", value: "استراتژیک آینده" },
+            { label: "۸ پایان", value: "آینده محتمل" },
           ].map((stat, i) => (
             <div key={i} className="glass rounded-lg p-3 text-center">
               <div className="text-xl md:text-2xl font-bold text-primary">{stat.label}</div>

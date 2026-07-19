@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { useGameStore } from "@/lib/game/gameStore";
-import { calculateEndingsProbability } from "@/lib/game/endingsData";
 
 export function EndingScreen() {
   const store = useGameStore();
@@ -25,7 +24,6 @@ export function EndingScreen() {
     victory: "پیروزی استراتژیک",
     defeat: "شکست استراتژیک",
     compromise: "مذاکره و سازش",
-    survival: "بقا و ادامه",
     destruction: "تخریب همه‌جانبه",
   };
 
@@ -44,7 +42,6 @@ export function EndingScreen() {
           className="glass-strong rounded-3xl p-6 md:p-10 mb-6 relative overflow-hidden"
           style={{ borderTopColor: ending.color, borderTopWidth: "6px" }}
         >
-          {/* Background glow */}
           <div
             className="absolute inset-0 opacity-20"
             style={{
@@ -63,7 +60,7 @@ export function EndingScreen() {
             </motion.div>
 
             <div className="text-xs font-bold mb-2 px-3 py-1 rounded-full inline-block" style={{ backgroundColor: ending.color + "30", color: ending.color }}>
-              پایان محتمل - {ending.category === "war" ? "جنگ" : ending.category === "nuclear" ? "هسته‌ای" : ending.category === "peace" ? "صلح" : ending.category === "regime_change" ? "تغییر رژیم" : "وضع موجود"}
+              پایان محتمل آینده
             </div>
 
             <motion.h1
@@ -77,19 +74,28 @@ export function EndingScreen() {
             </motion.h1>
             <p className="text-sm text-muted-foreground mb-4">{ending.nameEn}</p>
 
-            <div className="inline-block px-4 py-2 rounded-xl glass mb-6">
-              <div className="text-xs text-muted-foreground">احتمال وقوع</div>
-              <div className="text-3xl font-black font-num" style={{ color: ending.color }}>
-                {(endingProbability * 100).toFixed(1)}%
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+              <div className="inline-block px-4 py-2 rounded-xl glass">
+                <div className="text-xs text-muted-foreground">احتمال وقوع</div>
+                <div className="text-3xl font-black font-num" style={{ color: ending.color }}>
+                  {(endingProbability * 100).toFixed(1)}%
+                </div>
               </div>
-            </div>
 
-            <div
-              className="inline-block px-4 py-2 rounded-xl mx-2"
-              style={{ backgroundColor: resultColor + "30", color: resultColor }}
-            >
-              <div className="text-xs">نتیجه برای ایران</div>
-              <div className="text-lg font-bold">{resultLabel[ending.outcome.iranResult]}</div>
+              <div className="inline-block px-4 py-2 rounded-xl glass">
+                <div className="text-xs text-muted-foreground">بازه زمانی</div>
+                <div className="text-base font-bold" style={{ color: ending.color }}>
+                  {ending.timeframe}
+                </div>
+              </div>
+
+              <div
+                className="inline-block px-4 py-2 rounded-xl"
+                style={{ backgroundColor: resultColor + "30", color: resultColor }}
+              >
+                <div className="text-xs">نتیجه برای ایران</div>
+                <div className="text-lg font-bold">{resultLabel[ending.outcome.iranResult]}</div>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -101,7 +107,7 @@ export function EndingScreen() {
           transition={{ delay: 0.5 }}
           className="glass rounded-2xl p-5 mb-4"
         >
-          <h3 className="font-bold text-lg mb-3">📖 سناریو</h3>
+          <h3 className="font-bold text-lg mb-3">📖 سناریوی آینده</h3>
           <p className="text-sm text-foreground leading-relaxed">{ending.longDescription}</p>
         </motion.div>
 
@@ -141,7 +147,7 @@ export function EndingScreen() {
             onClick={() => setShowAll(!showAll)}
             className="w-full flex items-center justify-between text-right"
           >
-            <h3 className="font-bold text-base">📊 احتمال همه پایان‌های محتمل</h3>
+            <h3 className="font-bold text-base">📊 احتمال همه پایان‌های محتمل آینده</h3>
             <span className="text-xs text-muted-foreground">{showAll ? "▲ بستن" : "▼ نمایش"}</span>
           </button>
 
@@ -161,6 +167,7 @@ export function EndingScreen() {
                         <span className="flex items-center gap-2">
                           <span>{item.ending.icon}</span>
                           <span className="font-medium">{item.ending.name}</span>
+                          <span className="text-[10px] text-muted-foreground">({item.ending.timeframe})</span>
                         </span>
                         <span className="font-bold font-num" style={{ color: item.ending.color }}>
                           {(item.probability * 100).toFixed(1)}%
@@ -179,7 +186,7 @@ export function EndingScreen() {
                   ))}
                 <div className="text-[10px] text-muted-foreground/60 mt-3 leading-relaxed">
                   * این احتمالات بر اساس تصمیمات شما در طول {store.maxTurns} نوبت و وضعیت نهایی شش شاخص کلیدی ایران
-                  و دو شاخص دشمنان محاسبه شده‌اند.
+                  و دو شاخص دشمنان محاسبه شده‌اند. هر پایان، نگاه به آینده‌ای چندساله تا چندده‌ساله دارد.
                 </div>
               </motion.div>
             )}
@@ -226,7 +233,7 @@ export function EndingScreen() {
             onClick={() => resetGame()}
             className="flex-1 px-6 py-4 bg-primary text-primary-foreground rounded-xl font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/30"
           >
-            🔄 بازی دوباره
+            🔄 بازی دوباره با استراتژی متفاوت
           </button>
           <button
             onClick={() => setPhase("history")}

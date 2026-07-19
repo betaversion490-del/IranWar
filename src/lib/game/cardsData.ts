@@ -1,33 +1,33 @@
 // Game cards data: Iran (player), US, Israel (AI)
-// Each card has effects on game state and a probability weighting.
+// All cards are available from start.
+// Cards already used in real history are marked with `used: true`.
+// Future-oriented cards are marked with `used: false`.
 
 export type CardCategory =
-  | "nuclear" // هسته‌ای
-  | "military" // نظامی
-  | "proxy" // نیابتی
-  | "diplomatic" // دیپلماتیک
-  | "economic" // اقتصادی
-  | "cyber" // سایبری
-  | "intelligence" // اطلاعاتی
-  | "domestic" // داخلی
-  | "asymmetric"; // نامتقارن
+  | "nuclear"
+  | "military"
+  | "proxy"
+  | "diplomatic"
+  | "economic"
+  | "cyber"
+  | "intelligence"
+  | "domestic"
+  | "asymmetric"
+  | "extreme"; // کارت‌های افراطی و آینده‌نگرانه
 
 export type CardEffects = {
-  // Iran stats (0-100)
-  nuclearProgress?: number; // پیشرفت هسته‌ای
-  regionalInfluence?: number; // نفوذ منطقه‌ای
-  economicStability?: number; // ثبات اقتصادی
-  domesticSupport?: number; // حمایت داخلی
-  militaryCapability?: number; // توان نظامی
-  deterrence?: number; // بازدارندگی
-  // Enemy stats (0-100)
-  usPressure?: number; // فشار آمریکا
-  israelThreat?: number; // تهدید اسرائیل
-  // Probability multipliers for scenarios (typically 0.95-1.2)
-  warEscalation?: number; // شانس جنگ گسترده
-  nuclearBreakout?: number; // شانس سلاح هسته‌ای
-  regimeChange?: number; // شانس تغییر رژیم
-  negotiationChance?: number; // شانس مذاکره
+  nuclearProgress?: number;
+  regionalInfluence?: number;
+  economicStability?: number;
+  domesticSupport?: number;
+  militaryCapability?: number;
+  deterrence?: number;
+  usPressure?: number;
+  israelThreat?: number;
+  warEscalation?: number;
+  nuclearBreakout?: number;
+  regimeChange?: number;
+  negotiationChance?: number;
 };
 
 export type GameCard = {
@@ -40,68 +40,27 @@ export type GameCard = {
   longDescription: string;
   effects: CardEffects;
   icon: string;
-  rarity: "common" | "rare" | "epic" | "legendary";
-  // For enemy cards: weight in AI random selection
+  rarity: "common" | "rare" | "epic" | "legendary" | "apocalyptic";
+  used: boolean; // آیا در تاریخ واقعی استفاده شده؟
+  usedContext?: string; // توضیح استفاده قبلی
   aiWeight?: number;
-  // Specific counter to certain Iran cards (for smarter AI)
   counters?: string[];
+  // کارت‌های مرتبط برای نمایش در پنل حافظه
+  relatedHistoryEra?: string;
 };
 
+// ===== IRAN CARDS (Player) - 16 cards =====
 export const iranCards: GameCard[] = [
-  {
-    id: "iran_nuclear_breakout",
-    name: "غنی‌سازی تا ۹۰٪",
-    nameEn: "90% Enrichment",
-    category: "nuclear",
-    country: "iran",
-    description: "افزایش سطح غنی‌سازی اورانیوم به سطح تسلیحاتی.",
-    longDescription:
-      "پیش‌برد غنی‌سازی اورانیوم از ۶۰٪ فعلی به سطح ۹۰٪ (سلاح). این تصمیم، نقطه عبور آستانه شکستن بازدارندگی است و احتمالاً پاسخ نظامی آمریکا/اسرائیل را به دنبال دارد. در عوض، در صورت موفقیت، یکカード بازدارندگی دائمی است.",
-    effects: {
-      nuclearProgress: 22,
-      deterrence: 15,
-      economicStability: -12,
-      domesticSupport: 8,
-      usPressure: 18,
-      israelThreat: 25,
-      warEscalation: 1.18,
-      nuclearBreakout: 1.35,
-      negotiationChance: 0.85,
-    },
-    icon: "☢️",
-    rarity: "legendary",
-  },
-  {
-    id: "iran_proxy_hezbollah",
-    name: "فعال‌سازی حزب‌الله",
-    nameEn: "Hezbollah Activation",
-    category: "proxy",
-    country: "iran",
-    description: "شلیک روزانه هزاران موشک از لبنان به شمال اسرائیل.",
-    longDescription:
-      "دستور به حزب‌الله لبنان برای باز کردن جبهه شمالی. ده‌ها هزار موشک کاتیوشا، فجر و فاتح به سمت شهرهای اسرائیلی. این اقدام، اسرائیل را در دو جبهه قرار می‌دهد اما حزب‌الله را نیز در معرض نابودی قرار می‌دهد.",
-    effects: {
-      regionalInfluence: 12,
-      militaryCapability: 8,
-      deterrence: 10,
-      economicStability: -5,
-      israelThreat: 22,
-      usPressure: 8,
-      warEscalation: 1.15,
-      negotiationChance: 0.92,
-    },
-    icon: "🇱🇧",
-    rarity: "epic",
-  },
+  // === کارت‌های استفاده شده در گذشته ===
   {
     id: "iran_hormuz",
     name: "بستن تنگه هرمز",
     nameEn: "Strait of Hormuz Blockade",
     category: "asymmetric",
     country: "iran",
-    description: "تعطیل شریان نفت جهان، افزایش قیمت نفت به ۲۰۰ دلار.",
+    description: "تعطیل شریان نفت جهان، افزایش قیمت نفت به ۲۵۰ دلار.",
     longDescription:
-      "استقرار موشک‌های ساحلی، قایق‌های سواری و مین دریایی برای بستن تنگه هرمز. ۲۰٪ نفت جهان از این مسیر عبور می‌کند. قیمت نفت جهانی ۳ برابر می‌شود. اقتصاد جهانی فلج. اما این اقدام مستقیماً نیروی دریایی آمریکا را درگیر می‌کند.",
+      "استقرار موشک‌های ساحلی، قایق‌های سواری و مین دریایی برای بستن تنگه هرمز. ۲۰٪ نفت جهان از این مسیر عبور می‌کند. اقتصاد جهانی فلج. اما این اقدام مستقیماً نیروی دریایی آمریکا را درگیر می‌کند. در جنگ اسفند ۱۴۰۳، این کارت استفاده شد و قیمت نفت به ۲۵۰ دلار رسید.",
     effects: {
       economicStability: -15,
       deterrence: 18,
@@ -114,27 +73,32 @@ export const iranCards: GameCard[] = [
     },
     icon: "⚓",
     rarity: "legendary",
+    used: true,
+    usedContext: "در جنگ اسفند ۱۴۰۳ استفاده شد - قیمت نفت به ۲۵۰ دلار رسید",
+    relatedHistoryEra: "esfand_war",
   },
   {
-    id: "iran_cyber",
-    name: "حمله سایبری به زیرساخت‌ها",
-    nameEn: "Cyberattack on Infrastructure",
-    category: "cyber",
+    id: "iran_mobilization",
+    name: "مردم‌سازی و بسیج",
+    nameEn: "Mass Mobilization",
+    category: "domestic",
     country: "iran",
-    description: "حمله به بانک‌ها، شبکه‌های برق و آب آمریکا و اسرائیل.",
+    description: "بسیج میلیون‌ها داوطلب برای دفاع از کشور.",
     longDescription:
-      "استفاده از تیم‌های سایبری پیشرفته (گروه APT35، نصیر و غیره) برای حمله به زیرساخت‌های حیاتی دشمن. روشی کم‌هزینه و قابل انکار. اما خطر پاسخ سایبری ویرانگر توسط NSA و یگان ۸۲۰۰ اسرائیل وجود دارد.",
+      "اعلام بسیج عمومی. فراخوان بسیج، تشکیل لشکرهای مردمی. افزایش همبستگی ملی و آمادگی برای جنگ طولانی. این کارت در جنگ اسفند ۱۴۰۳ استفاده شد و اراده ملی را برای ادامه جنگ تقویت کرد.",
     effects: {
+      domesticSupport: 25,
+      militaryCapability: 12,
       deterrence: 8,
-      militaryCapability: 4,
-      economicStability: 3,
-      usPressure: -5,
-      israelThreat: -3,
-      warEscalation: 1.02,
-      negotiationChance: 0.98,
+      economicStability: -10,
+      warEscalation: 1.05,
+      regimeChange: 0.85,
     },
-    icon: "💻",
-    rarity: "rare",
+    icon: "👥",
+    rarity: "common",
+    used: true,
+    usedContext: "در جنگ اسفند ۱۴۰۳ استفاده شد",
+    relatedHistoryEra: "esfand_war",
   },
   {
     id: "iran_diplomacy",
@@ -144,7 +108,7 @@ export const iranCards: GameCard[] = [
     country: "iran",
     description: "مذاکره با چین، روسیه و اروپا برای کاهش فشار.",
     longDescription:
-      "فعال‌سازی کانال‌های دیپلماتیک با پکن، مسکو و اروپا. پیشنهاد محدودیت‌های داوطلبانه در برنامه هسته‌ای در ازای رفع تحریم‌ها. موفقیت وابسته به اعتمادسازی است که پس از سال‌ها بسیار ضعیف است.",
+      "فعال‌سازی کانال‌های دیپلماتیک با پکن، مسکو و اروپا. این کارت چندین بار در گذشته استفاده شده - در دوران خاتمی، روحانی و حتی پس از جنگ ۱۲ روزه. اما هر بار، فریب آمریکا (مانند برجام) نتیجه داد. اکنون، اعتماد به غرب در پایین‌ترین حد خود است.",
     effects: {
       nuclearProgress: -8,
       economicStability: 12,
@@ -158,6 +122,9 @@ export const iranCards: GameCard[] = [
     },
     icon: "🕊️",
     rarity: "rare",
+    used: true,
+    usedContext: "چندین بار استفاده شد (خاتمی، روحانی، برجام) - هر بار با فریب آمریکا",
+    relatedHistoryEra: "jcpoa",
   },
   {
     id: "iran_missile_strike",
@@ -167,7 +134,7 @@ export const iranCards: GameCard[] = [
     country: "iran",
     description: "شلیک صدها موشک بالستیک به سمت تل‌آویو و سایت‌های نظامی.",
     longDescription:
-      "عملیات وعده صادق ۳: شلیک ۳۰۰+ موشک بالستیک از جمله هایپرسونیک فتاح-۱ به سمت اسرائیل. برخی از پدافند (پیکان، فلاخن داوود) عبور می‌کنند. تلفات غیرنظامی احتمالی. اما این، اسرائیل را به حمله متقابل گسترده تحریک می‌کند.",
+      "شلیک ۳۰۰+ موشک بالستیک از جمله هایپرسونیک فتاح-۱ به سمت اسرائیل. این کارت سه بار استفاده شده: وعده صادق ۱ (فروردین ۱۴۰۳)، وعده صادق ۲ (مهر ۱۴۰۳) و حمله بزرگ اسفند ۱۴۰۳. در آخرین مورد، ۵۰۰ موشک شلیک شد.",
     effects: {
       deterrence: 18,
       militaryCapability: -8,
@@ -180,26 +147,58 @@ export const iranCards: GameCard[] = [
     },
     icon: "🚀",
     rarity: "epic",
+    used: true,
+    usedContext: "۳ بار استفاده شد (وعده صادق ۱، ۲ و حمله اسفند ۱۴۰۳)",
+    relatedHistoryEra: "direct_war",
   },
   {
-    id: "iran_mobilization",
-    name: "مردم‌سازی و بسیج",
-    nameEn: "Mass Mobilization",
-    category: "domestic",
+    id: "iran_houthi",
+    name: "فعال‌سازی حوثی‌ها",
+    nameEn: "Houthi Activation",
+    category: "proxy",
     country: "iran",
-    description: "بسیج میلیون‌ها داوطلب برای دفاع از کشور.",
+    description: "حمله حوثی‌ها به کشتیرانی دریای سرخ و باب‌المندب.",
     longDescription:
-      "اعلام بسیج عمومی. فراخوان بسیج، تشکیل لشکرهای مردمی. افزایش همبستگی ملی و آمادگی برای جنگ طولانی. اما این کار اقتصاد را بیشتر تضعیف می‌کند و جوانان را به جبهه می‌فرستد.",
+      "دستور به حوثی‌های یمن برای تشدید حملات به کشتی‌های مرتبط با اسرائیل و غرب در دریای سرخ. این کارت از ۱۴۰۲ به‌طور مداوم استفاده شده است. در جنگ اسفند ۱۴۰۳، حوثی‌ها به‌طور کامل فعال شدند و باب‌المندب را بستند.",
     effects: {
-      domesticSupport: 25,
-      militaryCapability: 12,
-      deterrence: 8,
-      economicStability: -10,
-      warEscalation: 1.05,
-      regimeChange: 0.85,
+      regionalInfluence: 8,
+      deterrence: 6,
+      militaryCapability: 3,
+      economicStability: -2,
+      usPressure: 10,
+      israelThreat: 8,
+      warEscalation: 1.08,
+      negotiationChance: 1.0,
     },
-    icon: "👥",
-    rarity: "common",
+    icon: "🚢",
+    rarity: "rare",
+    used: true,
+    usedContext: "از ۱۴۰۲ به‌طور مداوم استفاده شد، در اسفند ۱۴۰۳ به اوج رسید",
+    relatedHistoryEra: "esfand_war",
+  },
+  {
+    id: "iran_drone_swarm",
+    name: "حمله پهپادی انبوه",
+    nameEn: "Drone Swarm Attack",
+    category: "asymmetric",
+    country: "iran",
+    description: "شلیک صدها پهپاد انتحاری شاهد به اهداف استراتژیک.",
+    longDescription:
+      "استفاده از پهپادهای شاهد-۱۳۶ و آرش به صورت انبوه. این کارت در وعده صادق ۱ و ۲ و همچنین در جنگ اسفند ۱۴۰۳ استفاده شد. در اسفند ۱۴۰۳، ۳۰۰ پهپاد به اسرائیل شلیک شد.",
+    effects: {
+      militaryCapability: 6,
+      deterrence: 8,
+      economicStability: 2,
+      israelThreat: 10,
+      usPressure: 5,
+      warEscalation: 1.05,
+      negotiationChance: 1.0,
+    },
+    icon: "🛩️",
+    rarity: "rare",
+    used: true,
+    usedContext: "در وعده صادق ۱، ۲ و جنگ اسفند ۱۴۰۳ استفاده شد",
+    relatedHistoryEra: "direct_war",
   },
   {
     id: "iran_patience",
@@ -209,7 +208,7 @@ export const iranCards: GameCard[] = [
     country: "iran",
     description: "خویشتن‌داری، انتظار برای تغییر شرایط.",
     longDescription:
-      "تاکتیک قدیمی ایران: صبر کردن، تحمل فشار، امید به تغییر در آمریکا (مثلاً دولت دموکرات) یا فرصت‌های منطقه‌ای. هزینه: تضعیف تدریجی اقتصاد. مزیت: جلوگیری از جنگ.",
+      "تاکتیک قدیمی ایران: صبر کردن، تحمل فشار، امید به تغییر در آمریکا یا فرصت‌های منطقه‌ای. این کارت در گذشته چندین بار استفاده شده - مثلاً پس از جنگ ۱۲ روزه. هزینه: تضعیف تدریجی اقتصاد. مزیت: جلوگیری از جنگ گسترده.",
     effects: {
       nuclearProgress: 4,
       economicStability: -6,
@@ -223,57 +222,142 @@ export const iranCards: GameCard[] = [
     },
     icon: "⏳",
     rarity: "common",
+    used: true,
+    usedContext: "چندین بار در گذشته استفاده شد، پس از جنگ ۱۲ روزه نمونه اخیر",
+    relatedHistoryEra: "jcpoa",
+  },
+  // === کارت‌های استفاده نشده / آینده‌نگرانه ===
+  {
+    id: "iran_nuclear_breakout",
+    name: "ساخت بمب اتم",
+    nameEn: "Build Nuclear Bomb",
+    category: "extreme",
+    country: "iran",
+    description: "خروج کامل از NPT و ساخت اولین سلاح هسته‌ای ایران.",
+    longDescription:
+      "تصمیم نهایی: خروج از پیمان منع گسترش سلاح‌های هسته‌ای (NPT)، غنی‌سازی اورانیوم به ۹۰٪، ساخت و آزمایش بمب اتم. این کارت، بازدارندگی نهایی است - اگر موفق شود، ایران به قدرت هسته‌ای تبدیل می‌شود. اما اگر در طول مسیر متوقف شود، حمله نظامی گسترده قطعی است. این کارت تاکنون استفاده نشده، اما گزینه‌ای همیشگی روی میز است.",
+    effects: {
+      nuclearProgress: 30,
+      deterrence: 25,
+      economicStability: -20,
+      domesticSupport: 12,
+      usPressure: 30,
+      israelThreat: 35,
+      warEscalation: 1.4,
+      nuclearBreakout: 1.6,
+      negotiationChance: 0.7,
+    },
+    icon: "☢️",
+    rarity: "apocalyptic",
+    used: false,
+    aiWeight: 0,
+    relatedHistoryEra: "axis",
   },
   {
-    id: "iran_drone_swarm",
-    name: "حمله پهپادی انبوه",
-    nameEn: "Drone Swarm Attack",
+    id: "iran_ground_invasion",
+    name: "حمله زمینی به اسرائیل",
+    nameEn: "Ground Invasion of Israel",
+    category: "extreme",
+    country: "iran",
+    description: "اعزام سپاه و بسیج برای حمله زمینی به اسرائیل از لبنان و سوریه.",
+    longDescription:
+      "اعزام ده‌ها هزار نیروی سپاه و بسیج به لبنان و سوریه برای حمله زمینی به اسرائیل. این کارت هرگز استفاده نشده - حتی در جنگ اسفند ۱۴۰۳. نیازمند هماهنگی کامل محور مقاومت و پشتیبانی لجستیکی روسیه. هزینه بسیار سنگین، اما در صورت موفقیت، پایان اسرائیل را رقم می‌زند.",
+    effects: {
+      militaryCapability: -25,
+      deterrence: 12,
+      domesticSupport: 20,
+      economicStability: -15,
+      israelThreat: 30,
+      usPressure: 25,
+      warEscalation: 1.5,
+      negotiationChance: 0.6,
+    },
+    icon: "⚔️",
+    rarity: "apocalyptic",
+    used: false,
+    relatedHistoryEra: "direct_war",
+  },
+  {
+    id: "iran_icbm",
+    name: "حمله موشک قاره‌پیما به آمریکا",
+    nameEn: "ICBM Strike on USA",
+    category: "extreme",
+    country: "iran",
+    description: "ساخت و شلیک موشک قاره‌پیما به شهرهای اصلی آمریکا.",
+    longDescription:
+      "ایران در حال توسعه موشک قاره‌پیما (برد ۱۰۰۰۰+ کیلومتر) است. این کارت، حمله مستقیم به خاک اصلی آمریکا را شبیه‌سازی می‌کند. این کارت هرگز استفاده نشده و نیازمند چند سال توسعه است. در صورت استفاده، جنگ جهانی آغاز می‌شود و واکنش آمریکا بسیار ویرانگر خواهد بود.",
+    effects: {
+      deterrence: 30,
+      militaryCapability: -15,
+      domesticSupport: 25,
+      economicStability: -30,
+      usPressure: 40,
+      israelThreat: 10,
+      warEscalation: 1.8,
+      negotiationChance: 0.4,
+    },
+    icon: "🌍",
+    rarity: "apocalyptic",
+    used: false,
+    relatedHistoryEra: "direct_war",
+  },
+  {
+    id: "iran_bab_el_mandeb",
+    name: "بستن تنگه باب‌المندب",
+    nameEn: "Bab-el-Mandeb Blockade",
     category: "asymmetric",
     country: "iran",
-    description: "شلیک صدها پهپاد انتحاری شاهد به اهداف استراتژیک.",
+    description: "بستن شریان تجاری دریای سرخ با همکاری حوثی‌ها.",
     longDescription:
-      "استفاده از پهپادهای شاهد-۱۳۶ و آرش به صورت انبوه. این پهپادها ارزان (۲۰ هزار دلار) و دقت بالا دارند. پدافند اسرائیل برای رهگیری هر یک، موشک ۵۰۰ هزار دلاری شلیک می‌کند. تضعیف اقتصادی دشمن در بلندمدت.",
+      "حوثی‌ها با حمایت کامل ایران، تنگه باب‌المندب را می‌بندند. ۱۲٪ تجارت جهانی از این مسیر عبور می‌کند. این کارت تاکنون به‌طور کامل استفاده نشده - حوثی‌ها حملات محدود انجام داده‌اند اما بستن کامل را اجرا نکرده‌اند. در صورت استفاده کامل، تجارت جهانی به‌شدت مختل می‌شود.",
     effects: {
-      militaryCapability: 6,
-      deterrence: 8,
-      economicStability: 2,
-      israelThreat: 10,
-      usPressure: 5,
-      warEscalation: 1.05,
-      negotiationChance: 1.0,
-    },
-    icon: "🛩️",
-    rarity: "rare",
-  },
-  {
-    id: "iran_oil_weapon",
-    name: "سلاح نفت",
-    nameEn: "Oil Weapon",
-    category: "economic",
-    country: "iran",
-    description: "قطع صادرات نفت به متحدان آمریکا و اسرائیل.",
-    longDescription:
-      "قطع صادرات نفت به کشورهای همسو با آمریکا و کاهش تولید اوپک. قیمت نفت جهانی جهش می‌کند. اقتصادهای غربی ضربه می‌خورند اما درآمد ایران نیز کاهش می‌یابد. ابزار شمشیر دو لبه.",
-    effects: {
-      economicStability: -10,
-      deterrence: 12,
-      regionalInfluence: 8,
-      usPressure: -8,
-      warEscalation: 1.1,
+      economicStability: -8,
+      deterrence: 15,
+      regionalInfluence: 12,
+      militaryCapability: -2,
+      usPressure: 22,
+      israelThreat: 8,
+      warEscalation: 1.15,
       negotiationChance: 1.05,
     },
-    icon: "🛢️",
-    rarity: "rare",
+    icon: "🚢",
+    rarity: "legendary",
+    used: false,
+    relatedHistoryEra: "esfand_war",
+  },
+  {
+    id: "iran_hezbollah_full",
+    name: "فعال‌سازی کامل حزب‌الله",
+    nameEn: "Full Hezbollah Activation",
+    category: "proxy",
+    country: "iran",
+    description: "شلیک روزانه هزاران موشک از لبنان به کل اسرائیل.",
+    longDescription:
+      "دستور به حزب‌الله لبنان برای باز کردن کامل جبهه شمالی. ۱۵۰ هزار موشک کاتیوشا، فجر، فاتح و برکان به سمت شهرهای اسرائیلی. حزب‌الله در جنگ اسفند ۱۴۰۳ فعال شد اما به‌طور کامل همه توان خود را استفاده نکرد. این کارت، فعال‌سازی کامل و نابودی توان حزب‌الله را به دنبال دارد.",
+    effects: {
+      regionalInfluence: 14,
+      militaryCapability: 8,
+      deterrence: 12,
+      economicStability: -5,
+      israelThreat: 25,
+      usPressure: 8,
+      warEscalation: 1.18,
+      negotiationChance: 0.92,
+    },
+    icon: "🇱🇧",
+    rarity: "epic",
+    used: false,
+    relatedHistoryEra: "esfand_war",
   },
   {
     id: "iran_nuclear_withdraw",
-    name: "خروج از NPT",
-    nameEn: "Withdraw from NPT",
+    name: "خروج کامل از NPT",
+    nameEn: "Full NPT Withdrawal",
     category: "nuclear",
     country: "iran",
     description: "خروج از پیمان منع گسترش سلاح‌های هسته‌ای.",
     longDescription:
-      "اقدام نمادین و حقوقی بحرانی: خروج از NPT. این اقدام اعلام غیررسمی ورود به باشگاه هسته‌ای است. کره شمالی و اسرائیل تنها کشورهای خارج از این پیمان هستند. پاسخ آمریکا احتمالاً شدید خواهد بود.",
+      "اقدام نمادین و حقوقی بحرانی: خروج از NPT. این اقدام اعلام غیررسمی ورود به باشگاه هسته‌ای است. کره شمالی و اسرائیل تنها کشورهای خارج از این پیمان هستند. پاسخ آمریکا و اسرائیل احتمالاً شدید خواهد بود. این کارت تاکنون استفاده نشده، اما تهدید به آن چند بار مطرح شده.",
     effects: {
       nuclearProgress: 12,
       deterrence: 10,
@@ -287,31 +371,81 @@ export const iranCards: GameCard[] = [
     },
     icon: "📜",
     rarity: "epic",
+    used: false,
+    relatedHistoryEra: "axis",
   },
   {
-    id: "iran_houthi",
-    name: "فعال‌سازی حوثی‌ها",
-    nameEn: "Houthi Activation",
-    category: "proxy",
+    id: "iran_cyber",
+    name: "حمله سایبری به زیرساخت‌ها",
+    nameEn: "Cyberattack on Infrastructure",
+    category: "cyber",
     country: "iran",
-    description: "حمله حوثی‌ها به کشتیرانی دریای سرخ و باب‌المندب.",
+    description: "حمله به بانک‌ها، شبکه‌های برق و آب آمریکا و اسرائیل.",
     longDescription:
-      "دستور به حوثی‌های یمن برای تشدید حملات به کشتی‌های مرتبط با اسرائیل و غرب در دریای سرخ. اختلال در ۱۲٪ تجارت جهانی. آمریکا و بریتانیا مجبور به عملیات نظامی در یمن می‌شوند.",
+      "استفاده از تیم‌های سایبری پیشرفته برای حمله به زیرساخت‌های حیاتی دشمن. این کارت در مقیاس محدود استفاده شده (حمله به بانک‌های آمریکا در ۱۳۹۱-۱۳۹۲) اما حمله گسترده به زیرساخت‌های حیاتی هنوز انجام نشده. روشی کم‌هزینه و قابل انکار اما خطر پاسخ سایبری ویرانگر توسط NSA و یگان ۸۲۰۰ اسرائیل.",
     effects: {
-      regionalInfluence: 8,
-      deterrence: 6,
-      militaryCapability: 3,
-      economicStability: -2,
-      usPressure: 10,
-      israelThreat: 8,
-      warEscalation: 1.08,
-      negotiationChance: 1.0,
+      deterrence: 8,
+      militaryCapability: 4,
+      economicStability: 3,
+      usPressure: -5,
+      israelThreat: -3,
+      warEscalation: 1.02,
+      negotiationChance: 0.98,
     },
-    icon: "🚢",
+    icon: "💻",
     rarity: "rare",
+    used: false,
+    relatedHistoryEra: "shadow",
+  },
+  {
+    id: "iran_oil_weapon",
+    name: "سلاح نفت",
+    nameEn: "Oil Weapon",
+    category: "economic",
+    country: "iran",
+    description: "قطع صادرات نفت به متحدان آمریکا و اسرائیل.",
+    longDescription:
+      "قطع صادرات نفت به کشورهای همسو با آمریکا و کاهش تولید اوپک. این کارت در مقیاس محدود (تحریم‌های متقابل) استفاده شده اما به‌طور کامل به‌عنوان سلاح استفاده نشده. قیمت نفت جهانی جهش می‌کند. اقتصادهای غربی ضربه می‌خورند اما درآمد ایران نیز کاهش می‌یابد.",
+    effects: {
+      economicStability: -10,
+      deterrence: 12,
+      regionalInfluence: 8,
+      usPressure: -8,
+      warEscalation: 1.1,
+      negotiationChance: 1.05,
+    },
+    icon: "🛢️",
+    rarity: "rare",
+    used: false,
+    relatedHistoryEra: "jcpoa",
+  },
+  {
+    id: "iran_russia_alliance",
+    name: "اتحاد کامل با روسیه",
+    nameEn: "Full Russia Alliance",
+    category: "diplomatic",
+    country: "iran",
+    description: "امضای پیمان نظامی دفاع مشترک با روسیه.",
+    longDescription:
+      "ارتقای روابط با روسیه از شراکت به اتحاد رسمی نظامی. پیمان دفاع مشترک: حمله به یکی، حمله به هر دو. در جنگ اسفند ۱۴۰۳، روسیه میانجی‌گری کرد اما مستقیماً وارد نشد. این کارت، ورود کامل روسیه به جنگ را تضمین می‌کند. اما استقلال ایران در سیاست خارجی را محدود می‌کند.",
+    effects: {
+      deterrence: 25,
+      regionalInfluence: 15,
+      militaryCapability: 10,
+      economicStability: 5,
+      usPressure: -10,
+      israelThreat: -8,
+      warEscalation: 0.85,
+      negotiationChance: 1.2,
+    },
+    icon: "🤝",
+    rarity: "legendary",
+    used: false,
+    relatedHistoryEra: "esfand_war",
   },
 ];
 
+// ===== US CARDS - 10 cards =====
 export const usCards: GameCard[] = [
   {
     id: "us_sanctions",
@@ -321,7 +455,7 @@ export const usCards: GameCard[] = [
     country: "us",
     description: "تحریم تمامی صادرات نفت ایران و قطع نظام بانکی.",
     longDescription:
-      "اعمال «حالت حداکثری فشار» ترامپ-گونه: تحریم تمامی خرید نفت ایران، قطع از سیستم SWIFT، تحریم ثانویه علیه خریداران. اقتصاد ایران به تورم ۶۰٪ و کاهش ارزش ریال به نصف می‌رسد.",
+      "اعمال «حالت حداکثری فشار» ترامپ-گونه. این کارت از ۱۳۹۷ به‌طور مداوم استفاده شده. اقتصاد ایران به تورم ۶۰٪ و کاهش ارزش ریال به نصف رسیده است. تحریم‌ها در عمل هرگز رفع نشدند - حتی در دوران برجام.",
     effects: {
       economicStability: -20,
       domesticSupport: -10,
@@ -333,8 +467,11 @@ export const usCards: GameCard[] = [
     },
     icon: "💸",
     rarity: "rare",
+    used: true,
+    usedContext: "از ۱۳۹۷ به‌طور مداوم استفاده شد",
     aiWeight: 18,
     counters: ["iran_nuclear_breakout", "iran_hormuz"],
+    relatedHistoryEra: "jcpoa",
   },
   {
     id: "us_military_strike",
@@ -344,7 +481,7 @@ export const usCards: GameCard[] = [
     country: "us",
     description: "بمباران تأسیسات هسته‌ای با بمب‌های MOP.",
     longDescription:
-      "حمله B-2 با بمب‌های GBU-57 (MOP) به فردو، نطنز و اسپاد. ناوهای آمریکایی موشک کروز شلیک می‌کنند. آسیب جدی به برنامه هسته‌ای اما شروع یک جنگ گسترده است.",
+      "حمله B-2 با بمب‌های GBU-57 (MOP) به فردو، نطنز و اسپاد. این کارت در جنگ ۱۲ روزه (آبان ۱۴۰۳) و جنگ اسفند ۱۴۰۳ استفاده شد. آسیب جدی به برنامه هسته‌ای اما شروع یک جنگ گسترده است.",
     effects: {
       nuclearProgress: -30,
       militaryCapability: -15,
@@ -357,8 +494,11 @@ export const usCards: GameCard[] = [
     },
     icon: "✈️",
     rarity: "legendary",
+    used: true,
+    usedContext: "در جنگ ۱۲ روزه و جنگ اسفند ۱۴۰۳ استفاده شد",
     aiWeight: 8,
     counters: ["iran_nuclear_breakout", "iran_nuclear_withdraw"],
+    relatedHistoryEra: "esfand_war",
   },
   {
     id: "us_naval_pressure",
@@ -368,7 +508,7 @@ export const usCards: GameCard[] = [
     country: "us",
     description: "اعزام دو ناو هواپیمابر به خلیج فارس.",
     longDescription:
-      "اعزام گروه ناو هواپیمابر آبراهام لینکلن و کارل وینسون به خلیج فارس. ۱۲۰ هواپیما، ۹۰ هلیکوپتر، ۸۰۰۰ سرباز. نمایش قدرت، بازدارندگی، آماده برای حمله.",
+      "اعزام گروه ناو هواپیمابر به خلیج فارس. این کارت بارها استفاده شده - در ۱۳۹۸ (پس از سلطیمانی)، در ۱۴۰۳ (در طول جنگ ۱۲ روزه) و در ۱۴۰۴. نمایش قدرت، بازدارندگی، آماده برای حمله.",
     effects: {
       militaryCapability: -8,
       deterrence: -5,
@@ -378,17 +518,20 @@ export const usCards: GameCard[] = [
     },
     icon: "🛳️",
     rarity: "epic",
+    used: true,
+    usedContext: "بارها استفاده شد (۱۳۹۸، ۱۴۰۳، ۱۴۰۴)",
     aiWeight: 14,
+    relatedHistoryEra: "soleimani",
   },
   {
     id: "us_negotiation",
-    name: "پیشنهاد مذاکره",
-    nameEn: "Negotiation Offer",
+    name: "پیشنهاد مذاکره (فریب)",
+    nameEn: "Negotiation Offer (Deception)",
     category: "diplomatic",
     country: "us",
     description: "پیشنهاد مذاکره بدون پیش‌شرط با رهبری ایران.",
     longDescription:
-      "بایدن-گونه: پیشنهاد مذاکره مستقیم بدون پیش‌شرط. کاهش تحریم‌ها در ازای محدودیت‌های هسته‌ای. سیگنال مثبت به جامعه جهانی اما خطر رد توسط ایران به دلیل بی‌اعتمادی عمیق.",
+      "بایدن-گونه: پیشنهاد مذاکره مستقیم بدون پیش‌شرط. این کارت در ۱۳۹۹-۱۴۰۱ استفاده شد. تجربه نشان داد این پیشنهادها فریبی بیش نبود - آمریکا هیچ‌گاه قصد واقعی رفع تحریم‌ها را نداشت. هدف، توقف برنامه هسته‌ای ایران بدون عوض کردن چیزی.",
     effects: {
       economicStability: 10,
       nuclearProgress: -6,
@@ -400,8 +543,11 @@ export const usCards: GameCard[] = [
     },
     icon: "🤝",
     rarity: "rare",
+    used: true,
+    usedContext: "در ۱۳۹۹-۱۴۰۱ استفاده شد، فریب بود",
     aiWeight: 10,
     counters: ["iran_diplomacy", "iran_patience"],
+    relatedHistoryEra: "jcpoa",
   },
   {
     id: "us_cyber_offensive",
@@ -411,7 +557,7 @@ export const usCards: GameCard[] = [
     country: "us",
     description: "حمله NSA به زیرساخت‌های نظامی و غیرنظامی ایران.",
     longDescription:
-      "عملیات استرلنگ (Stuxnet-like): حمله سایبری NSA و سایبرکام به شبکه‌های فرماندهی سپاه، سامانه‌های پدافندی، شبکه‌های ارتباطی. قابل انکار، کم‌هزینه، اما ممکن است ایران را به تلافی وامی‌دارد.",
+      "حمله سایبری NSA و سایبرکام به شبکه‌های فرماندهی سپاه، سامانه‌های پدافندی، شبکه‌های ارتباطی. استاکس‌نت (۱۳۸۹) اولین نمونه بود. قابل انکار، کم‌هزینه، اما ممکن است ایران را به تلافی وامی‌دارد.",
     effects: {
       militaryCapability: -10,
       nuclearProgress: -4,
@@ -421,8 +567,11 @@ export const usCards: GameCard[] = [
     },
     icon: "👾",
     rarity: "rare",
+    used: true,
+    usedContext: "از ۱۳۸۹ (استاکس‌نت) به‌طور مکرر استفاده شد",
     aiWeight: 12,
     counters: ["iran_cyber"],
+    relatedHistoryEra: "axis",
   },
   {
     id: "us_aid_israel",
@@ -432,7 +581,7 @@ export const usCards: GameCard[] = [
     country: "us",
     description: "ارسال پاتریوت، تاد و مهمات اضطراری به اسرائیل.",
     longDescription:
-      "اعزام سیستم‌های پاتریوت و تاد، مهمات هوشمند، سوخت نظامی. همچنین حمایت دیپلماتیک در سازمان ملل. تشدید همکاری نظامی آمریکا-اسرائیل به بالاترین سطح تاریخ.",
+      "اعزام سیستم‌های پاتریوت و تاد، مهمات هوشمند، سوخت نظامی. این کارت در جنگ ۱۲ روزه و جنگ اسفند ۱۴۰۳ به‌طور کامل استفاده شد. حمایت دیپلماتیک در سازمان ملل. تشدید همکاری نظامی آمریکا-اسرائیل به بالاترین سطح تاریخ.",
     effects: {
       israelThreat: 16,
       militaryCapability: -6,
@@ -442,8 +591,11 @@ export const usCards: GameCard[] = [
     },
     icon: "🇺🇸",
     rarity: "epic",
+    used: true,
+    usedContext: "در جنگ ۱۲ روزه و جنگ اسفند ۱۴۰۳ استفاده شد",
     aiWeight: 16,
-    counters: ["iran_missile_strike", "iran_proxy_hezbollah"],
+    counters: ["iran_missile_strike", "iran_hezbollah_full"],
+    relatedHistoryEra: "direct_war",
   },
   {
     id: "us_intel_support",
@@ -453,7 +605,7 @@ export const usCards: GameCard[] = [
     country: "us",
     description: "کمک اطلاعاتی و مالی به گروه‌های مخالف داخلی.",
     longDescription:
-      "حمایت از شبکه‌های مخالف، پخش رادیویی و ماهواره‌ای، کمک به سازمان‌های حقوق بشری. نرم‌افزاری برای دور زدن فیلترینگ. هدف: تغییر رژیم نرم.",
+      "حمایت از شبکه‌های مخالف، پخش رادیویی و ماهواره‌ای، کمک به سازمان‌های حقوق بشری. این کارت از سال‌ها پیش به‌طور مداوم استفاده شده. هدف: تغییر رژیم نرم.",
     effects: {
       domesticSupport: -15,
       economicStability: -5,
@@ -464,31 +616,89 @@ export const usCards: GameCard[] = [
     },
     icon: "🕵️",
     rarity: "rare",
+    used: true,
+    usedContext: "از دهه‌ها پیش به‌طور مداوم استفاده شده",
     aiWeight: 10,
+    relatedHistoryEra: "revolution",
   },
   {
-    id: "us_diplomatic_isolation",
-    name: "انزوای دیپلماتیک",
-    nameEn: "Diplomatic Isolation",
+    id: "us_ground_invasion",
+    name: "حمله زمینی به ایران",
+    nameEn: "Ground Invasion of Iran",
+    category: "extreme",
+    country: "us",
+    description: "اعزام ۵۰۰ هزار سرباز برای حمله زمینی به ایران.",
+    longDescription:
+      "حمله زمینی همه‌جانبه به ایران از خاک عراق، افغانستان و خلیج فارس. این کارت هرگز استفاده نشده - حتی در اوج تنش. آمریکا می‌داند که جنگ زمینی در ایران، بزرگ‌تر از ویتنام خواهد بود. اما در صورت استفاده، پایان رژیم را رقم می‌زند.",
+    effects: {
+      militaryCapability: -40,
+      deterrence: -20,
+      domesticSupport: 30,
+      economicStability: -25,
+      usPressure: 35,
+      israelThreat: 10,
+      warEscalation: 1.8,
+      negotiationChance: 0.3,
+      regimeChange: 1.8,
+    },
+    icon: "🪖",
+    rarity: "apocalyptic",
+    used: false,
+    aiWeight: 3,
+    relatedHistoryEra: "soleimani",
+  },
+  {
+    id: "us_nuclear_strike",
+    name: "حمله هسته‌ای به ایران",
+    nameEn: "Nuclear Strike on Iran",
+    category: "extreme",
+    country: "us",
+    description: "استفاده از سلاح هسته‌ای علیه تأسیسات زیرزمینی ایران.",
+    longDescription:
+      "استفاده از بمب هسته‌ای B61 برای نابودی تأسیسات فردو و سایر سایت‌های زیرزمینی. این کارت هرگز استفاده نشده و بسیار بعید است استفاده شود. اما در صورت استفاده، پاسخ جهانی بسیار شدید خواهد بود. آمریکا خود نیز از این گزینه هراس دارد.",
+    effects: {
+      militaryCapability: -50,
+      deterrence: -30,
+      domesticSupport: -20,
+      economicStability: -40,
+      usPressure: 25,
+      israelThreat: 15,
+      warEscalation: 2.5,
+      negotiationChance: 0.1,
+      regimeChange: 2.0,
+    },
+    icon: "💀",
+    rarity: "apocalyptic",
+    used: false,
+    aiWeight: 1,
+    relatedHistoryEra: "esfand_war",
+  },
+  {
+    id: "us_withdraw",
+    name: "خروج استراتژیک از خاورمیانه",
+    nameEn: "Strategic Withdrawal from ME",
     category: "diplomatic",
     country: "us",
-    description: "فشار به کشورهای عربی و اروپایی برای قطع روابط.",
+    description: "خروج کامل نیروها از خاورمیانه و تمرکز بر چین.",
     longDescription:
-      "کاخ سفید از ابوظبی، ریاض، دoha و آنکارا می‌خواهد روابط خود را با تهران کاهش دهند. توافق ابراهیم دچار شکاف می‌شود. ایران منزوی‌تر می‌شود اما به سمت روسیه و چین سوق می‌یابد.",
+      "تصمیم استراتژیک آمریکا برای خروج از خاورمیانه، تعطیلی پایگاه‌ها در عراق، سوریه، قطر و امارات، و تمرکز بر مهار چین در شرق آسیا. این کارت استفاده نشده اما در گفتمان استراتژیک آمریکا مطرح است. در صورت استفاده، ایران به قدرت هژمون منطقه تبدیل می‌شود.",
     effects: {
-      regionalInfluence: -12,
-      economicStability: -8,
-      usPressure: 12,
-      warEscalation: 1.05,
-      negotiationChance: 0.92,
-      regimeChange: 1.08,
+      usPressure: -40,
+      israelThreat: -15,
+      regionalInfluence: 25,
+      deterrence: 20,
+      warEscalation: 0.6,
+      negotiationChance: 1.8,
     },
-    icon: "🌐",
-    rarity: "common",
-    aiWeight: 12,
+    icon: "🚪",
+    rarity: "legendary",
+    used: false,
+    aiWeight: 4,
+    relatedHistoryEra: "esfand_war",
   },
 ];
 
+// ===== ISRAEL CARDS - 10 cards =====
 export const israelCards: GameCard[] = [
   {
     id: "israel_air_strike",
@@ -498,7 +708,7 @@ export const israelCards: GameCard[] = [
     country: "israel",
     description: "حمله ۱۰۰ جنگنده به تأسیسات نظامی و موشکی ایران.",
     longDescription:
-      "عملیات روزهای بلند: ۱۰۰+ جنگنده F-35، F-15، F-16 به تأسیسات پدافندی، موشکی، تولید پهپاد و فرودگاه‌های نظامی حمله می‌کنند. ضربه جدی به توان نظامی ایران اما پاسخ موشکی قطعی است.",
+      "عملیات روزهای بلند: ۱۰۰+ جنگنده F-35، F-15، F-16 به تأسیسات پدافندی، موشکی، تولید پهپاد و فرودگاه‌های نظامی حمله می‌کنند. این کارت در جنگ ۱۲ روزه و جنگ اسفند ۱۴۰۳ استفاده شد.",
     effects: {
       militaryCapability: -18,
       nuclearProgress: -10,
@@ -511,8 +721,11 @@ export const israelCards: GameCard[] = [
     },
     icon: "🛩️",
     rarity: "legendary",
+    used: true,
+    usedContext: "در جنگ ۱۲ روزه و جنگ اسفند ۱۴۰۳ استفاده شد",
     aiWeight: 12,
     counters: ["iran_missile_strike", "iran_nuclear_breakout"],
+    relatedHistoryEra: "esfand_war",
   },
   {
     id: "israel_assassination",
@@ -522,7 +735,7 @@ export const israelCards: GameCard[] = [
     country: "israel",
     description: "ترور فرماندهان سپاه و دانشمندان هسته‌ای.",
     longDescription:
-      "موساد یک کمپین ترور آغاز می‌کند: فرماندهان نیروی قدس، دانشمندان هسته‌ای، مهندسان موشکی. روش‌ها: بمب‌های متصل به خودرو، شلیک از راه دور، مسمومیت. ضربه به بازدارندگی و حیثیت ایران.",
+      "موساد یک کمپین ترور آغاز می‌کند: فرماندهان نیروی قدس، دانشمندان هسته‌ای، مهندسان موشکی. این کارت بارها استفاده شده: فخری‌زاده (۱۳۹۸)، هنیه (۱۴۰۳)، نصرالله (۱۴۰۳)، و سید علی خامنه‌ای (اسفند ۱۴۰۳).",
     effects: {
       militaryCapability: -8,
       nuclearProgress: -6,
@@ -534,8 +747,11 @@ export const israelCards: GameCard[] = [
     },
     icon: "🎯",
     rarity: "epic",
+    used: true,
+    usedContext: "بارها استفاده شد: فخری‌زاده، هنیه، نصرالله، خامنه‌ای",
     aiWeight: 16,
-    counters: ["iran_nuclear_breakout", "iran_proxy_hezbollah"],
+    counters: ["iran_nuclear_breakout", "iran_hezbollah_full"],
+    relatedHistoryEra: "esfand_war",
   },
   {
     id: "israel_nuclear_facility",
@@ -545,7 +761,7 @@ export const israelCards: GameCard[] = [
     country: "israel",
     description: "حمله مستقیم به قلب برنامه هسته‌ای ایران.",
     longDescription:
-      "حمله F-35 با بمب‌های سنگرشکن به تأسیسات هسته‌ای نطنز، فردو و اسپاد. آسیب جدی به سانتریفیوژها. این حمله یک قرمز خط قطعی ایران است و حمله متقابل موشکی قطعی است.",
+      "حمله F-35 با بمب‌های سنگرشکن به تأسیسات هسته‌ای نطنز، فردو و اسپاد. این کارت در جنگ ۱۲ روزه و جنگ اسفند ۱۴۰۳ استفاده شد. آسیب جدی به سانتریفیوژها.",
     effects: {
       nuclearProgress: -25,
       deterrence: -12,
@@ -559,8 +775,11 @@ export const israelCards: GameCard[] = [
     },
     icon: "☢️",
     rarity: "legendary",
+    used: true,
+    usedContext: "در جنگ ۱۲ روزه و جنگ اسفند ۱۴۰۳ استفاده شد",
     aiWeight: 10,
     counters: ["iran_nuclear_breakout", "iran_nuclear_withdraw"],
+    relatedHistoryEra: "esfand_war",
   },
   {
     id: "israel_sabotage",
@@ -570,7 +789,7 @@ export const israelCards: GameCard[] = [
     country: "israel",
     description: "خرابکاری در کارخانه‌های موشکی و سایبری.",
     longDescription:
-      "موساد در کارخانه‌های تولید موشک، سایت‌های پهپادی و سیستم‌های سایبری نفوذ می‌کند. انفجارها، آتش‌سوزی‌ها، خرابی‌های نرم‌افزاری. ضربه زیر پوست، قابل انکار اما تأثیر بلندمدت.",
+      "موساد در کارخانه‌های تولید موشک، سایت‌های پهپادی و سیستم‌های سایبری نفوذ می‌کند. انفجارها، آتش‌سوزی‌ها، خرابی‌های نرم‌افزاری. این کارت بارها استفاده شده: نطنز (۱۳۸۹، ۱۳۹۹)، پارچین، سایت‌های پهپادی.",
     effects: {
       militaryCapability: -8,
       nuclearProgress: -4,
@@ -581,7 +800,10 @@ export const israelCards: GameCard[] = [
     },
     icon: "🔧",
     rarity: "rare",
+    used: true,
+    usedContext: "بارها استفاده شد (نطنز ۱۳۸۹، ۱۳۹۹، پارچین)",
     aiWeight: 14,
+    relatedHistoryEra: "axis",
   },
   {
     id: "israel_hezbollah_strike",
@@ -591,7 +813,7 @@ export const israelCards: GameCard[] = [
     country: "israel",
     description: "حمله هوایی گسترده به مواضع حزب‌الله در لبنان.",
     longDescription:
-      "اسرائیل هزاران موشک حزب‌الله را در لبنان نابود می‌کند. ترور رهبران ارشد. حزب‌الله به‌شدت تضعیف می‌شود اما بقایای آن به شهرهای شمالی اسرائیل شلیک می‌کنند.",
+      "اسرائیل هزاران موشک حزب‌الله را در لبنان نابود می‌کند. این کارت در ۱۴۰۳ استفاده شد: پیجرها (شهریور ۱۴۰۳)، ترور نصرالله (مهر ۱۴۰۳)، حمله گسترده به لبنان. حزب‌الله به‌شدت تضعیف شد.",
     effects: {
       regionalInfluence: -12,
       militaryCapability: 4,
@@ -602,39 +824,21 @@ export const israelCards: GameCard[] = [
     },
     icon: "🇱🇧",
     rarity: "epic",
+    used: true,
+    usedContext: "در ۱۴۰۳ استفاده شد (پیجرها، نصرالله، حمله به لبنان)",
     aiWeight: 12,
-    counters: ["iran_proxy_hezbollah"],
-  },
-  {
-    id: "israel_diplomatic",
-    name: "دیپلماسی ضد ایرانی",
-    nameEn: "Anti-Iran Diplomacy",
-    category: "diplomatic",
-    country: "israel",
-    description: "هماهنگی با عربستان و اردن علیه ایران.",
-    longDescription:
-      "نتانیاهو با عربستان، امارات، اردن و بحرین هماهنگ می‌کند. توافق‌های امنیتی، مانورهای مشترک، تبادل اطلاعات. تشکیل ائتلاف نظامی ضدایرانی.",
-    effects: {
-      regionalInfluence: -10,
-      economicStability: -4,
-      israelThreat: 8,
-      usPressure: 6,
-      warEscalation: 1.04,
-      negotiationChance: 0.95,
-    },
-    icon: "🌐",
-    rarity: "common",
-    aiWeight: 10,
+    counters: ["iran_hezbollah_full"],
+    relatedHistoryEra: "direct_war",
   },
   {
     id: "israel_preemptive",
-    name: "حمله پیش‌دگیرانه",
+    name: "حمله پیش‌دگیرانه همه‌جانبه",
     nameEn: "Pre-emptive Strike",
     category: "military",
     country: "israel",
     description: "حمله غافلگیرانه همه‌جانبه با ۲۰۰ جنگنده.",
     longDescription:
-      "«عملیات نبرد پایان»: حمله همزمان به هسته‌ای، موشکی، پدافندی و فرماندهی سپاه. ساعت‌اول: ۵۰۰ هدف. تصمیم بسیار پرخطیر که احتمالاً به جنگ تمام‌عیار منطقه‌ای ختم می‌شود.",
+      "حمله همزمان به هسته‌ای، موشکی، پدافندی و فرماندهی سپاه. ساعت‌اول: ۵۰۰ هدف. این کارت تا حدودی در جنگ ۱۲ روزه و جنگ اسفند ۱۴۰۳ استفاده شد اما هرگز به‌طور کامل. تصمیم بسیار پرخطیر که احتمالاً به جنگ تمام‌عیار ختم می‌شود.",
     effects: {
       nuclearProgress: -20,
       militaryCapability: -15,
@@ -647,8 +851,36 @@ export const israelCards: GameCard[] = [
     },
     icon: "💥",
     rarity: "legendary",
+    used: false,
     aiWeight: 6,
     counters: ["iran_nuclear_breakout", "iran_nuclear_withdraw"],
+    relatedHistoryEra: "esfand_war",
+  },
+  {
+    id: "israel_nuclear_strike",
+    name: "حمله هسته‌ای به ایران",
+    nameEn: "Nuclear Strike on Iran",
+    category: "extreme",
+    country: "israel",
+    description: "استفاده از سلاح هسته‌ای علیه تهران و تأسیسات استراتژیک.",
+    longDescription:
+      "استفاده از کلاهک هسته‌ای علیه تهران، اصفهان و تأسیسات زیرزمینی. اسرائیل دارای ۹۰-۴۰۰ کلاهک هسته‌ای تخمین زده می‌شود. این کارت هرگز استفاده نشده و بسیار بعید است. اما در صورت استفاده، پاسخ ایران و جهان بسیار ویرانگر خواهد بود.",
+    effects: {
+      militaryCapability: -50,
+      deterrence: -30,
+      domesticSupport: -30,
+      economicStability: -50,
+      usPressure: 15,
+      israelThreat: 35,
+      warEscalation: 2.5,
+      negotiationChance: 0.1,
+      regimeChange: 1.8,
+    },
+    icon: "💀",
+    rarity: "apocalyptic",
+    used: false,
+    aiWeight: 1,
+    relatedHistoryEra: "esfand_war",
   },
   {
     id: "israel_cyber",
@@ -658,7 +890,7 @@ export const israelCards: GameCard[] = [
     country: "israel",
     description: "حمله به شبکه‌های بانکی، مخابراتی و نظامی ایران.",
     longDescription:
-      "یگان ۸۲۰۰ اسرائیل با بدافهای پیشرفته به بانک مرکزی، شبکه مخابرات، سیستم‌های پدافندی و شبکه سپاه حمله می‌کند. ضربه قابل انکار اما بسیار مؤثر.",
+      "یگان ۸۲۰۰ اسرائیل با بدافهای پیشرفته به بانک مرکزی، شبکه مخابرات، سیستم‌های پدافندی و شبکه سپاه حمله می‌کند. این کارت بارها استفاده شده: استاکس‌نت (با همکاری آمریکا)، فلیم، دوکو.",
     effects: {
       economicStability: -12,
       militaryCapability: -6,
@@ -668,8 +900,62 @@ export const israelCards: GameCard[] = [
     },
     icon: "🦠",
     rarity: "rare",
+    used: true,
+    usedContext: "بارها استفاده شد (استاکس‌نت، فلیم، دوکو)",
     aiWeight: 14,
     counters: ["iran_cyber"],
+    relatedHistoryEra: "axis",
+  },
+  {
+    id: "israel_assassinate_leader",
+    name: "ترور رهبران عالی‌رتبه",
+    nameEn: "Assassinate Top Leaders",
+    category: "extreme",
+    country: "israel",
+    description: "ترور رئیس‌جمهور و دیگر مقامات عالی‌رتبه.",
+    longDescription:
+      "حمله به مقامات عالی‌رتبه نظامی و سیاسی ایران: رئیس‌جمهور، رئیس ستون، فرماندهان سپاه. این کارت در اسفند ۱۴۰۳ با ترور سید علی خامنه‌ای استفاده شد. در صورت استفاده مجدد، پاسخ ایران بسیار شدید خواهد بود.",
+    effects: {
+      militaryCapability: -10,
+      deterrence: -15,
+      domesticSupport: 25,
+      economicStability: -8,
+      israelThreat: 22,
+      usPressure: 8,
+      warEscalation: 1.5,
+      negotiationChance: 0.65,
+      regimeChange: 1.3,
+    },
+    icon: "🎯",
+    rarity: "apocalyptic",
+    used: true,
+    usedContext: "در اسفند ۱۴۰۳ با ترور سید علی خامنه‌ای استفاده شد",
+    aiWeight: 4,
+    relatedHistoryEra: "esfand_war",
+  },
+  {
+    id: "israel_diplomatic",
+    name: "دیپلماسی ضد ایرانی",
+    nameEn: "Anti-Iran Diplomacy",
+    category: "diplomatic",
+    country: "israel",
+    description: "هماهنگی با عربستان و اردن علیه ایران.",
+    longDescription:
+      "هماهنگی با عربستان، امارات، اردن و بحرین. توافق‌های امنیتی، مانورهای مشترک، تبادل اطلاعات. این کارت بارها استفاده شده: توافق ابراهیم (۲۰۲۰)، همکاری اطلاعاتی ضد ایرانی.",
+    effects: {
+      regionalInfluence: -10,
+      economicStability: -4,
+      israelThreat: 8,
+      usPressure: 6,
+      warEscalation: 1.04,
+      negotiationChance: 0.95,
+    },
+    icon: "🌐",
+    rarity: "common",
+    used: true,
+    usedContext: "بارها استفاده شد (توافق ابراهیم، همکاری اطلاعاتی)",
+    aiWeight: 10,
+    relatedHistoryEra: "soleimani",
   },
 ];
 
@@ -685,6 +971,7 @@ export const categoryInfo: Record<CardCategory, { label: string; color: string; 
   intelligence: { label: "اطلاعاتی", color: "oklch(0.55 0.15 220)", icon: "🕵️" },
   domestic: { label: "داخلی", color: "oklch(0.65 0.16 165)", icon: "👥" },
   asymmetric: { label: "نامتقارن", color: "oklch(0.6 0.2 35)", icon: "🌊" },
+  extreme: { label: "افراطی", color: "oklch(0.5 0.28 25)", icon: "💀" },
 };
 
 export const rarityInfo: Record<GameCard["rarity"], { label: string; color: string }> = {
@@ -692,4 +979,5 @@ export const rarityInfo: Record<GameCard["rarity"], { label: string; color: stri
   rare: { label: "کمیاب", color: "oklch(0.65 0.18 250)" },
   epic: { label: "حماسی", color: "oklch(0.65 0.2 305)" },
   legendary: { label: "افسانه‌ای", color: "oklch(0.7 0.22 35)" },
+  apocalyptic: { label: "آخرالزمانی", color: "oklch(0.5 0.28 25)" },
 };
