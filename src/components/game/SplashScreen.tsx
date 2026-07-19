@@ -124,8 +124,8 @@ export function SplashScreen() {
         >
           {[
             { label: "۷۰+ سال", value: "تاریخچه مناسبات" },
-            { label: "۳۶ کارت", value: "استراتژیک آینده" },
-            { label: "۸ پایان", value: "آینده محتمل" },
+            { label: "۴۰+ کارت", value: "استراتژیک" },
+            { label: "۸ پایان", value: "محتمل آینده" },
           ].map((stat, i) => (
             <div key={i} className="glass rounded-lg p-3 text-center">
               <div className="text-xl md:text-2xl font-bold text-primary">{stat.label}</div>

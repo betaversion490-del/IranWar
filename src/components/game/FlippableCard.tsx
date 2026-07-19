@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { categoryInfo, rarityInfo, type GameCard } from "@/lib/game/cardsData";
+import { categoryInfo, rarityInfo, actorInfo, type GameCard } from "@/lib/game/cardsData";
 import { useGameStore } from "@/lib/game/gameStore";
 
 export function FlippableCard({
@@ -21,19 +21,20 @@ export function FlippableCard({
 
   const cat = categoryInfo[card.category];
   const rar = rarityInfo[card.rarity];
+  const actor = actorInfo[card.actor];
   const isFlipped = flippedCardId === card.id;
   const isPlayedThisGame = playedIranCardIds.includes(card.id);
   const alreadyUsedInHistory = card.used;
 
   const sizeClasses = {
     small: "w-32 h-44",
-    normal: "w-40 h-56 sm:w-44 sm:h-60",
-    large: "w-56 h-72 sm:w-64 sm:h-80",
+    normal: "w-full h-64 sm:h-72",
+    large: "w-56 h-80 sm:w-64 sm:h-96",
   };
 
   return (
     <div
-      className={`relative ${sizeClasses[size]} ${size === "small" ? "" : "sm:mx-auto"}`}
+      className={`relative ${sizeClasses[size]}`}
       style={{ perspective: "1200px" }}
     >
       <motion.div
@@ -45,13 +46,14 @@ export function FlippableCard({
         {/* FRONT */}
         <div
           className={`absolute inset-0 rounded-2xl p-3 flex flex-col items-center text-center ${
-            card.country === "iran"
-              ? "card-iran"
-              : card.country === "us"
-              ? "card-us"
-              : "card-israel"
-          } ${isPlayedThisGame ? "opacity-60" : ""} ${isFlipped ? "pointer-events-none" : ""}`}
-          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+            isPlayedThisGame ? "opacity-60" : ""
+          } ${isFlipped ? "pointer-events-none" : ""}`}
+          style={{
+            background: actor.gradient,
+            border: `1px solid ${actor.color}80`,
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
         >
           {/* Top badges */}
           <div className="absolute top-1.5 right-1.5 left-1.5 flex items-start justify-between pointer-events-none">
@@ -114,7 +116,7 @@ export function FlippableCard({
           )}
 
           {/* Hint */}
-          {!isPlayed && !isResolving && !isFlipped && (
+          {!isPlayed && !isResolving && !isFlipped && !flippedCardId && (
             <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-muted-foreground/50 pointer-events-none">
               برای جزئیات ضربه بزنید
             </div>
@@ -123,14 +125,13 @@ export function FlippableCard({
 
         {/* BACK */}
         <div
-          className={`absolute inset-0 rounded-2xl p-3 flex flex-col text-right glass-strong ${
-            card.country === "iran"
-              ? "border-emerald-500/50"
-              : card.country === "us"
-              ? "border-blue-500/50"
-              : "border-amber-500/50"
-          }`}
-          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+          className="absolute inset-0 rounded-2xl p-3 flex flex-col text-right glass-strong"
+          style={{
+            border: `1px solid ${actor.color}80`,
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+          }}
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-2 pb-2 border-b border-border/30">
@@ -145,6 +146,13 @@ export function FlippableCard({
             >
               ✕
             </button>
+          </div>
+
+          {/* Actor label */}
+          <div className="mb-2">
+            <span className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ backgroundColor: actor.color + "30", color: actor.color }}>
+              {card.actorLabel}
+            </span>
           </div>
 
           {/* Long description */}
@@ -183,7 +191,7 @@ export function FlippableCard({
           </div>
 
           {/* Play button */}
-          {!isPlayed && !isResolving && card.country === "iran" && (
+          {!isPlayed && !isResolving && card.actor === "iran" && (
             <button
               onClick={() => playCard(card.id)}
               className="w-full py-2 bg-primary text-primary-foreground rounded-lg font-bold text-xs hover:bg-primary/90 active:scale-95 transition-all relative z-10"

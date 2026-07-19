@@ -185,8 +185,8 @@ export function EndingScreen() {
                     </div>
                   ))}
                 <div className="text-[10px] text-muted-foreground/60 mt-3 leading-relaxed">
-                  * این احتمالات بر اساس تصمیمات شما در طول {store.maxTurns} نوبت و وضعیت نهایی شش شاخص کلیدی ایران
-                  و دو شاخص دشمنان محاسبه شده‌اند. هر پایان، نگاه به آینده‌ای چندساله تا چندده‌ساله دارد.
+                  * این احتمالات بر اساس تحقیقات ژئوپلیتیک (نظریه بازدارندگی، مدل‌های کره شمالی/پاکستان/هند،
+                  سابقه پاسخ‌های آمریکا/اسرائیل/ناتو) و تصمیمات شما در طول {store.maxTurns} نوبت محاسبه شده‌اند.
                 </div>
               </motion.div>
             )}
@@ -201,16 +201,14 @@ export function EndingScreen() {
           className="glass rounded-2xl p-5 mb-6"
         >
           <h3 className="font-bold text-base mb-3">📈 وضعیت نهایی ایران</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {[
               { label: "پیشرفت هسته‌ای", val: store.nuclearProgress, color: "oklch(0.6 0.25 25)" },
               { label: "بازدارندگی", val: store.deterrence, color: "oklch(0.65 0.15 165)" },
-              { label: "اقتصاد", val: store.economicStability, color: "oklch(0.7 0.18 70)" },
-              { label: "حمایت داخلی", val: store.domesticSupport, color: "oklch(0.65 0.16 165)" },
               { label: "توان نظامی", val: store.militaryCapability, color: "oklch(0.6 0.18 250)" },
+              { label: "ثبات اقتصادی", val: store.economicStability, color: "oklch(0.7 0.18 70)" },
+              { label: "حمایت داخلی", val: store.domesticSupport, color: "oklch(0.65 0.16 165)" },
               { label: "نفوذ منطقه‌ای", val: store.regionalInfluence, color: "oklch(0.6 0.2 305)" },
-              { label: "فشار آمریکا", val: store.usPressure, color: "oklch(0.6 0.15 250)" },
-              { label: "تهدید اسرائیل", val: store.israelThreat, color: "oklch(0.7 0.18 70)" },
             ].map((s, i) => (
               <div key={i} className="glass rounded-lg p-2 text-center">
                 <div className="text-[10px] text-muted-foreground mb-1">{s.label}</div>
