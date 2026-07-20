@@ -35,7 +35,7 @@ export function SplashScreen() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-[100dvh] flex flex-col items-center justify-center p-6 relative overflow-hidden"
+      className="min-h-[100dvh] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden"
     >
       {/* Animated background map */}
       <div className="absolute inset-0 map-grid opacity-30" />
@@ -64,14 +64,14 @@ export function SplashScreen() {
           transition={{ duration: 0.8 }}
           className="mb-6 inline-block"
         >
-          <div className="text-6xl md:text-8xl mb-4">🌍</div>
+          <div className="text-5xl sm:text-6xl md:text-8xl mb-3 sm:mb-4">🌍</div>
         </motion.div>
 
         <motion.h1
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="text-4xl md:text-7xl font-black mb-3 bg-gradient-to-l from-primary via-emerald-300 to-amber-400 bg-clip-text text-transparent glow-text"
+          className="text-3xl sm:text-4xl md:text-7xl font-black mb-2 sm:mb-3 bg-gradient-to-l from-primary via-emerald-300 to-amber-400 bg-clip-text text-transparent glow-text"
         >
           بازی بزرگ خاورمیانه
         </motion.h1>
@@ -80,7 +80,7 @@ export function SplashScreen() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="text-lg md:text-2xl text-muted-foreground mb-2 font-medium"
+          className="text-base sm:text-lg md:text-2xl text-muted-foreground mb-2 font-medium"
         >
           ایران در برابر آمریکا و اسرائیل
         </motion.p>
@@ -89,7 +89,7 @@ export function SplashScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="text-sm md:text-base text-muted-foreground/70 mb-10 max-w-2xl mx-auto leading-relaxed"
+          className="text-xs sm:text-sm md:text-base text-muted-foreground/70 mb-6 sm:mb-10 max-w-2xl mx-auto leading-relaxed"
         >
           یک شبیه‌سازی استراتژیک تعاملی بر اساس تاریخچه کامل مناسبات و درگیری‌های
           سه کشور از کودتای ۲۸ مرداد ۱۳۳۲ تا بحران ۲۰۲۵. شما در جایگاه تصمیم‌گیرندگان
@@ -100,17 +100,17 @@ export function SplashScreen() {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.9 }}
-          className="flex flex-col sm:flex-row gap-3 justify-center"
+          className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center px-2"
         >
           <button
             onClick={() => setPhase("intro")}
-            className="px-8 py-4 bg-primary text-primary-foreground rounded-xl font-bold text-lg hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/30"
+            className="px-6 sm:px-8 py-3 sm:py-4 bg-primary text-primary-foreground rounded-xl font-bold text-base sm:text-lg hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/30"
           >
             شروع بازی
           </button>
           <button
             onClick={() => setPhase("history")}
-            className="px-8 py-4 glass rounded-xl font-bold text-lg hover:scale-105 active:scale-95 transition-all"
+            className="px-6 sm:px-8 py-3 sm:py-4 glass rounded-xl font-bold text-base sm:text-lg hover:scale-105 active:scale-95 transition-all"
           >
             مرور تاریخچه (۱۳۳۲-۱۴۰۴)
           </button>
@@ -120,16 +120,16 @@ export function SplashScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="mt-12 grid grid-cols-3 gap-3 max-w-2xl mx-auto"
+          className="mt-8 sm:mt-12 grid grid-cols-3 gap-2 sm:gap-3 max-w-2xl mx-auto"
         >
           {[
-            { label: "۷۰+ سال", value: "تاریخچه مناسبات" },
+            { label: "۷۰+ سال", value: "تاریخچه" },
             { label: "۴۰+ کارت", value: "استراتژیک" },
-            { label: "۸ پایان", value: "محتمل آینده" },
+            { label: "۸ پایان", value: "محتمل" },
           ].map((stat, i) => (
-            <div key={i} className="glass rounded-lg p-3 text-center">
-              <div className="text-xl md:text-2xl font-bold text-primary">{stat.label}</div>
-              <div className="text-xs text-muted-foreground mt-1">{stat.value}</div>
+            <div key={i} className="glass rounded-lg p-2 sm:p-3 text-center">
+              <div className="text-base sm:text-xl md:text-2xl font-bold text-primary">{stat.label}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">{stat.value}</div>
             </div>
           ))}
         </motion.div>
@@ -138,7 +138,7 @@ export function SplashScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
-          className="mt-8 text-xs text-muted-foreground/50 max-w-xl mx-auto leading-relaxed"
+          className="mt-6 sm:mt-8 text-[10px] sm:text-xs text-muted-foreground/50 max-w-xl mx-auto leading-relaxed px-2"
         >
           ⚠️ این بازی بر اساس وقایع مستند تاریخی ساخته شده اما سناریوهای آینده تحلیلی-احتمالی هستند
           و منعکس‌کننده موقعیت رسمی هیچ‌یک از طرف‌ها نیست. هدف، درک بهتر پیچیدگی‌های ژئوپلیتیک منطقه است.

@@ -33,27 +33,27 @@ export function HistoryScreen() {
       className="min-h-[100dvh] flex flex-col"
     >
       {/* Header */}
-      <div className="sticky top-0 z-20 glass-strong border-b border-border/50 p-4">
+      <div className="sticky top-0 z-20 glass-strong border-b border-border/50 p-3 sm:p-4 safe-top">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <button
             onClick={() => setPhase("splash")}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             → بازگشت
           </button>
-          <h1 className="text-lg md:text-2xl font-bold text-center flex-1">
-            📜 تاریخچه مناسبات ایران، آمریکا و اسرائیل
+          <h1 className="text-sm sm:text-lg md:text-2xl font-bold text-center flex-1 px-2">
+            📜 تاریخچه مناسبات
           </h1>
           <button
             onClick={() => startGame()}
-            className="text-sm bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold hover:scale-105 transition"
+            className="text-xs sm:text-sm bg-primary text-primary-foreground px-3 sm:px-4 py-2 rounded-lg font-bold hover:scale-105 transition"
           >
             شروع بازی ←
           </button>
         </div>
       </div>
 
-      <div className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
+      <div className="flex-1 p-3 sm:p-4 md:p-6 max-w-7xl mx-auto w-full">
         {/* Era timeline */}
         <div className="mb-6 overflow-x-auto pb-2">
           <div className="flex md:grid md:grid-cols-8 gap-2 min-w-[800px] md:min-w-0">
@@ -64,7 +64,7 @@ export function HistoryScreen() {
                   setSelectedEra(era);
                   setSelectedEventIdx(null);
                 }}
-                className={`relative flex-shrink-0 md:flex-shrink p-3 rounded-xl text-right transition-all border ${
+                className={`relative flex-shrink-0 md:flex-shrink p-2 sm:p-3 rounded-xl text-right transition-all border ${
                   selectedEra?.id === era.id
                     ? "glass-strong scale-[1.02]"
                     : "glass opacity-70 hover:opacity-100"
@@ -214,14 +214,14 @@ export function HistoryScreen() {
       </div>
 
       {/* Footer */}
-      <div className="sticky bottom-0 glass-strong border-t border-border/50 p-4">
+      <div className="sticky bottom-0 glass-strong border-t border-border/50 p-3 sm:p-4 safe-bottom">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-          <div className="text-xs text-muted-foreground hidden sm:block">
+          <div className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
             برای جزئیات هر رویداد، روی آن ضربه بزنید
           </div>
           <button
             onClick={() => startGame()}
-            className="ml-auto px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/30"
+            className="ml-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm sm:text-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/30"
           >
             شروع شبیه‌سازی ←
           </button>

@@ -5,7 +5,7 @@ set -e
 
 PROJECT_DIR="/home/z/my-project"
 DOWNLOAD_DIR="${PROJECT_DIR}/download"
-VERSION="2.0.0"
+VERSION="2.1.0"
 ZIP_NAME="middle-east-strategic-game-v${VERSION}.zip"
 ZIP_PATH="${DOWNLOAD_DIR}/${ZIP_NAME}"
 
@@ -27,6 +27,7 @@ COPY_PATHS=(
   "prisma"
   "mini-services"
   "examples"
+  "RESEARCH.md"
   "package.json"
   "package-lock.json"
   "bun.lock"
