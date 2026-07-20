@@ -25,20 +25,36 @@ export function FlippableCard({
   const alreadyUsedInHistory = card.used;
 
   return (
-    <div className="relative w-full aspect-[5/7] flip-card-container">
+    <div
+      className="relative w-full"
+      style={{
+        paddingTop: "140%", // aspect ratio 5/7 = 140%
+        perspective: "1200px",
+      }}
+    >
       <motion.div
-        className="flip-card-inner absolute inset-0"
+        className="absolute inset-0"
+        style={{
+          transformStyle: "preserve-3d",
+          WebkitTransformStyle: "preserve-3d",
+          pointerEvents: "none",
+        }}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.5, type: "spring", stiffness: 150 }}
       >
         {/* FRONT */}
         <div
-          className={`flip-card-face p-2.5 sm:p-3 flex flex-col items-center text-center no-select ${
+          className={`absolute inset-0 rounded-2xl p-2.5 sm:p-3 flex flex-col items-center text-center no-select ${
             isPlayedThisGame ? "opacity-60" : ""
-          } ${isFlipped ? "pointer-events-none" : ""}`}
+          }`}
           style={{
             background: actor.gradient,
             border: `1px solid ${actor.color}80`,
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            visibility: isFlipped ? "hidden" : "visible",
+            pointerEvents: isFlipped ? "none" : "auto",
+            zIndex: isFlipped ? 1 : 10,
           }}
         >
           {/* Top badges */}
@@ -120,13 +136,21 @@ export function FlippableCard({
 
         {/* BACK */}
         <div
-          className="flip-card-face flip-card-back p-2.5 sm:p-3 flex flex-col text-right glass-strong no-select"
+          className="absolute inset-0 rounded-2xl flex flex-col text-right glass-strong no-select overflow-hidden"
           style={{
             border: `1px solid ${actor.color}80`,
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+            visibility: isFlipped ? "visible" : "hidden",
+            pointerEvents: "none",
           }}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-border/30">
+          {/* Header - fixed top */}
+          <div
+            className="flex items-center justify-between p-2 sm:p-2.5 pb-1.5 border-b border-border/30 shrink-0"
+            style={{ pointerEvents: "auto" }}
+          >
             <div className="flex items-center gap-1 min-w-0 flex-1">
               <span className="text-base sm:text-lg shrink-0">{card.icon}</span>
               <h4 className="font-bold text-[11px] sm:text-xs md:text-sm leading-tight truncate">
@@ -142,67 +166,72 @@ export function FlippableCard({
             </button>
           </div>
 
-          {/* Actor label */}
-          <div className="mb-1.5">
-            <span
-              className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-bold"
-              style={{ backgroundColor: actor.color + "30", color: actor.color }}
-            >
-              {card.actorLabel}
-            </span>
-          </div>
+          {/* Content - scrollable middle */}
+          <div className="flex-1 overflow-y-auto p-2 sm:p-2.5">
+            {/* Actor label */}
+            <div className="mb-1.5">
+              <span
+                className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-bold"
+                style={{ backgroundColor: actor.color + "30", color: actor.color }}
+              >
+                {card.actorLabel}
+              </span>
+            </div>
 
-          {/* Long description */}
-          <p className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground/90 leading-relaxed mb-2 flex-1 overflow-y-auto">
-            {card.longDescription}
-          </p>
+            {/* Long description */}
+            <p className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground/90 leading-relaxed mb-2">
+              {card.longDescription}
+            </p>
 
-          {/* Used context */}
-          {card.usedContext && (
-            <div className="mb-1.5 p-1.5 rounded bg-amber-500/10 border border-amber-500/20">
-              <div className="text-[8px] sm:text-[9px] text-amber-300 font-bold mb-0.5">
-                📚 سابقه استفاده:
+            {/* Used context */}
+            {card.usedContext && (
+              <div className="mb-1.5 p-1.5 rounded bg-amber-500/10 border border-amber-500/20">
+                <div className="text-[8px] sm:text-[9px] text-amber-300 font-bold mb-0.5">
+                  📚 سابقه استفاده:
+                </div>
+                <div className="text-[8px] sm:text-[9px] text-amber-200/80 leading-relaxed">
+                  {card.usedContext}
+                </div>
               </div>
-              <div className="text-[8px] sm:text-[9px] text-amber-200/80 leading-relaxed">
-                {card.usedContext}
+            )}
+
+            {/* Effects */}
+            <div className="mb-2">
+              <div className="text-[8px] sm:text-[9px] text-muted-foreground mb-1">اثرات:</div>
+              <div className="flex flex-wrap gap-0.5">
+                {Object.entries(card.effects).map(([key, val]) => {
+                  const numVal = typeof val === "number" ? val : 0;
+                  const isMult = numVal > 0 && numVal < 2 && !Number.isInteger(numVal);
+                  const display = isMult
+                    ? `×${numVal.toFixed(2)}`
+                    : `${numVal > 0 ? "+" : ""}${numVal}`;
+                  return (
+                    <span
+                      key={key}
+                      className={`text-[8px] sm:text-[9px] px-1 py-0.5 rounded font-num ${
+                        numVal > 0
+                          ? "bg-emerald-500/15 text-emerald-300"
+                          : "bg-rose-500/15 text-rose-300"
+                      }`}
+                    >
+                      {key.replace(/([A-Z])/g, " $1").trim()}: {display}
+                    </span>
+                  );
+                })}
               </div>
             </div>
-          )}
-
-          {/* Effects */}
-          <div className="mb-2">
-            <div className="text-[8px] sm:text-[9px] text-muted-foreground mb-1">اثرات:</div>
-            <div className="flex flex-wrap gap-0.5">
-              {Object.entries(card.effects).map(([key, val]) => {
-                const numVal = typeof val === "number" ? val : 0;
-                const isMult = numVal > 0 && numVal < 2 && !Number.isInteger(numVal);
-                const display = isMult
-                  ? `×${numVal.toFixed(2)}`
-                  : `${numVal > 0 ? "+" : ""}${numVal}`;
-                return (
-                  <span
-                    key={key}
-                    className={`text-[8px] sm:text-[9px] px-1 py-0.5 rounded font-num ${
-                      numVal > 0
-                        ? "bg-emerald-500/15 text-emerald-300"
-                        : "bg-rose-500/15 text-rose-300"
-                    }`}
-                  >
-                    {key.replace(/([A-Z])/g, " $1").trim()}: {display}
-                  </span>
-                );
-              })}
-            </div>
           </div>
 
-          {/* Play button */}
+          {/* Play button - fixed bottom */}
           {!isPlayed && !isResolving && card.actor === "iran" && (
-            <button
-              onClick={() => playCard(card.id)}
-              className="w-full py-2 sm:py-2.5 bg-primary text-primary-foreground rounded-lg font-bold text-[11px] sm:text-xs hover:bg-primary/90 active:scale-95 transition-all relative z-10"
-            >
-              ▶ بازی کردن این کارت
-            </button>
+            <div className="p-2 sm:p-2.5 pt-1.5 border-t border-border/30 shrink-0" style={{ pointerEvents: "auto" }}>
+              <button
+                onClick={() => playCard(card.id)}
+                className="w-full py-2 sm:py-2.5 bg-primary text-primary-foreground rounded-lg font-bold text-[11px] sm:text-xs hover:bg-primary/90 active:scale-95 transition-all"
+              >
+                ▶ بازی کردن این کارت
+              </button>
+            </div>
           )}
         </div>
       </motion.div>

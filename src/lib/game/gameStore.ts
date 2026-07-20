@@ -9,7 +9,7 @@ import {
   type GameCard,
   type CardEffects,
 } from "./cardsData";
-import { determineEnding, type GameState as EngineState, type Ending } from "./endingsData";
+import { determineEnding, endings, type GameState as EngineState, type Ending } from "./endingsData";
 
 export type GameState = {
   phase: "splash" | "intro" | "history" | "game" | "ending";
@@ -45,6 +45,10 @@ export type GameState = {
   // Animation
   isResolving: boolean;
   historyViewedEra: string | null;
+  // Early ending trigger
+  earlyEndingTriggered: string | null;
+  // Last changes for animation
+  lastStatChanges: Partial<Record<string, number>> | null;
 };
 
 export type MoveEntry = {
@@ -82,6 +86,8 @@ const INITIAL_STATE = {
   allProbabilities: null,
   isResolving: false,
   historyViewedEra: null,
+  earlyEndingTriggered: null,
+  lastStatChanges: null,
 };
 
 function clamp(value: number, min = 0, max = 100): number {
@@ -298,6 +304,75 @@ function effectsSummaryText(iranCard: GameCard, enemyCards: GameCard[]): string 
   return parts.slice(0, 6).join("، ");
 }
 
+// Check for early ending conditions - if game should end before 8 turns
+function checkEarlyEnding(
+  state: GameState,
+  iranCard: GameCard,
+  enemyCards: GameCard[]
+): string | null {
+  // 1. Nuclear bomb successfully built and tested (Iran played nuclear breakout)
+  if (iranCard.id === "iran_nuclear_breakout" && state.nuclearProgress >= 85) {
+    return "iran_nuclear_power";
+  }
+
+  // 2. Nuclear war triggered (any nuclear strike played)
+  const allCards = [iranCard, ...enemyCards];
+  if (allCards.some(c => c.id === "us_nuclear_strike" || c.id === "israel_nuclear_strike")) {
+    return "regional_nuclear_war";
+  }
+
+  // 3. Iran's strategic defeat (military capability destroyed + war escalation max)
+  if (state.militaryCapability <= 15 && state.warEscalation >= 90) {
+    return "iran_strategic_defeat";
+  }
+
+  // 4. Regime change (economic collapse + low domestic support)
+  if (state.economicStability <= 10 && state.domesticSupport <= 15) {
+    return "regime_change_iran";
+  }
+
+  // 5. US withdrawal (high Iranian deterrence + regional influence)
+  if (state.deterrence >= 85 && state.regionalInfluence >= 85 && state.warEscalation < 40) {
+    return "us_withdrawal";
+  }
+
+  // 6. Historic peace (high negotiation chance + low war escalation)
+  if (state.negotiationChanceMult >= 2.5 && state.warEscalation < 30) {
+    return "historic_peace";
+  }
+
+  // 7. Ground invasion triggered Israel collapse scenario
+  if (iranCard.id === "iran_ground_invasion" && state.militaryCapability > 50) {
+    return "israel_collapse";
+  }
+
+  return null;
+}
+
+// Calculate stat changes for animation
+function calculateStatChanges(
+  before: GameState,
+  after: GameState
+): Partial<Record<string, number>> {
+  const changes: Partial<Record<string, number>> = {};
+  const keys: (keyof GameState)[] = [
+    "nuclearProgress",
+    "regionalInfluence",
+    "economicStability",
+    "domesticSupport",
+    "militaryCapability",
+    "deterrence",
+    "warEscalation",
+  ];
+  for (const key of keys) {
+    const diff = (after[key] as number) - (before[key] as number);
+    if (diff !== 0) {
+      changes[key] = diff;
+    }
+  }
+  return changes;
+}
+
 export const useGameStore = create<GameState & {
   setPhase: (phase: GameState["phase"]) => void;
   startGame: () => void;
@@ -333,6 +408,7 @@ export const useGameStore = create<GameState & {
     const iranCard = iranCards.find((c) => c.id === cardId);
     if (!iranCard) return;
 
+    const beforeState = { ...state };
     let newState = { ...state };
     // Apply Iran card effects
     const iranEffects = applyEffects(newState, iranCard.effects);
@@ -349,6 +425,7 @@ export const useGameStore = create<GameState & {
 
     const summary = summarizeMove(iranCard, enemyCards);
     const effectsSummary = effectsSummaryText(iranCard, enemyCards);
+    const statChanges = calculateStatChanges(beforeState, newState);
 
     const moveEntry: MoveEntry = {
       turn: state.turn,
@@ -358,6 +435,9 @@ export const useGameStore = create<GameState & {
       effectsSummary,
     };
 
+    // Check for early ending conditions
+    const earlyEnding = checkEarlyEnding(newState, iranCard, enemyCards);
+
     set({
       ...newState,
       playedIranCard: iranCard,
@@ -366,12 +446,33 @@ export const useGameStore = create<GameState & {
       flippedCardId: null,
       isResolving: true,
       moveLog: [...state.moveLog, moveEntry],
+      earlyEndingTriggered: earlyEnding,
+      lastStatChanges: statChanges,
     });
   },
 
   nextTurn: () => {
     const state = get();
     if (!state.isResolving) return;
+
+    // Check for early ending
+    if (state.earlyEndingTriggered) {
+      const ending = endings.find((e) => e.id === state.earlyEndingTriggered);
+      if (ending) {
+        set({
+          phase: "ending",
+          ending,
+          endingProbability: 1.0, // 100% - this ending is triggered
+          allProbabilities: [{ ending, probability: 1.0 }],
+          isResolving: false,
+          playedIranCard: null,
+          enemyResponses: [],
+          earlyEndingTriggered: null,
+          lastStatChanges: null,
+        });
+        return;
+      }
+    }
 
     if (state.turn >= state.maxTurns) {
       const engineState: EngineState = {
@@ -399,6 +500,7 @@ export const useGameStore = create<GameState & {
         isResolving: false,
         playedIranCard: null,
         enemyResponses: [],
+        lastStatChanges: null,
       });
       return;
     }
@@ -408,6 +510,7 @@ export const useGameStore = create<GameState & {
       isResolving: false,
       playedIranCard: null,
       enemyResponses: [],
+      lastStatChanges: null,
     });
   },
 }));

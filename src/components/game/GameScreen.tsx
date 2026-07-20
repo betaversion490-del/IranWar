@@ -12,22 +12,40 @@ function StatBar({
   value,
   color,
   icon,
+  change,
 }: {
   label: string;
   value: number;
   color: string;
   icon: string;
+  change?: number;
 }) {
   return (
-    <div className="space-y-0.5">
+    <div className="space-y-0.5 relative">
       <div className="flex items-center justify-between text-[10px]">
         <span className="flex items-center gap-1 text-muted-foreground">
           <span>{icon}</span>
           <span>{label}</span>
         </span>
-        <span className="font-bold font-num text-xs" style={{ color }}>
-          {value}
-        </span>
+        <div className="flex items-center gap-1">
+          {change !== undefined && change !== 0 && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.5, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className={`text-[9px] font-bold font-num px-1 rounded ${
+                change > 0
+                  ? "bg-emerald-500/20 text-emerald-300"
+                  : "bg-rose-500/20 text-rose-300"
+              }`}
+            >
+              {change > 0 ? "+" : ""}{change}
+            </motion.span>
+          )}
+          <span className="font-bold font-num text-xs" style={{ color }}>
+            {value}
+          </span>
+        </div>
       </div>
       <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
         <motion.div
@@ -35,7 +53,7 @@ function StatBar({
           style={{ backgroundColor: color }}
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         />
       </div>
     </div>
@@ -133,6 +151,8 @@ export function GameScreen() {
     isResolving,
     moveLog,
     nextTurn,
+    earlyEndingTriggered,
+    lastStatChanges,
   } = store;
 
   const flippedCard = flippedCardId ? iranCards.find((c) => c.id === flippedCardId) : null;
@@ -204,12 +224,12 @@ export function GameScreen() {
             <div className="text-[10px] text-muted-foreground">۶ شاخص حیاتی</div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 sm:gap-x-4 gap-y-1.5">
-            <StatBar label="هسته‌ای" value={nuclearProgress} color="oklch(0.6 0.25 25)" icon="☢️" />
-            <StatBar label="بازدارندگی" value={deterrence} color="oklch(0.65 0.15 165)" icon="🛡️" />
-            <StatBar label="نظامی" value={militaryCapability} color="oklch(0.6 0.18 250)" icon="⚔️" />
-            <StatBar label="اقتصاد" value={economicStability} color="oklch(0.7 0.18 70)" icon="💰" />
-            <StatBar label="حمایت داخلی" value={domesticSupport} color="oklch(0.65 0.16 165)" icon="👥" />
-            <StatBar label="نفوذ منطقه‌ای" value={regionalInfluence} color="oklch(0.6 0.2 305)" icon="🌐" />
+            <StatBar label="هسته‌ای" value={nuclearProgress} color="oklch(0.6 0.25 25)" icon="☢️" change={lastStatChanges?.nuclearProgress} />
+            <StatBar label="بازدارندگی" value={deterrence} color="oklch(0.65 0.15 165)" icon="🛡️" change={lastStatChanges?.deterrence} />
+            <StatBar label="نظامی" value={militaryCapability} color="oklch(0.6 0.18 250)" icon="⚔️" change={lastStatChanges?.militaryCapability} />
+            <StatBar label="اقتصاد" value={economicStability} color="oklch(0.7 0.18 70)" icon="💰" change={lastStatChanges?.economicStability} />
+            <StatBar label="حمایت داخلی" value={domesticSupport} color="oklch(0.65 0.16 165)" icon="👥" change={lastStatChanges?.domesticSupport} />
+            <StatBar label="نفوذ منطقه‌ای" value={regionalInfluence} color="oklch(0.6 0.2 305)" icon="🌐" change={lastStatChanges?.regionalInfluence} />
           </div>
 
           {/* War Escalation Meter */}
@@ -267,12 +287,26 @@ export function GameScreen() {
               </div>
 
               <div className="mt-4 text-center">
-                <button
-                  onClick={() => nextTurn()}
-                  className="px-6 sm:px-8 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm sm:text-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/30"
-                >
-                  {turn >= maxTurns ? "🏁 نتیجه نهایی" : "← ادامه نوبت بعد"}
-                </button>
+                {earlyEndingTriggered ? (
+                  <div className="space-y-2">
+                    <div className="text-xs text-rose-400 font-bold animate-pulse">
+                      ⚠️ شرایط بحرانی ایجاد شد - بازی به پایان می‌رسد
+                    </div>
+                    <button
+                      onClick={() => nextTurn()}
+                      className="px-6 sm:px-8 py-3 bg-rose-600 text-white rounded-xl font-bold text-sm sm:text-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-rose-600/30"
+                    >
+                      🏁 مشاهده پایان
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => nextTurn()}
+                    className="px-6 sm:px-8 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm sm:text-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/30"
+                  >
+                    {turn >= maxTurns ? "🏁 نتیجه نهایی" : "← ادامه نوبت بعد"}
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
