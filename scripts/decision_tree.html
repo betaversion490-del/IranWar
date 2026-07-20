@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>درخت تصمیم‌گیری راهبردی - بازی بزرگ خاورمیانه</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 0; }
+:root {
+    --c-bg: #0a0e1a;
+    --c-text: #e8e6e3;
+    --c-accent: #16a34a;
+    --c-danger: #dc2626;
+    --c-warn: #d97706;
+    --c-info: #0ea5e9;
+    --c-purple: #a855f7;
+    --c-muted: #94a3b8;
+    --c-border: #1e293b;
+    --c-card: #111827;
+    --c-card-light: #1e293b;
+}
+* { box-sizing: border-box; }
+html, body {
+    margin: 0; padding: 0;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+    font-size: 11px;
+    line-height: 1.6;
+}
+@media screen {
+    html { background: #1a1a1a; display: flex; justify-content: center; }
+    body { width: 210mm; background: var(--c-bg); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+}
+
+/* COVER */
+.cover {
+    width: 210mm; height: 297mm;
+    padding: 35mm 25mm;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+    break-after: page;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+}
+.cover::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 30% 20%, rgba(22, 163, 74, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+.cover-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; }
+.cover-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.cover-badge {
+    background: rgba(22, 163, 74, 0.15); border: 1px solid rgba(22, 163, 74, 0.4);
+    color: var(--c-accent); padding: 6px 16px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+}
+.cover-date { color: var(--c-muted); font-size: 11px; text-align: left; }
+.cover-main { text-align: center; margin: auto 0; }
+.cover-icon { font-size: 64px; margin-bottom: 20px; }
+.cover-title {
+    font-size: 38px; font-weight: 900; line-height: 1.2; margin: 0 0 12px;
+    background: linear-gradient(135deg, #16a34a 0%, #a855f7 50%, #0ea5e9 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.cover-subtitle { font-size: 16px; color: var(--c-muted); margin: 0 0 24px; }
+.cover-desc {
+    font-size: 12px; color: var(--c-text); opacity: 0.7; line-height: 1.8;
+    max-width: 140mm; margin: 0 auto;
+}
+.cover-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 32px auto 0; max-width: 160mm; }
+.cover-stat {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px; text-align: center;
+}
+.cover-stat-num { font-size: 22px; font-weight: 900; color: var(--c-accent); }
+.cover-stat-label { font-size: 9px; color: var(--c-muted); margin-top: 2px; }
+.cover-footer { text-align: center; color: var(--c-muted); font-size: 10px; opacity: 0.6; }
+
+/* CONTENT */
+.main-content { padding: 16mm 14mm; }
+.section { margin-bottom: 18px; break-inside: avoid; }
+.section-title {
+    font-size: 18px; font-weight: 800; color: var(--c-accent);
+    margin: 0 0 8px; padding-bottom: 5px; border-bottom: 2px solid var(--c-accent);
+}
+.section-num {
+    display: inline-block; background: var(--c-accent); color: var(--c-bg);
+    width: 24px; height: 24px; line-height: 24px; text-align: center;
+    border-radius: 50%; font-size: 12px; margin-left: 6px;
+}
+.subsection-title {
+    font-size: 14px; font-weight: 700; color: var(--c-text);
+    margin: 12px 0 5px; padding-right: 8px; border-right: 3px solid var(--c-accent);
+}
+p { margin: 5px 0; text-align: justify; line-height: 1.7; }
+
+/* DECISION TREE - Mind Map Style */
+.tree-path {
+    background: var(--c-card); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px; margin: 10px 0; break-inside: avoid;
+}
+.path-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--c-border);
+}
+.path-icon { font-size: 20px; }
+.path-title { font-size: 14px; font-weight: 700; flex: 1; }
+.path-prob {
+    background: var(--c-card-light); padding: 3px 8px; border-radius: 12px;
+    font-size: 10px; font-weight: 700; color: var(--c-accent);
+}
+.path-prob.danger { color: var(--c-danger); }
+.path-prob.warn { color: var(--c-warn); }
+
+.path-flow {
+    display: flex; align-items: center; gap: 4px; margin: 8px 0; flex-wrap: wrap;
+}
+.path-step {
+    background: var(--c-card-light); border: 1px solid var(--c-border);
+    border-radius: 6px; padding: 5px 8px; font-size: 9px; font-weight: 600;
+    text-align: center; min-width: 60px;
+}
+.path-step.nuclear { border-color: var(--c-danger); color: var(--c-danger); }
+.path-step.military { border-color: var(--c-warn); color: var(--c-warn); }
+.path-step.diplomatic { border-color: var(--c-accent); color: var(--c-accent); }
+.path-step.alliance { border-color: var(--c-purple); color: var(--c-purple); }
+.path-step.asymmetric { border-color: var(--c-info); color: var(--c-info); }
+.path-arrow { color: var(--c-muted); font-size: 14px; }
+
+.path-result {
+    background: linear-gradient(135deg, rgba(22, 163, 74, 0.1), rgba(14, 165, 233, 0.05));
+    border: 1px solid var(--c-accent); border-radius: 8px; padding: 8px 10px;
+    margin-top: 6px; font-size: 10px;
+}
+.path-result.victory { border-color: var(--c-accent); background: linear-gradient(135deg, rgba(22, 163, 74, 0.15), transparent); }
+.path-result.defeat { border-color: var(--c-danger); background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), transparent); }
+.path-result.compromise { border-color: var(--c-warn); background: linear-gradient(135deg, rgba(217, 119, 6, 0.15), transparent); }
+.path-result.survival { border-color: var(--c-info); background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), transparent); }
+.path-result.destruction { border-color: var(--c-danger); background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), transparent); }
+
+.path-stages { margin: 6px 0; }
+.stage {
+    display: flex; gap: 6px; margin: 4px 0; padding: 5px 8px;
+    background: rgba(255,255,255,0.02); border-radius: 4px; font-size: 9px;
+}
+.stage-label { font-weight: 700; color: var(--c-accent); min-width: 50px; }
+.stage-content { flex: 1; color: var(--c-muted); }
+
+.path-actors {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin: 6px 0;
+}
+.actor-response {
+    background: rgba(255,255,255,0.02); border-radius: 4px; padding: 4px 6px; font-size: 9px;
+}
+.actor-name { font-weight: 700; color: var(--c-info); }
+.actor-action { color: var(--c-muted); }
+
+.power-map {
+    background: var(--c-card-light); border-radius: 6px; padding: 8px; margin: 6px 0;
+    font-size: 9px; font-family: monospace; line-height: 1.5; white-space: pre; color: var(--c-muted);
+}
+
+/* Sources perspective box */
+.perspective-box {
+    background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 6px; padding: 8px 10px; margin: 6px 0; break-inside: avoid;
+}
+.perspective-title { font-size: 10px; font-weight: 700; color: var(--c-purple); margin-bottom: 4px; }
+.perspective-content { font-size: 9px; color: var(--c-muted); line-height: 1.6; }
+
+table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 9px; }
+th { background: var(--c-accent); color: var(--c-bg); padding: 5px 6px; text-align: right; font-weight: 700; font-size: 9px; }
+td { padding: 5px 6px; border-bottom: 1px solid var(--c-border); text-align: right; }
+tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+ul, ol { padding-right: 16px; margin: 5px 0; }
+li { margin: 2px 0; line-height: 1.5; }
+.highlight { background: rgba(22, 163, 74, 0.15); padding: 1px 4px; border-radius: 3px; font-weight: 600; }
+.danger { color: var(--c-danger); font-weight: 700; }
+.warn { color: var(--c-warn); font-weight: 700; }
+.info { color: var(--c-info); font-weight: 700; }
+.source { font-size: 8px; color: var(--c-muted); margin-top: 2px; opacity: 0.7; }
+
+/* ENDING */
+.ending {
+    width: 210mm; height: 297mm; padding: 35mm 25mm;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+    break-before: page; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+}
+.ending-icon { font-size: 64px; margin-bottom: 16px; }
+.ending-title { font-size: 26px; font-weight: 900; color: var(--c-accent); margin: 0 0 10px; }
+.ending-text { font-size: 12px; color: var(--c-muted); max-width: 140mm; line-height: 1.8; }
+.ending-divider { width: 50px; height: 3px; background: var(--c-accent); margin: 18px auto; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+    <div class="cover-content">
+        <div class="cover-header">
+            <div class="cover-badge">درخت تصمیم‌گیری راهبردی</div>
+            <div class="cover-date">تیر ۱۴۰۴<br>نسخه ۶.۰</div>
+        </div>
+        <div class="cover-main">
+            <div class="cover-icon">🌳</div>
+            <h1 class="cover-title">درخت تصمیم‌گیری راهبردی</h1>
+            <p class="cover-subtitle">مایندمپ توالی و ترکیب کارت‌ها → پایان واقعی</p>
+            <p class="cover-desc">
+                این سند حاصل تحقیق از منابع ایرانی (IRNA، تسنیم، فارس، Khamenei.ir،
+                ایران اینترنشنال، BBC فارسی) و منابع غربی (CSIS، CFR، RAND، IAEA) است.
+                هر مسیر، ترکیبی از دیدگاه‌های ایرانی و غربی را منعکس می‌کند.
+            </p>
+            <div class="cover-stats">
+                <div class="cover-stat"><div class="cover-stat-num">۱۰</div><div class="cover-stat-label">مسیر تصمیم</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۲۰</div><div class="cover-stat-label">کارت استراتژیک</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۱۵</div><div class="cover-stat-label">پایان واقعی</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۲</div><div class="cover-stat-label">دیدگاه (ایرانی+غربی)</div></div>
+            </div>
+        </div>
+        <div class="cover-footer">بر اساس منابع ایرانی و غربی · IAEA، CSIS، CFR، RAND، IRNA، تسنیم، فارس</div>
+    </div>
+</div>
+
+<div class="main-content">
+
+<!-- 1. INTRO -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱</span>مقدمه: ترکیب دیدگاه‌ها</h2>
+    <p>این درخت تصمیم‌گیری بر اساس تحقیق از منابع ایرانی و غربی ساخته شده است. دیدگاه رسمی ایرانی (IRNA، تسنیم، فارس، Khamenei.ir) بر «اقتصاد مقاومتی»، «بازدارندگی نامتقارن» و «حرمت سلاح هسته‌ای» تأکید می‌کند، در حالی که منابع غربی (CSIS، CFR، RAND، IAEA) بر «فروپاشی اقتصاد»، «تضعیف محور مقاومت» و «خطر بمب» متمرکزند. حقیقت در ترکیب این دو دیدگاه است.</p>
+    
+    <div class="perspective-box">
+        <div class="perspective-title">🔍 یافته کلیدی ترکیب دیدگاه‌ها</div>
+        <div class="perspective-content">
+            <strong>منابع رسمی ایرانی:</strong> اقتصاد پایدار است، محور مقاومت تضعیف شده ولی زنده، فتوای حرمت بمب معتبر است، برجام تجربه‌آموز بود.<br>
+            <strong>منابع غربی/مستقل:</strong> اقتصاد در حال فروپاشی است، محور مقاومت متلاشی، فتوا قابل تغییر، برجام شکست خورد.<br>
+            <strong>حقیقت ترکیبی:</strong> اقتصاد در رکود مزمن (نه فروپاشی فوری)، محور مقاومت ضعیف ولی در حال بازسازی، فتوا واقعی ولی قابل بازنگری، برجام شکست خورد ولی درس‌آموز بود.
+        </div>
+    </div>
+</div>
+
+<!-- 2. PATH 1: NUCLEAR -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۲</span>مسیر ۱: مسیر هسته‌ای</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">☢️</div>
+            <div class="path-title">خروج NPT → غنی‌سازی ۹۰٪ → ساخت بمب</div>
+            <div class="path-prob warn">۲۰-۲۵٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step nuclear">خروج NPT</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step nuclear">غنی‌سازی ۹۰٪</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step nuclear">ساخت بمب</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step nuclear">آزمایش</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">خروج از NPT (۹۰ روز). ارجاع به شورای امنیت. قطعنامه فصل VII. تحریم‌های بی‌سابقه.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">غنی‌سازی به ۹۰٪ (چند ماه). حمله پیش‌دگیرانه اسرائیل (۵۰-۶۵٪). حمله آمریکا (۳۰-۴۰٪).</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۳:</div>
+                <div class="stage-content">ساخت و آزمایش بمب (۶-۱۸ ماه). زمین‌لرزه مصنوعی ۴.۸ ریشتر. تأیید CTBTO.</div>
+            </div>
+        </div>
+        
+        <div class="path-actors">
+            <div class="actor-response">
+                <div class="actor-name">🇺🇸 آمریکا</div>
+                <div class="actor-action">پیش از آزمایش: حمله ۶۰-۷۵٪. پس از تثبیت: containment (مدل کره شمالی)</div>
+            </div>
+            <div class="actor-response">
+                <div class="actor-name">🇮🇱 اسرائیل</div>
+                <div class="actor-action">پیش از آزمایش: حمله ۸۰-۹۰٪. پس از: پایان ابهام هسته‌ای، اعلام رسمی</div>
+            </div>
+            <div class="actor-response">
+                <div class="actor-name">🇸🇦 عربستان</div>
+                <div class="actor-action">کلاهک از پاکستان (۶۰-۷۰٪). پیمان سپتامبر ۲۰۲۵ فعال می‌شود</div>
+            </div>
+            <div class="actor-response">
+                <div class="actor-name">🇹🇷 ترکیه</div>
+                <div class="actor-action">برنامه مستقل (۲۰-۳۰٪). هشدار فیدان: «اگر ایران بمب بگیرد، ترکیه هم»</div>
+            </div>
+        </div>
+        
+        <div class="perspective-box">
+            <div class="perspective-title">🇮🇷 دیدگاه ایرانی</div>
+            <div class="perspective-content">
+                فتوای خامنه‌ای (۱۳۸۹) حرمت سلاح هسته‌ای را اعلام کرده. اما یادداشت فارس (۱۴۰۵) نشان می‌دهد بحث جدی در داخل حکومت وجود دارد. موضع رسمی: «نه بمب، نه توقف غنی‌سازی». فتوا قابل تغییر است.
+            </div>
+        </div>
+        
+        <div class="path-result victory">
+            <strong>پایان واقعی: بازدارندگی هسته‌ای ایران (۳-۱۰ سال)</strong><br>
+            اگر بمب تثبیت شود، آمریکا به containment روی می‌آورد. مسابقه تسلیحاتی منطقه‌ای. تحریم‌ها به‌تدریج رفع (مدل پاکستان/هند). «MAD منطقه‌ای». ولی پنجره بحرانی ۱۸-۳۶ ماه خطرناک است.
+        </div>
+        
+        <div class="power-map">
+نقشه قدرت جدید:
+    آمریکا (کاهش جاه‌طلبی)
+         |
+    +----+----+----+
+    |    |    |    |
+  ایران  اسرائیل  عربستان  ترکیه
+ (هسته‌ای) (پایان) (کلاهک) (برنامه)
+    |
+ محور مقاومت
+ (چتر هسته‌ای)
+        </div>
+    </div>
+</div>
+
+<!-- 3. PATH 2: DIPLOMATIC -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۳</span>مسیر ۲: مسیر دیپلماتیک</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🕊️</div>
+            <div class="path-title">دیپلماسی → عادی‌سازی با عربستان → اتحاد با چین</div>
+            <div class="path-prob">۱۵-۲۰٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step diplomatic">دیپلماسی</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">عادی‌سازی عربستان</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">اتحاد با چین</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">صبر</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">مذاکره با ۱+۵. آمریکا «فریب استراتژیک» (۸۰-۹۰٪). ولی توافق موقت ممکن.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">تعمیق توافق پکن (۱۴۰۱). کاهش تنش با عربستان. اسرائیل در انزوا.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۳:</div>
+                <div class="stage-content">گسترش پکت ۲۵ ساله با چین. سرمایه‌گذاری محدود (نه وعده ۴۰۰ میلیارد).</div>
+            </div>
+        </div>
+        
+        <div class="perspective-box">
+            <div class="perspective-title">🇮🇷 دیدگاه ایرانی</div>
+            <div class="perspective-content">
+                خامنه‌ای: «مذاکره با آمریکا هیچ فایده‌ای ندارد». تجربه برجام نشان داد آمریکا قابل اعتماد نیست. ولی دولت پزشکیان تمایل به مذاکره غیرمستقیم دارد. تناقض بین رهبری و دولت.
+            </div>
+        </div>
+        
+        <div class="path-result compromise">
+            <strong>پایان واقعی: توافق کوچک (Less for Less) + عادی‌سازی تدریجی</strong><br>
+            توافق «Less for Less» (نه More for More). رشد اقتصادی ۶-۸٪. احیای صنعت نفت. ولی شکننده (نیاز به تأیید کنگره). مدل ویتنام-آمریکا (۲۰ سال). ۳۰-۳۵٪ احتمال توافق کوچک.
+        </div>
+    </div>
+</div>
+
+<!-- 4. PATH 3: MILITARY -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۴</span>مسیر ۳: مسیر نظامی کامل</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">⚔️</div>
+            <div class="path-title">حمله موشکی → حزب‌الله → هرمز</div>
+            <div class="path-prob danger">۲۵-۳۰٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step military">حمله موشکی</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step military">حزب‌الله</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step military">هرمز</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step military">پاسخ گسترده</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">حمله ۳۰۰+ موشک به اسرائیل. پدافند ۹۰-۹۵٪. ۲۸ کشته اسرائیلی. پاسخ اسرائیل (۸۰-۹۰٪).</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">فعال‌سازی حزب‌الله. ولی ۸۵-۹۰٪ زرادخانه نابود شده. تنها ۳۰٬۰۰۰ راکت باقی‌مانده.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۳:</div>
+                <div class="stage-content">بستن هرمز. قیمت نفت ۲۵۰ دلار. پاسخ آمریکا (۹۰٪+). حمله به نیروی دریایی ایران.</div>
+            </div>
+        </div>
+        
+        <div class="perspective-box">
+            <div class="perspective-title">🇮🇷 دیدگاه ایرانی</div>
+            <div class="perspective-content">
+                سپاه اعتراف کرد وعده صادق ۱ و ۲ بازدارندگی ایجاد نکرد. جنگ ۱۲ روزه ضربه سنگین بود (۱۰۶۲ کشته). ولی روایت رسمی: «ایستادگی». اقتصاد آسیب دید ولی تولید متوقف نشد (IRNA).
+            </div>
+        </div>
+        
+        <div class="path-result defeat">
+            <strong>پایان واقعی: شکست استراتژیک محدود + بازسازی</strong><br>
+            برنامه هسته‌ای تأخیر ۱-۲ ساله. توان موشکی کاهش. محور مقاومت تحلیل رفت. ولی رژیم سرنگون نشد. ایران در حال بازسازی (مدل ۲۰۲۵). انتقام نامتقارن قطعی.
+        </div>
+    </div>
+</div>
+
+<!-- 5. PATH 4: ANTI-WESTERN ALLIANCE -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۵</span>مسیر ۴: مسیر ائتلاف ضد غربی</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🤝</div>
+            <div class="path-title">اتحاد با روسیه → اتحاد با چین → بمب اتم</div>
+            <div class="path-prob warn">۱۰-۱۵٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step alliance">اتحاد روسیه</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step alliance">اتحاد چین</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step nuclear">بمب اتم</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step alliance">بلوک CRINK</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">پیمان راهبردی با روسیه (۱۴۰۳). Su-35، S-400 وعده داده شد ولی تحویل نشد.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">گسترش پکت با چین. سرمایه‌گذاری محدود. خرید نفت با تخفیف ۳۰-۴۰٪.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۳:</div>
+                <div class="stage-content">ساخت بمب با پشتیبانی بلوک شرقی. شکل‌گیری CRINK.</div>
+            </div>
+        </div>
+        
+        <div class="perspective-box">
+            <div class="perspective-title">🇮🇷 دیدگاه ایرانی</div>
+            <div class="perspective-content">
+                تسنیم: «جنگ با ایران ضعف‌های هژمونی آمریکا را آشکار کرد». روسیه و چین متحدان «معاملاتی» هستند، نه استراتژیک. در بحران فاصله می‌گیرند. ولی پیمان ۲۰۲۵ با روسیه واقعی است.
+            </div>
+        </div>
+        
+        <div class="path-result compromise">
+            <strong>پایان واقعی: بلوک شرقی قدرتمند + جنگ سرد جدید</strong><br>
+            شکل‌گیری CRINK (چین، روسیه، ایران، کره شمالی). جنگ سرد جدید. اقتصاد جهانی چندقطبی. تحریم‌های متقابل. قیمت نفت ۱۰۰-۱۵۰ دلار. ولی چین در بحران فاصله می‌گیرد.
+        </div>
+    </div>
+</div>
+
+<!-- 6. PATH 5: ATTRITION -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۶</span>مسیر ۵: مسیر فرسایشی</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">⏳</div>
+            <div class="path-title">صبر → حوثی‌ها → صبر → بحران رهبری</div>
+            <div class="path-prob">۴۰-۵۰٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step diplomatic">صبر</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step asymmetric">حوثی‌ها</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">صبر</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">بحران رهبری</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">سال ۱-۳:</div>
+                <div class="stage-content">صبر استراتژیک. تورم ۴۰-۵۰٪. فرار مغزها ۱۸۰٬۰۰۰ نفر/سال. اقتصاد در رکود.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">سال ۳-۵:</div>
+                <div class="stage-content">فعال‌سازی حوثی‌ها. حمله به دریای سرخ. Prosperity Guardian. تأثیر بر تجارت جهانی.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">سال ۵-۱۰:</div>
+                <div class="stage-content">ادامه فرسایش. بحران جانشینی رهبری. شکاف درون نخبگان. اعتراضات دوره‌ای.</div>
+            </div>
+        </div>
+        
+        <div class="perspective-box">
+            <div class="perspective-title">🇮🇷 دیدگاه ایرانی</div>
+            <div class="perspective-content">
+                «اقتصاد مقاومتی» دکترین رسمی است. خامنه‌ای: «تحریم‌ها فرصت است». ولی فرارو: «فروپاشی عملاً رخ داده». حقیقت: رکود مزمن، نه فروپاشی فوری. «ونزوئلایی شدن تدریجی».
+            </div>
+        </div>
+        
+        <div class="path-result compromise">
+            <strong>پایان واقعی: جنگ سایه‌ای ۳ سال + بحران رهبری → تحول بزرگ</strong><br>
+            این محتمل‌ترین مسیر است. پس از ۳-۵ سال فرسایش، بحران جانشینی رهبری رخ می‌دهد. سپس به یکی از پایان‌های نهایی ختم می‌شود: بمب اتم، توافق، یا تغییر رژیم از درون (گورباچف).
+        </div>
+    </div>
+</div>
+
+<!-- 7. PATH 6: MIXED -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۷</span>مسیر ۶: مسیر ترکیبی (دیپلماسی + نظامی)</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🔄</div>
+            <div class="path-title">دیپلماسی → شکست → حمله موشکی → صبر</div>
+            <div class="path-prob warn">۲۰-۲۵٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step diplomatic">دیپلماسی</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step danger">شکست</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step military">حمله موشکی</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">صبر</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">مذاکره. آمریکا فریب می‌دهد (مدل برجام). توافق شکننده.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">شکست توافق. خروج آمریکا. اعتراض در ایران.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۳:</div>
+                <div class="stage-content">حمله موشکی به عنوان پاسخ. سپس صبر استراتژیک.</div>
+            </div>
+        </div>
+        
+        <div class="path-result compromise">
+            <strong>پایان واقعی: چرخه توافق-شکست-جنگ (مدل JCPOA فشرده)</strong><br>
+            الگوی JCPOA تکرار می‌شود: توافق ۲۰۲۶ → شکست ۲۰۲۷ → جنگ ۲۰۲۷ → توافق ۲۰۲۸. هر چرخه ایران ضعیف‌تر.
+        </div>
+    </div>
+</div>
+
+<!-- 8. PATH 7: NORTH KOREA MODEL -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۸</span>مسیر ۷: مسیر کره شمالی</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🇰🇵</div>
+            <div class="path-title">خروج NPT → کلاهک از کره شمالی → آزمایش</div>
+            <div class="path-prob warn">۱۵-۲۵٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step nuclear">خروج NPT</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step alliance">کلاهک کره شمالی</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step nuclear">آزمایش</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step nuclear">تثبیت</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">خروج از NPT. کره شمالی کلاهک می‌دهد (۲۰-۳۰٪). انتقال هوایی/دریایی.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">آزمایش هسته‌ای. حمله پیش‌دگیرانه (۶۰-۷۰٪). ولی اگر موفق شود، تثبیت سریع.</div>
+            </div>
+        </div>
+        
+        <div class="path-result victory">
+            <strong>پایان واقعی: بمب سریع + بازدارندگی</strong><br>
+            اگر موفق شود، زمان رسیدن به بمب از سال‌ها به ماه‌ها کاهش می‌یابد. ولی خطر حمله پیش‌دگیرانه بالا. احتمال موفقیت: ۱۵-۲۵٪.
+        </div>
+    </div>
+</div>
+
+<!-- 9. PATH 8: MOBILIZATION -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۹</span>مسیر ۸: مسیر مردمسازی</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">👥</div>
+            <div class="path-title">مردمسازی → بسیج → دفاع</div>
+            <div class="path-prob">۱۰-۱۵٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step diplomatic">مردمسازی</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">بسیج</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step military">دفاع</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">اعلام بسیج عمومی. ۴۵۰٬۰۰۰-۶۰۰٬۰۰۰ داوطلب. حمایت داخلی افزایش.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">بسیج گسترده. ولی اقتصاد ضعیف‌تر. مقاومت اجتماعی در شرایط فعلی.</div>
+            </div>
+        </div>
+        
+        <div class="path-result survival">
+            <strong>پایان واقعی: بقای رژیم با هزینه اقتصادی (مدل کوبا/کره شمالی)</strong><br>
+            رژیم باقی می‌ماند ولی اقتصاد فرسوده. مدل کوبا/کره شمالی. ولی ایران جامعه بازتری است (اینترنت)، تنوع قومی خطر تجزیه.
+        </div>
+    </div>
+</div>
+
+<!-- 10. PATH 9: SAUDI NORMALIZATION -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۰</span>مسیر ۹: مسیر عادی‌سازی با عربستان</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🤝</div>
+            <div class="path-title">عادی‌سازی عربستان → اتحاد چین → صبر</div>
+            <div class="path-prob">۳۵-۴۵٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step diplomatic">عادی‌سازی عربستان</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step alliance">اتحاد چین</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">صبر</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">تعمیق توافق پکن (۱۴۰۱). کاهش تنش با عربستان. اسرائیل در انزوا.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">گسترش پکت با چین. سرمایه‌گذاری محدود ولی واقعی.</div>
+            </div>
+        </div>
+        
+        <div class="path-result victory">
+            <strong>پایان واقعی: کاهش جاه‌طلبی آمریکا + نفوذ نسبی ایران</strong><br>
+            بهترین گزینه اقتصادی ایران. عادی‌سازی با عربستان → تضعیف پیمان ابراهیم. ائتلاف با چین → پشتوانه اقتصادی. کاهش تنش منطقه‌ای.
+        </div>
+    </div>
+</div>
+
+<!-- 11. PATH 10: EXTREME -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۱</span>مسیر ۱۰: مسیر افراطی</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">💀</div>
+            <div class="path-title">حمله زمینی → ICBM → فاجعه</div>
+            <div class="path-prob danger">۱-۳٪</div>
+        </div>
+        
+        <div class="path-flow">
+            <div class="path-step military">حمله زمینی</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step military">ICBM</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step nuclear">تبادل هسته‌ای</div>
+        </div>
+        
+        <div class="path-stages">
+            <div class="stage">
+                <div class="stage-label">مرحله ۱:</div>
+                <div class="stage-content">حمله زمینی به اسرائیل (غیرممکن - فاصله ۱۵۰۰ کیلومتر). پاسخ هسته‌ای اسرائیل.</div>
+            </div>
+            <div class="stage">
+                <div class="stage-label">مرحله ۲:</div>
+                <div class="stage-content">ساخت ICBM (۳-۷ سال). تهدید مستقیم خاک آمریکا. حمله پیش‌دگیرانه.</div>
+            </div>
+        </div>
+        
+        <div class="path-result destruction">
+            <strong>پایان واقعی: جنگ هسته‌ای منطقه‌ای (فاجعه)</strong><br>
+            ۵-۲۰ میلیون کشته. زمستان هسته‌ای کوچک. فروپاشی NPT. رکود بزرگ جهانی. بسیار بعید (۱-۳٪).
+        </div>
+    </div>
+</div>
+
+<!-- 12. SUMMARY TABLE -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۲</span>جدول خلاصه مسیرها</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>مسیر</th>
+                <th>کارت‌ها</th>
+                <th>احتمال</th>
+                <th>پایان واقعی</th>
+                <th>نتیجه</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>۱. هسته‌ای</td>
+                <td>NPT → ۹۰٪ → بمب</td>
+                <td>۲۰-۲۵٪</td>
+                <td>بازدارندگی هسته‌ای</td>
+                <td class="info">پیروزی</td>
+            </tr>
+            <tr>
+                <td>۲. دیپلماتیک</td>
+                <td>دیپلماسی → عربستان → چین</td>
+                <td>۱۵-۲۰٪</td>
+                <td>توافق کوچک</td>
+                <td class="warn">سازش</td>
+            </tr>
+            <tr>
+                <td>۳. نظامی</td>
+                <td>موشکی → حزب‌الله → هرمز</td>
+                <td>۲۵-۳۰٪</td>
+                <td>شکست استراتژیک</td>
+                <td class="danger">شکست</td>
+            </tr>
+            <tr>
+                <td>۴. ضد غربی</td>
+                <td>روسیه → چین → بمب</td>
+                <td>۱۰-۱۵٪</td>
+                <td>بلوک CRINK</td>
+                <td class="warn">سازش</td>
+            </tr>
+            <tr>
+                <td>۵. فرسایشی</td>
+                <td>صبر → حوثی → صبر</td>
+                <td>۴۰-۵۰٪</td>
+                <td>بحران رهبری → تحول</td>
+                <td class="warn">سازش</td>
+            </tr>
+            <tr>
+                <td>۶. ترکیبی</td>
+                <td>دیپلماسی → شکست → موشکی</td>
+                <td>۲۰-۲۵٪</td>
+                <td>چرخه توافق-جنگ</td>
+                <td class="warn">سازش</td>
+            </tr>
+            <tr>
+                <td>۷. کره شمالی</td>
+                <td>NPT → کلاهک → آزمایش</td>
+                <td>۱۵-۲۵٪</td>
+                <td>بمب سریع</td>
+                <td class="info">پیروزی</td>
+            </tr>
+            <tr>
+                <td>۸. مردمسازی</td>
+                <td>بسیج → دفاع</td>
+                <td>۱۰-۱۵٪</td>
+                <td>بقا با هزینه</td>
+                <td class="info">بقا</td>
+            </tr>
+            <tr>
+                <td>۹. عربستان</td>
+                <td>عادی‌سازی → چین → صبر</td>
+                <td>۳۵-۴۵٪</td>
+                <td>نفوذ نسبی</td>
+                <td class="info">پیروزی</td>
+            </tr>
+            <tr>
+                <td>۱۰. افراطی</td>
+                <td>زمینی → ICBM</td>
+                <td class="danger">۱-۳٪</td>
+                <td>جنگ هسته‌ای</td>
+                <td class="danger">تخریب</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 13. THREE MOST LIKELY COMBINED PATHS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۳</span>سه مسیر ترکیبی محتمل‌ترین</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🅰️</div>
+            <div class="path-title">مسیر A: فرسایش + تغییر تدریجی (۳۵٪)</div>
+            <div class="path-prob">۳۵٪</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step diplomatic">صبر</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step diplomatic">کاهش جاه‌طلبی آمریکا</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step alliance">CRINK</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">گورباچف ایرانی</div>
+        </div>
+        <p style="margin:5px 0">ایران در ۳-۵ سال تحت فشار اقتصادی و بحران رهبری، یک «گورباچف ایرانی» ظهور می‌کند. اصلاحات آغاز، سپس از کنترل خارج. رژیم در ۵-۸ سال فرومی‌پاشد. بمب هرگز ساخته نمی‌شود.</p>
+    </div>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🅱️</div>
+            <div class="path-title">مسیر B: بمب از طریق بازسازی (۲۰٪)</div>
+            <div class="path-prob warn">۲۰٪</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step military">شکست</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step nuclear">بازسازی</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step nuclear">بمب</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step nuclear">بازدارندگی</div>
+        </div>
+        <p style="margin:5px 0">ایران در پنجره ۱۸-۳۶ ماه به بمب می‌رسد. آمریکا/اسرائیل یا حمله می‌کنند یا می‌پذیرند. اگر بمب تثبیت شود، مسابقه تسلیحاتی.</p>
+    </div>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🅲️</div>
+            <div class="path-title">مسیر C: چرخه توافق-شکست-جنگ (۲۰٪)</div>
+            <div class="path-prob warn">۲۰٪</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step diplomatic">توافق</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step danger">شکست</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step military">جنگ</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">توافق مجدد</div>
+        </div>
+        <p style="margin:5px 0">چرخه JCPOA تکرار می‌شود در فشرده‌شده‌تر: توافق ۲۰۲۶ → شکست ۲۰۲۷ → جنگ ۲۰۲۷ → توافق ۲۰۲۸. هر چرخه ایران ضعیف‌تر.</p>
+    </div>
+</div>
+
+<!-- 14. SOURCES -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۴</span>منابع (ایرانی + غربی)</h2>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--c-card);border-radius:6px;padding:8px;">
+            <div style="font-weight:700;color:var(--c-accent);font-size:11px;margin-bottom:4px;">🇮🇷 منابع ایرانی</div>
+            <ul style="font-size:9px;">
+                <li>IRNA (خبرگزاری رسمی)</li>
+                <li>تسنیم (وابسته به سپاه)</li>
+                <li>فارس (وابسته به سپاه)</li>
+                <li>Khamenei.ir (سایت رهبری)</li>
+                <li>خبرآنلاین، تابناک، مشرق</li>
+                <li>ایران اینترنشنال (مخالف)</li>
+                <li>BBC فارسی، DW فارسی</li>
+                <li>رادیو فردا (مخالف)</li>
+                <li>ویکی‌پدیا فارسی، ویکی‌شیعه</li>
+            </ul>
+        </div>
+        <div style="background:var(--c-card);border-radius:6px;padding:8px;">
+            <div style="font-weight:700;color:var(--c-info);font-size:11px;margin-bottom:4px;">🌍 منابع غربی</div>
+            <ul style="font-size:9px;">
+                <li>IAEA (آژانس هسته‌ای)</li>
+                <li>CSIS, CFR, RAND</li>
+                <li>IISS, SIPRI</li>
+                <li>Carnegie, Brookings</li>
+                <li>Belfer Center (Harvard)</li>
+                <li>ISW, Soufan Center</li>
+                <li>Reuters, AP, BBC, CNN</li>
+                <li>UK Parliament, US Congress</li>
+                <li>IMF, World Bank</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- ENDING -->
+<div class="ending">
+    <div class="ending-icon">🌳</div>
+    <h1 class="ending-title">پایان درخت تصمیم‌گیری</h1>
+    <div class="ending-divider"></div>
+    <p class="ending-text">
+        این درخت بر اساس تحقیق از منابع ایرانی و غربی ساخته شده است.
+        ۱۰ مسیر تصمیم، ۲۰ کارت استراتژیک، و ۱۵ پایان واقعی تحلیل شده‌اند.
+        حقیقت در ترکیب دیدگاه‌ها است.
+    </p>
+    <div class="ending-divider"></div>
+    <p class="ending-text" style="font-size:11px;opacity:0.6">
+        نسخه ۶.۰ · تیر ۱۴۰۴<br>
+        منابع: IRNA، تسنیم، فارس، Khamenei.ir + IAEA، CSIS، CFR، RAND
+    </p>
+</div>
+
+</body>
+</html>

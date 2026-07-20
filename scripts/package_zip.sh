@@ -5,7 +5,7 @@ set -e
 
 PROJECT_DIR="/home/z/my-project"
 DOWNLOAD_DIR="${PROJECT_DIR}/download"
-VERSION="3.1.0"
+VERSION="6.0.0"
 ZIP_NAME="middle-east-strategic-game-v${VERSION}.zip"
 ZIP_PATH="${DOWNLOAD_DIR}/${ZIP_NAME}"
 
@@ -29,6 +29,8 @@ COPY_PATHS=(
   "examples"
   "RESEARCH.md"
   "GAME_TREE.md"
+  "DECISION_TREE.pdf"
+  "RESEARCH_DOCUMENT.pdf"
   "package.json"
   "package-lock.json"
   "bun.lock"
