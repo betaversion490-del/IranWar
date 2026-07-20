@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تحلیل راهبردی مناسبات ایران، آمریکا و اسرائیل</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@page {
+    size: A4;
+    margin: 0;
+}
+:root {
+    --c-bg: #0a0e1a;
+    --c-text: #e8e6e3;
+    --c-accent: #16a34a;
+    --c-danger: #dc2626;
+    --c-warn: #d97706;
+    --c-info: #0ea5e9;
+    --c-muted: #94a3b8;
+    --c-border: #1e293b;
+    --c-card: #111827;
+    --c-card-light: #1e293b;
+}
+* { box-sizing: border-box; }
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+    font-size: 13px;
+    line-height: 1.7;
+}
+@media screen {
+    html {
+        background: #1a1a1a;
+        display: flex;
+        justify-content: center;
+    }
+    body {
+        width: 210mm;
+        background: var(--c-bg);
+        box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
+}
+
+/* Cover Page */
+.cover {
+    width: 210mm;
+    height: 297mm;
+    padding: 40mm 25mm;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+    break-after: page;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 20%, rgba(22, 163, 74, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(220, 38, 38, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+.cover-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+.cover-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.cover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: auto;
+}
+.cover-badge {
+    background: rgba(22, 163, 74, 0.15);
+    border: 1px solid rgba(22, 163, 74, 0.4);
+    color: var(--c-accent);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.cover-date {
+    color: var(--c-muted);
+    font-size: 11px;
+    text-align: left;
+}
+.cover-main {
+    text-align: center;
+    margin: auto 0;
+}
+.cover-icon {
+    font-size: 72px;
+    margin-bottom: 24px;
+}
+.cover-title {
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1.2;
+    margin: 0 0 16px;
+    background: linear-gradient(135deg, #16a34a 0%, #fbbf24 50%, #dc2626 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.cover-subtitle {
+    font-size: 18px;
+    color: var(--c-muted);
+    margin: 0 0 32px;
+    font-weight: 400;
+}
+.cover-desc {
+    font-size: 13px;
+    color: var(--c-text);
+    opacity: 0.7;
+    line-height: 1.8;
+    max-width: 140mm;
+    margin: 0 auto;
+}
+.cover-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 40px auto 0;
+    max-width: 160mm;
+}
+.cover-stat {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--c-border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+.cover-stat-num {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--c-accent);
+}
+.cover-stat-label {
+    font-size: 10px;
+    color: var(--c-muted);
+    margin-top: 4px;
+}
+.cover-footer {
+    margin-top: auto;
+    text-align: center;
+    color: var(--c-muted);
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+/* Main Content */
+.main-content {
+    padding: 20mm 18mm;
+}
+.section {
+    margin-bottom: 24px;
+    break-inside: avoid;
+}
+.section-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--c-accent);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--c-accent);
+}
+.section-num {
+    display: inline-block;
+    background: var(--c-accent);
+    color: var(--c-bg);
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 14px;
+    margin-left: 8px;
+}
+.subsection {
+    margin: 16px 0 8px;
+}
+.subsection-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--c-text);
+    margin: 0 0 8px;
+    padding-right: 12px;
+    border-right: 3px solid var(--c-accent);
+}
+p {
+    margin: 8px 0;
+    text-align: justify;
+    line-height: 1.8;
+}
+.card {
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 10px 0;
+    break-inside: avoid;
+}
+.card-accent {
+    border-right: 4px solid var(--c-accent);
+}
+.card-danger {
+    border-right: 4px solid var(--c-danger);
+}
+.card-warn {
+    border-right: 4px solid var(--c-warn);
+}
+.card-info {
+    border-right: 4px solid var(--c-info);
+}
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 10px 0;
+}
+.stat-box {
+    background: var(--c-card-light);
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+}
+.stat-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--c-accent);
+    display: block;
+}
+.stat-label {
+    font-size: 10px;
+    color: var(--c-muted);
+    margin-top: 2px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 11px;
+    break-inside: auto;
+}
+th {
+    background: var(--c-accent);
+    color: var(--c-bg);
+    padding: 8px 10px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 11px;
+}
+td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--c-border);
+    text-align: right;
+}
+tr:nth-child(even) td {
+    background: rgba(255,255,255,0.02);
+}
+ul, ol {
+    padding-right: 20px;
+    margin: 8px 0;
+}
+li {
+    margin: 4px 0;
+    line-height: 1.7;
+}
+.highlight {
+    background: rgba(22, 163, 74, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.danger {
+    color: var(--c-danger);
+    font-weight: 700;
+}
+.warn {
+    color: var(--c-warn);
+    font-weight: 700;
+}
+.quote {
+    background: rgba(255,255,255,0.03);
+    border-right: 4px solid var(--c-info);
+    padding: 12px 16px;
+    margin: 10px 0;
+    font-style: italic;
+    color: var(--c-muted);
+    border-radius: 4px;
+    break-inside: avoid;
+}
+.source {
+    font-size: 10px;
+    color: var(--c-muted);
+    margin-top: 4px;
+    opacity: 0.7;
+}
+.warning-box {
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    break-inside: avoid;
+}
+.warning-title {
+    color: var(--c-danger);
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+/* Ending Page */
+.ending {
+    width: 210mm;
+    height: 297mm;
+    padding: 40mm 25mm;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+    break-before: page;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.ending-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+}
+.ending-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--c-accent);
+    margin: 0 0 16px;
+}
+.ending-text {
+    font-size: 14px;
+    color: var(--c-muted);
+    max-width: 140mm;
+    line-height: 1.8;
+}
+.ending-divider {
+    width: 60px;
+    height: 3px;
+    background: var(--c-accent);
+    margin: 24px auto;
+    border-radius: 2px;
+}
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-content">
+        <div class="cover-header">
+            <div class="cover-badge">سند تحلیلی راهبردی</div>
+            <div class="cover-date">
+                تیر ۱۴۰۴<br>
+                نسخه ۴.۰
+            </div>
+        </div>
+        <div class="cover-main">
+            <div class="cover-icon">🌍</div>
+            <h1 class="cover-title">بازی بزرگ خاورمیانه</h1>
+            <p class="cover-subtitle">تحلیل راهبردی مناسبات ایران، آمریکا و اسرائیل</p>
+            <p class="cover-desc">
+                این سند حاصل ۹ تحقیق موازی بر اساس داده‌های واقعی تا اواسط ۲۰۲۶ است.
+                تمامی آمار، ارقام و سناریوها بر اساس منابع معتبر بین‌المللی شامل
+                IAEA، CSIS، CFR، RAND، IISS، SIPRI، Reuters، AP و BBC تدوین شده است.
+                هدف، ارائه تصویری واقع‌بینانه از وضعیت فعلی و مسیرهای پیش‌روست.
+            </p>
+            <div class="cover-stats">
+                <div class="cover-stat">
+                    <div class="cover-stat-num">۷۰+</div>
+                    <div class="cover-stat-label">سال تاریخچه مناسبات</div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-num">۱۲</div>
+                    <div class="cover-stat-label">سناریوی پایان محتمل</div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-num">۸</div>
+                    <div class="cover-stat-label">تحقیق موازی</div>
+                </div>
+            </div>
+        </div>
+        <div class="cover-footer">
+            بر اساس داده‌های واقعی ۲۰۲۴-۲۰۲۶ · شامل تحلیل جنگ ۱۲ روزه و Operation Epic Fury
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+<!-- SECTION 1: Executive Summary -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱</span>خلاصه راهبردی</h2>
+    
+    <div class="card card-accent">
+        <p><strong>وضعیت فعلی (اواسط ۲۰۲۶):</strong> ایران در ضعیف‌ترین موقعیت راهبردی خود از زمان جنگ ایران-عراق قرار دارد. برنامه هسته‌ای پس از حملات ژوئن ۲۰۲۵ (جنگ ۱۲ روزه) و فوریه ۲۰۲۶ (Operation Epic Fury) به‌شدت آسیب دیده، محور مقاومت متلاشی شده، اقتصاد در حال فروپاشی با تورم ۶۲-۶۹ درصد و ریال ۱.۹ میلیون به دلار است. با این حال، رژیم همچنان بر سر قدرت است و در حال بازسازی توان نظامی با کمک روسیه است.</p>
+    </div>
+
+    <div class="warning-box">
+        <div class="warning-title">⚠️ یافته کلیدی</div>
+        <p style="margin:0">تحلیل ۷ مورد تاریخی (کره شمالی، پاکستان، هند، آفریقای جنوبی، لیبی، عراق، سوریه) نشان می‌دهد: <strong>بمب تثبیت‌شده حمله پیش‌دگیرانه را غیرمحتمل می‌کند</strong>، اما پنجره بحرانی ۱۸-۳۶ ماه اول خطرناک است. درس لیبی (۲۰۰۳ توقف، ۲۰۱۱ سرنگونی) به ایران آموخته که توقف برنامه = حذف مصونیت.</p>
+    </div>
+
+    <h3 class="subsection-title">محتمل‌ترین مسیرها</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>سناریو</th>
+                <th>احتمال واقعی</th>
+                <th>بازه زمانی</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>جنگ سایه‌ای + بحران رهبری</td><td>۴۰-۵۰٪</td><td>۳-۱۰ سال</td></tr>
+            <tr><td>بازدارندگی هسته‌ای ایران</td><td>۲۰-۲۵٪</td><td>۳-۱۰ سال</td></tr>
+            <tr><td>کاهش جاه‌طلبی آمریکا</td><td>۲۰-۲۵٪</td><td>۵-۱۵ سال</td></tr>
+            <tr><td>توافق جامع</td><td>۱۵-۲۰٪</td><td>۲-۱۰ سال</td></tr>
+            <tr><td>شکست استراتژیک محدود</td><td>۱۵-۲۰٪</td><td>۱-۵ سال</td></tr>
+            <tr><td>تغییر رژیم از درون</td><td>۱۰-۱۵٪</td><td>۲-۱۰ سال</td></tr>
+            <tr><td>جنگ هسته‌ای منطقه‌ای</td><td class="danger">۱-۳٪</td><td>فقط بحرانی</td></tr>
+        </tbody>
+    </table>
+    <p class="source">منبع: تحلیل مؤلف بر اساس CSIS, CFR, RAND, ISIS, OSW (۲۰۲۵-۲۰۲۶)</p>
+</div>
+
+<!-- SECTION 2: Iran Nuclear Program -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۲</span>برنامه هسته‌ای ایران</h2>
+    
+    <h3 class="subsection-title">وضعیت فعلی (۲۰۲۴-۲۰۲۶)</h3>
+    <p>ایران تنها کشور غیرسلاح‌دار هسته‌ای جهان است که تا ۶۰ درصد اورانیوم را غنی‌سازی می‌کند. این سطح غنی‌سازی، اگرچه کوتاه‌تر از ۹۰ درصد مورد نیاز برای سلاح است، اما نشان‌دهنده پیشرفت قابل توجه برنامه هسته‌ای ایران است. طبق گزارش IAEA در ۳۱ مه ۲۰۲۵، ذخیره اورانیوم غنی‌شده ۶۰ درصد ایران به ۴۰۸.۶ کیلوگرم رسید که تا ژوئن ۲۰۲۵ به ۴۴۰ کیلوگرم افزایش یافت. این مقدار برای ساخت نزدیک به ۱۰ سلاح هسته‌ای کافی است.</p>
+
+    <div class="stat-grid">
+        <div class="stat-box">
+            <span class="stat-value">۶۰٪</span>
+            <span class="stat-label">سطح غنی‌سازی فعلی</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">۴۴۰ kg</span>
+            <span class="stat-label">ذخیره اورانیوم ۶۰٪</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">۲۲٬۰۰۰</span>
+            <span class="stat-label">سانتریفیوژ (پیش از حملات)</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">~۱۰</span>
+            <span class="stat-label">بمب قابل ساخت</span>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">زمان breakout (رسیدن به بمب)</h3>
+    <div class="card card-danger">
+        <p>پیش از حملات ۲۰۲۵، زمان breakout ایران <strong>تقریباً صفر</strong> بود (UK Parliament Commons Library، ۲۰۲۵). طبق برآورد ISIS در می ۲۰۲۵، ایران می‌توانست ذخیره ۶۰٪ خود را طی <strong>۳ هفته</strong> در فردو به ۲۳۳ کیلوگرم اورانیوم بسیار غنی‌شده (WGU) تبدیل کند. پس از حملات ۲۰۲۵، برآورد ژوئیه ۲۰۲۶: <strong>۱ تا ۳ ماه</strong> (IranWarRoom بر اساس داده IAEA).</p>
+    </div>
+
+    <h3 class="subsection-title">تأثیر حملات ۲۰۲۵ و ۲۰۲۶</h3>
+    <p><strong>جنگ ۱۲ روزه (۱۳-۲۴ ژوئن ۲۰۲۵):</strong> اسرائیل ۱۳ ژوئن حمله را آغاز کرد. در ۲۲ ژوئن، آمریکا با عملیات Midnight Hammer با بمب‌افکن‌های B-2 و بمب‌های GBU-57 MOP به فردو، نطنز و اصفهان حمله کرد. نطنز «نابودشده» و فردو و اصفهان «آسیب بسیار شدید» دیدند. با این حال، بیش از ۴۰۰ کیلوگرم اورانیوم ۶۰٪ همچنان در سایت‌های اصفهان و فردو باقی ماند (رئیس IAEA Grossi، ۲۰ اکتبر ۲۰۲۵).</p>
+
+    <p><strong>Operation Epic Fury (۲۸ فوریه ۲۰۲۶):</strong> آغاز عملیات مشترک آمریکا-اسرائیل با ۹۰۰ حمله در ۱۲ ساعت نخست. اهداف شامل رهبری، سایت‌های هسته‌ای، زیرساخت موشکی، پدافند و وزارتخانه‌ها بود. ایران با چندین موج موشک بالستیک و پهپاد پاسخ داد و از موشک‌های هایپرسونیک (فتاح) استفاده کرد. ۳ نظامی آمریکایی کشته و ۵ نفر به‌شدت مجروح شدند.</p>
+
+    <div class="quote">
+        «برنامه هسته‌ای ایران ویران اما دست‌نخورده است. ارزیابی اولیه نشان می‌دهد برنامه شاید فقط ۶ ماه عقب افتاده باشد.»
+        <div class="source">CNN، ۱۶ نوامبر ۲۰۲۵</div>
+    </div>
+</div>
+
+<!-- SECTION 3: Iran Economy -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۳</span>اقتصاد ایران در حال فروپاشی</h2>
+    
+    <p>اقتصاد ایران در بدترین وضعیت خود از دهه ۱۹۸۰ قرار دارد. ترکیب تحریم‌های چندلایه (آمریکا، سازمان ملل، اتحادیه اروپا)، مدیریت ناکارآمد داخلی، و خسارات ناشی از جنگ‌های ۲۰۲۵ و ۲۰۲۶، اقتصاد را به لبه فروپاشی رسانده است.</p>
+
+    <div class="stat-grid">
+        <div class="stat-box">
+            <span class="stat-value">۶۲-۶۹٪</span>
+            <span class="stat-label">نرخ تورم سالانه</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">۱.۹M</span>
+            <span class="stat-label">ریال به ازای هر دلار (ژوئیه ۲۰۲۶)</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">-۲.۷٪</span>
+            <span class="stat-label">رشد GDP (۲۰۲۵/۲۶)</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">$۳۰۰B</span>
+            <span class="stat-label">GDP اسمی (۲۰۲۶)</span>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">ارزش ریال</h3>
+    <p>ریال ایران کم‌ارزش‌ترین واحد پول جهان است. در ۱۹ مارس ۲۰۲۵، دلار از ۱ میلیون ریال عبور کرد. در اوایل ژانویه ۲۰۲۶ به ۱.۴۲-۱.۵ میلیون ریال رسید و در ژوئیه ۲۰۲۶ به رکورد تاریخی ۱.۸-۱.۹۵ میلیون ریال سقوط کرد. ریال از ابتدای ۲۰۲۶ حدود ۴۳.۷ درصد ارزش خود را از دست داد.</p>
+
+    <h3 class="subsection-title">فرار مغزها</h3>
+    <div class="card card-warn">
+        <p>خروج سالانه نخبگان و متخصصان به <strong>۱۸۰٬۰۰۰ نفر در سال</strong> می‌رسد که خسارت آن بیش از <strong>۶۰ میلیارد دلار</strong> تخمین زده می‌شود (IranNewsWire). World Bank این خسارت را ۵۰ میلیارد دلار در سال برآورد می‌کند. در سال ۲۰۲۲، ۶٬۵۰۰ پزشک و ۳٬۰۰۰ پرستار مهاجرت کردند. شمار دانشجویان ایرانی خارج از کشور در ۲۰۲۴ به رکورد تاریخی رسید.</p>
+    </div>
+
+    <h3 class="subsection-title">تولید نفت</h3>
+    <p>ایران در ۲۰۲۵-۲۰۲۶ روزانه ۳.۲-۳.۳ میلیون بشکه نفت تولید می‌کند که از آن حدود ۲ میلیون بشکه صادر می‌شود. درآمد صادراتی نفت در ۲۰۲۵ حدود ۴۱ میلیارد دلار بود. با این حال، در آوریل ۲۰۲۶، تولید ۳۵۰ هزار بشکه نسبت به قبل از جنگ کاهش یافت. هدف دولت رساندن تولید به ۴ میلیون بشکه است.</p>
+</div>
+
+<!-- SECTION 4: Military Capability -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۴</span>توان نظامی ایران</h2>
+    
+    <p>ایران بزرگترین و متنوع‌ترین زرادخانه موشکی خاورمیانه را دارد (CSIS Missile Threat). پیش از جنگ ژوئن ۲۰۲۵، ایران بیش از ۳٬۰۰۰ موشک بالستیک داشت. در جنگ ۱۲ روزه، ۵۰۰-۵۵۰ موشک بالستیک و ۱٬۰۰۰ پهپاد شلیک شد که بخش عمده‌ای از موجودی موشک‌های میان‌برد و برد متوسط مصرف شد.</p>
+
+    <h3 class="subsection-title">انواع موشک‌های بالستیک</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>موشک</th>
+                <th>نوع</th>
+                <th>برد</th>
+                <th>یادداشت</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>فتاح-۱</td><td>«مافوق صوت» (ادعا)</td><td>~۱٬۴۰۰ km</td><td>IISS (۲۰۲۳) ادعای هایپرسونیک را اغراق‌آمیز می‌داند</td></tr>
+            <tr><td>خرمشهر-۴</td><td>سوخت مایع</td><td>~۲٬۰۰۰ km</td><td>بار مفیدی بزرگ</td></tr>
+            <tr><td>سجیل</td><td>سوخت جامد</td><td>~۲٬۰۰۰ km</td><td>نخستین‌بار در درگیری ۲۰۲۶ استفاده شد</td></tr>
+            <tr><td>عماد/قدیر</td><td>سوخت مایع</td><td>۱٬۶۰۰-۱٬۸۰۰ km</td><td>نسخه‌های قدیمی‌تر</td></tr>
+        </tbody>
+    </table>
+
+    <h3 class="subsection-title">نیروی انسانی</h3>
+    <div class="stat-grid">
+        <div class="stat-box">
+            <span class="stat-value">۱۵۰-۱۹۰K</span>
+            <span class="stat-label">سپاه پاسداران (فعال)</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">۵-۱۵K</span>
+            <span class="stat-label">نیروی قدس</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">۴۰-۹۰K</span>
+            <span class="stat-label">بسیج (فعال)</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-value">۵۷۰K</span>
+            <span class="stat-label">کل نیروهای مسلح</span>
+        </div>
+    </div>
+    <p class="source">منبع: CFR، ۳۰ ژانویه ۲۰۲۶؛ DNI/NCTC؛ IISS Military Balance 2025</p>
+</div>
+
+<!-- SECTION 5: Axis of Resistance -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۵</span>محور مقاومت در حال متلاشی</h2>
+    
+    <div class="warning-box">
+        <div class="warning-title">⚠️ ضربه راهبردی</div>
+        <p style="margin:0">سقوط اسد در ۸ دسامبر ۲۰۲۴، کریدور زمینی ایران به حزب‌الله را قطع کرد. این «ضعف راهبردی و نظامی» ایران را آشکار کرد (Chatham House). ایران ده‌ها میلیارد دلار برای حفظ اسد هزینه کرده بود.</p>
+    </div>
+
+    <h3 class="subsection-title">حزب‌الله پس از نصرالله</h3>
+    <p>حسن نصرالله در سپتامبر ۲۰۲۴ کشته شد. از اکتبر ۲۰۲۳ تا سپتامبر ۲۰۲۴، بیش از ۵۰۰ جنگجوی حزب‌الله کشته شدند. اسرائیل حدود نیمی از زرادخانه موشکی/راکتی حزب‌الله را نابود کرد. موجودی راکت‌ها پیش از جنگ ۴۰٬۰۰۰ تا ۱۲۰٬۰۰۰ تخمین زده می‌شد. حزب‌الله اکنون «ضعیف‌تر از همیشه» است (INSS، ۲۰۲۵).</p>
+
+    <h3 class="subsection-title">حوثی‌های یمن</h3>
+    <p>بحران دریای سرخ با حمله به کشتی‌ها ادامه دارد. از مارس تا مه ۲۰۲۵، آمریکا حملات گسترده‌ای به حوثی‌ها انجام داد. در ۶ مه ۲۰۲۵، ترامپ اعلام توقف حملات آمریکا کرد. در ژوئیه ۲۰۲۶، ایران از حوثی‌ها خواست تنگه باب‌المندب را در صورت حمله آمریکا به شبکه برق ببندند.</p>
+
+    <h3 class="subsection-title">حماس پس از ۷ اکتبر</h3>
+    <p>یحیی سنوار (معمار ۷ اکتبر) در اکتبر ۲۰۲۴ کشته شد. محمد ضیف (فرمانده نظامی) - مرگ در ژانویه ۲۰۲۵ تأیید شد. اسرائیل توان نظامی حماس را به‌شدت تضعیف کرد و حماس به شورش‌گر تبدیل شد.</p>
+
+    <h3 class="subsection-title">شبه‌نظامیان عراقی</h3>
+    <p>کتیب حزب‌الله و دیگر شبه‌نظامیان تحت فشار برای خلع سلام هستند. کتیب امام علی سلاح‌ها را تحت کنترل دولت گذاشت. شبه‌نظامیان بر سر خلع سلاح تقسیم شده‌اند.</p>
+</div>
+
+<!-- SECTION 6: Direct Confrontations -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۶</span>درگیری‌های مستقیم ایران-اسرائیل</h2>
+    
+    <p>در دو سال گذشته، پنج دور درگیری مستقیم ایران-اسرائیل رخ داده است که نشان‌دهنده گذار از «جنگ سایه‌ای» به «رویارویی مستقیم» است.</p>
+
+    <h3 class="subsection-title">وعده صادق ۱ (۱۳-۱۴ آوریل ۲۰۲۴)</h3>
+    <p>پاسخ به حمله اسرائیل به کنسولگری ایران در دمشق. ایران ۱۷۰ پهپاد، ۳۰+ موشک کروز و ۱۲۰+ موشک بالستیک (مجموعاً بیش از ۳۰۰ پرتابه) شلیک کرد. این اولین حمله مستقیم ایران به اسرائیل بود. آسیب حداقل بود.</p>
+
+    <h3 class="subsection-title">وعده صادق ۲ (۱ اکتبر ۲۰۲۴)</h3>
+    <p>حدود ۱۸۰-۲۰۰ موشک بالستیک در دو موج شلیک شد. بزرگ‌ترین حمله درگیری ایران-اسرائیل تا آن زمان. آسیب به پایگاه‌های هوایی نواتیم و تل‌نوف. پاسخ اسرائیل در ۲۶ اکتبر ۲۰۲۴ (عملیات «روزهای توبه»): ۱۰۰+ هواپیما شامل F-35، نابودی سیستم‌های پدافندی، ۵ کشته.</p>
+
+    <h3 class="subsection-title">جنگ ۱۲ روزه (۱۳-۲۴ ژوئن ۲۰۲۵)</h3>
+    <div class="card card-danger">
+        <p><strong>ایران:</strong> ۱٬۰۶۰ تا ۱٬۱۹۰ کشته، هزاران مجروح، ده‌ها هزار آواره. ۵۲ مقام و فرمانده ارشد ایرانی کشته شدند.</p>
+        <p><strong>اسرائیل:</strong> ۲۸ کشته، ۶۰۰+ مجروح.</p>
+        <p><strong>آمریکا:</strong> عملیات Midnight Hammer با B-2 و GBU-57 MOP به فردو، نطنز، اصفهان.</p>
+    </div>
+
+    <h3 class="subsection-title">Operation Epic Fury (۲۸ فوریه ۲۰۲۶)</h3>
+    <p>عملیات مشترک آمریکا-اسرائیل با ۹۰۰ حمله در ۱۲ ساعت نخست. ایران با موشک‌های هایپرسونیک (فتاح) و سجیل پاسخ داد. ۳ نظامی آمریکایی کشته و ۵ نفر به‌شدت مجروح شدند.</p>
+</div>
+
+<!-- SECTION 7: Historical Lessons -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۷</span>درس‌های تاریخی بمب هسته‌ای</h2>
+    
+    <p>تحلیل ۷ مورد تاریخی کشورهایی که به بمب هسته‌ای رسیدند یا تلاش کردند، الگوهای روشنی برای ایران ارائه می‌دهد.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>کشور</th>
+                <th>سال</th>
+                <th>حمله خارجی؟</th>
+                <th>رفع تحریم؟</th>
+                <th>نتیجه</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>کره شمالی</td><td>۲۰۰۶</td><td>خیر</td><td>خیر (۱۸ سال)</td><td>مصونیت نظامی، انزوا</td></tr>
+            <tr><td>پاکستان</td><td>۱۹۹۸</td><td>خیر</td><td>بله (۲۰۰۱)</td><td>پذیرش کامل</td></tr>
+            <tr><td>هند</td><td>۱۹۷۴/۹۸</td><td>خیر</td><td>بله (۲۰۰۸)</td><td>شریک آمریکا</td></tr>
+            <tr><td>آفریقای جنوبی</td><td>۱۹۸۹</td><td>—</td><td>—</td><td>تنها dismantle موفق</td></tr>
+            <tr><td>لیبی</td><td>۲۰۰۳</td><td>—</td><td>موقتاً</td><td class="danger">سرنگونی ۲۰۱۱</td></tr>
+            <tr><td>عراق</td><td>—</td><td>بله (۱۹۸۱، ۲۰۰۳)</td><td>—</td><td>برنامه متوقف نشد</td></tr>
+            <tr><td>سوریه</td><td>—</td><td>بله (۲۰۰۷)</td><td>—</td><td>ضربه زودهنگام مؤثر</td></tr>
+        </tbody>
+    </table>
+
+    <div class="card card-accent">
+        <h4 style="margin:0 0 8px;color:var(--c-accent)">درس‌های کلیدی برای ایران:</h4>
+        <ol>
+            <li><strong>بمب تثبیت‌شده، حمله پیش‌دگیرانه را غیرمحتمل می‌کند</strong> - کره شمالی، پاکستان، هند هیچ‌کدام حمله نشدند.</li>
+            <li><strong>پنجره بحرانی ۱۸-۳۶ ماه اول</strong> - احتمال حمله اسرائیل ۵۰-۶۵٪.</li>
+            <li><strong>پس از تثبیت، آمریکا به containment روی می‌آورد</strong> - مثل کره شمالی.</li>
+            <li><strong>توقف برنامه = حذف مصونیت = سرنگونی</strong> - درس لیبی.</li>
+            <li><strong>تحریم‌ها به‌تدریج رفع می‌شوند</strong> - مدل پاکستان/هند.</li>
+        </ol>
+    </div>
+</div>
+
+<!-- SECTION 8: Scenarios -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۸</span>سناریوهای پایان محتمل</h2>
+    
+    <p>بر اساس تحلیل داده‌های واقعی و الگوهای تاریخی، ۱۲ سناریوی پایان محتمل طراحی شده است. هر سناریو ترکیبی از وقایع + نتیجه نهایی است.</p>
+
+    <h3 class="subsection-title">۱. جنگ سایه‌ای + بحران رهبری (۴۰-۵۰٪)</h3>
+    <div class="card card-accent">
+        <p><strong>مسیر:</strong> صبر استراتژیک + فعال‌سازی نیابتی + حمله سایبری → ۳-۵ سال فرسایش → بحران جانشینی رهبری → تحول بزرگ.</p>
+        <p><strong>نتیجه:</strong> جنگ سایه‌ای به‌تنهایی پایان نیست. پس از ۳-۵ سال به بحران رهبری می‌رسد و سپس به یکی از پایان‌های نهایی (بمب اتم، توافق، یا تغییر رژیم) ختم می‌شود.</p>
+        <p><strong>الگوی تاریخی:</strong> جنگ کره (۷۰ سال)، کشمیر (۷۷ سال)، اسرائیل-فلسطین (۷۵ سال).</p>
+    </div>
+
+    <h3 class="subsection-title">۲. بازدارندگی هسته‌ای ایران (۲۰-۲۵٪)</h3>
+    <div class="card card-accent">
+        <p><strong>مسیر:</strong> خروج NPT → دریافت کلاهک/غنی‌سازی ۹۰٪ → ساخت بمب → پذیرش آمریکا.</p>
+        <p><strong>نتیجه:</strong> ایران به قدرت هسته‌ای تبدیل می‌شود. مسابقه تسلیحاتی منطقه‌ای. تحریم‌ها به‌تدریج رفع. «MAD منطقه‌ای».</p>
+        <p><strong>الگوی تاریخی:</strong> کره شمالی (۲۰۰۶)، پاکستان (۱۹۹۸)، هند (۱۹۹۸).</p>
+    </div>
+
+    <h3 class="subsection-title">۳. شکست استراتژیک محدود + بازسازی (۱۵-۲۰٪)</h3>
+    <div class="card card-danger">
+        <p><strong>مسیر:</strong> حمله موشکی + حزب‌الله + هرمز → پاسخ هماهنگ آمریکا-اسرائیل.</p>
+        <p><strong>نتیجه:</strong> برنامه هسته‌ای تأخیر ۱-۲ ساله. توان موشکی کاهش. محور مقاومت تحلیل رفت. ولی رژیم سرنگون نشد. ایران در حال بازسازی.</p>
+        <p><strong>الگوی تاریخی:</strong> جنگ ۱۲ روزه ۲۰۲۵ (واقعی!)، عراق ۱۹۹۱، صربستان ۱۹۹۹.</p>
+    </div>
+
+    <h3 class="subsection-title">۴. توافق جامع و عادی‌سازی (۱۵-۲۰٪)</h3>
+    <div class="card card-info">
+        <p><strong>مسیر:</strong> دیپلماسی + عادی‌سازی با عربستان + اتحاد با چین.</p>
+        <p><strong>نتیجه:</strong> توافق «Less for Less». رشد اقتصادی ۶-۸٪. احیای صنعت نفت. ولی شکننده.</p>
+        <p><strong>الگوی تاریخی:</strong> ویتنام-آمریکا (۱۹۹۵)، هند-آمریکا (۲۰۰۸)، کمپ دیوید (۱۹۷۸).</p>
+    </div>
+
+    <h3 class="subsection-title">۵. تغییر رژیم از درون (۱۰-۱۵٪)</h3>
+    <div class="card card-warn">
+        <p><strong>مسیر:</strong> فرسایش + بحران جانشینی + شکاف درون نخبگان + اعتراضات.</p>
+        <p><strong>نتیجه:</strong> تغییر مسالمت‌آمیز یا پرآشوب. احتمال دموکراسی (مدل اسپانیا/پرتغال).</p>
+        <p><strong>الگوی تاریخی:</strong> گورباچف/شوروی (۱۹۹۱)، سقوط اسد (۲۰۲۴).</p>
+    </div>
+
+    <h3 class="subsection-title">۶. کاهش جاه‌طلبی آمریکا (۲۰-۲۵٪)</h3>
+    <div class="card card-accent">
+        <p><strong>مسیر:</strong> فرسایش طولانی‌مدت + ائتلاف با روسیه/چین.</p>
+        <p><strong>نتیجه:</strong> آمریکا پایگاه‌ها را نگه می‌دارد، ولی رویای «تغییر رژیم» را کنار می‌گذارد.</p>
+        <p><strong>الگوی تاریخی:</strong> ویتنام (۱۹۷۳)، عراق (۲۰۱۱)، افغانستان (۲۰۲۱).</p>
+    </div>
+
+    <h3 class="subsection-title">۷. جنگ هسته‌ای منطقه‌ای (۱-۳٪)</h3>
+    <div class="card card-danger">
+        <p><strong>مسیر:</strong> حمله زمینی + ICBM → تبادل هسته‌ای.</p>
+        <p><strong>نتیجه:</strong> ۵-۲۰ میلیون کشته. زمستان هسته‌ای کوچک. فاجعه جهانی.</p>
+        <p><strong>الگوی تاریخی:</strong> جنگ سرد (MAD کار کرد)، پاکستان-هند (چند بحران، جنگ نشد).</p>
+    </div>
+</div>
+
+<!-- SECTION 9: Card Effects Analysis -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۹</span>تحلیل اثرات کارت‌های استراتژیک</h2>
+    
+    <p>هر کارت استراتژیک در بازی، بر اساس داده‌های واقعی، اثرات مشخصی بر شش شاخص ایران دارد.</p>
+
+    <h3 class="subsection-title">کارت‌های هسته‌ای</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>کارت</th>
+                <th>هسته‌ای</th>
+                <th>بازدارندگی</th>
+                <th>اقتصاد</th>
+                <th>احتمال پاسخ نظامی</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>ساخت بمب اتم</td><td class="highlight">+۳۵</td><td class="highlight">+۳۰</td><td class="danger">-۲۵</td><td class="danger">۵۰-۶۵٪</td></tr>
+            <tr><td>خروج از NPT</td><td>+۱۵</td><td>+۱۰</td><td>-۱۰</td><td>۳۰-۴۰٪</td></tr>
+            <tr><td>دریافت کلاهک از کره شمالی</td><td>+۲۵</td><td>+۱۸</td><td>-۱۸</td><td class="danger">۶۰-۷۰٪</td></tr>
+        </tbody>
+    </table>
+
+    <h3 class="subsection-title">کارت‌های نظامی</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>کارت</th>
+                <th>بازدارندگی</th>
+                <th>توان نظامی</th>
+                <th>حمایت داخلی</th>
+                <th>تشدید جنگ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>حمله موشکی به اسرائیل</td><td>+۱۸</td><td>-۸</td><td>+۱۵</td><td class="warn">×۱.۳</td></tr>
+            <tr><td>حمله زمینی به اسرائیل</td><td>+۱۲</td><td class="danger">-۳۰</td><td>+۲۵</td><td class="danger">×۱.۶</td></tr>
+            <tr><td>ساخت ICBM</td><td>+۳۰</td><td>-۱۰</td><td>+۲۰</td><td class="danger">×۱.۵</td></tr>
+            <tr><td>حمله به پایگاه‌های آمریکا</td><td>+۱۵</td><td>-۸</td><td>+۲۰</td><td class="warn">×۱.۳۵</td></tr>
+        </tbody>
+    </table>
+
+    <h3 class="subsection-title">کارت‌های نیابتی</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>کارت</th>
+                <th>نفوذ منطقه‌ای</th>
+                <th>بازدارندگی</th>
+                <th>توان نظامی</th>
+                <th>پاسخ قطعی</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>فعال‌سازی حزب‌الله</td><td>+۱۴</td><td>+۱۲</td><td>+۸</td><td>۸۰-۸۵٪ (اسرائیل)</td></tr>
+            <tr><td>فعال‌سازی حوثی‌ها</td><td>+۸</td><td>+۶</td><td>+۳</td><td>۸۰-۸۵٪ (Prosperity Guardian)</td></tr>
+            <tr><td>شبه‌نظامیان عراق</td><td>+۶</td><td>+۵</td><td>+۲</td><td>۶۰-۷۰٪</td></tr>
+            <tr><td>حماس و جهاد</td><td>+۱۰</td><td>+۵</td><td>+۲</td><td>۸۰-۸۵٪</td></tr>
+        </tbody>
+    </table>
+
+    <h3 class="subsection-title">کارت‌های نامتقارن</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>کارت</th>
+                <th>بازدارندگی</th>
+                <th>اقتصاد</th>
+                <th>قیمت نفت</th>
+                <th>پاسخ آمریکا</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>بستن تنگه هرمز</td><td>+۱۸</td><td class="danger">-۱۵</td><td class="danger">$۲۵۰</td><td class="danger">۸۵-۹۰٪ (عملیات آزادسازی)</td></tr>
+            <tr><td>بستن باب‌المندب</td><td>+۱۵</td><td>-۸</td><td class="warn">$۱۲۰</td><td>۸۰-۸۵٪</td></tr>
+            <tr><td>حمله پهپادی انبوه</td><td>+۸</td><td>+۲</td><td>—</td><td>متوسط</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- SECTION 10: Combination Analysis -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۰</span>تحلیل ترکیب کارت‌ها</h2>
+    
+    <h3 class="subsection-title">ترکیب‌های موفق (به پایان مثبت)</h3>
+    <div class="card card-accent">
+        <p><strong>دیپلماسی + عادی‌سازی با عربستان + اتحاد با چین:</strong> این ترکیب می‌تواند به توافق جامع منجر شود. عادی‌سازی با عربستان، انزوای اسرائیل را افزایش می‌دهد و اتحاد با چین، پشتوانه اقتصادی فراهم می‌کند.</p>
+    </div>
+    <div class="card card-accent">
+        <p><strong>دیپلماسی + صبر استراتژیک + اتحاد با روسیه:</strong> این ترکیب باعث کاهش تنش و تقویت بازدارندگی بدون تشدید جنگ می‌شود.</p>
+    </div>
+
+    <h3 class="subsection-title">ترکیب‌های خطرناک (به جنگ)</h3>
+    <div class="card card-danger">
+        <p><strong>حمله موشکی + حزب‌الله + هرمز:</strong> این ترکیب به جنگ گسترده منطقه‌ای و شکست استراتژیک منجر می‌شود (مثل ۲۰۲۵).</p>
+    </div>
+    <div class="card card-danger">
+        <p><strong>حمله زمینی + ICBM:</strong> این ترکیب احتمالاً به جنگ هسته‌ای منجر می‌شود. حمله زمینی به اسرائیل، پاسخ هسته‌ای اسرائیل را برمی‌انگیزد.</p>
+    </div>
+
+    <h3 class="subsection-title">ترکیب‌های متناقض</h3>
+    <div class="card card-warn">
+        <p><strong>دیپلماسی + حمله موشکی:</strong> این ترکیب دیپلماسی را شکست می‌دهد. آمریکا فریب استراتژیک را کنار می‌گذارد و به پاسخ نظامی روی می‌آورد.</p>
+    </div>
+    <div class="card card-warn">
+        <p><strong>عادی‌سازی با عربستان + حزب‌الله:</strong> این ترکیب تنش با عربستان را ایجاد می‌کند و عادی‌سازی را نابود می‌کند.</p>
+    </div>
+</div>
+
+<!-- SECTION 11: Sources -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۱</span>منابع و مراجع</h2>
+    
+    <h3 class="subsection-title">منابع تحلیلی</h3>
+    <ul>
+        <li><strong>IAEA</strong> - گزارش‌های تأیید و نظارت هسته‌ای (GOV/2025/24، GOV/2026/8)</li>
+        <li><strong>ISIS</strong> (Institute for Science and International Security) - تحلیل سانتریفیوژ، breakout</li>
+        <li><strong>CSIS</strong> (Center for Strategic and International Studies) - زرادخانه موشکی</li>
+        <li><strong>CFR</strong> (Council on Foreign Relations) - IRGC، حزب‌الله</li>
+        <li><strong>RAND Corporation</strong> - تحلیل استراتژیک</li>
+        <li><strong>IISS</strong> (Military Balance 2025) - توان نظامی</li>
+        <li><strong>SIPRI</strong> - داده‌های تسلیحاتی</li>
+        <li><strong>Carnegie Endowment</strong> - تحلیل دیپلماسی</li>
+        <li><strong>Brookings Institution</strong> - تحلیل سیاست خارجی</li>
+        <li><strong>Belfer Center</strong> (Harvard) - تحلیل هسته‌ای</li>
+        <li><strong>Quincy Institute</strong> - تحلیل سیاست آمریکا</li>
+        <li><strong>OSW</strong> (Centre for Eastern Studies) - تحلیل منطقه‌ای</li>
+        <li><strong>INSS</strong> (Israel National Security Institute)</li>
+        <li><strong>Soufan Center</strong> - تحلیل تروریسم</li>
+        <li><strong>ISW</strong> (Institute for the Study of War)</li>
+    </ul>
+
+    <h3 class="subsection-title">منابع رسمی</h3>
+    <ul>
+        <li><strong>UN Security Council Resolutions</strong></li>
+        <li><strong>US Congress</strong> (CRS Reports)</li>
+        <li><strong>US State Department</strong> (history.state.gov)</li>
+        <li><strong>UK Parliament Research Briefings</strong> (CBP-10284)</li>
+        <li><strong>Costs of War</strong> (Brown University)</li>
+        <li><strong>US Treasury OFAC</strong></li>
+    </ul>
+
+    <h3 class="subsection-title">منابع خبری</h3>
+    <ul>
+        <li><strong>Reuters</strong> - اخبار و آمار</li>
+        <li><strong>Associated Press</strong> (AP)</li>
+        <li><strong>BBC</strong></li>
+        <li><strong>Al Jazeera</strong></li>
+        <li><strong>CNN</strong></li>
+        <li><strong>Times of Israel</strong></li>
+        <li><strong>Iran International</strong></li>
+    </ul>
+
+    <h3 class="subsection-title">داده‌های اقتصادی</h3>
+    <ul>
+        <li><strong>IMF</strong> (DataMapper/WEO آوریل ۲۰۲۶)</li>
+        <li><strong>World Bank</strong> (MPO)</li>
+        <li><strong>Deutsche Bank Research</strong></li>
+    </ul>
+</div>
+
+</div>
+
+<!-- ENDING PAGE -->
+<div class="ending">
+    <div class="ending-icon">🎯</div>
+    <h1 class="ending-title">پایان سند</h1>
+    <div class="ending-divider"></div>
+    <p class="ending-text">
+        این سند بر اساس ۹ تحقیق موازی و داده‌های واقعی تا اواسط ۲۰۲۶ تدوین شده است.
+        تمامی آمار و ارقام از منابع معتبر بین‌المللی جمع‌آوری شده‌اند.
+        هدف، ارائه تصویری واقع‌بینانه از وضعیت و مسیرهای پیش‌روست.
+    </p>
+    <div class="ending-divider"></div>
+    <p class="ending-text" style="font-size:11px;opacity:0.6">
+        نسخه ۴.۰ · تیر ۱۴۰۴<br>
+        بر اساس داده‌های IAEA، CSIS، CFR، RAND، ISIS، OSW، Reuters، AP، BBC
+    </p>
+</div>
+
+</body>
+</html>
