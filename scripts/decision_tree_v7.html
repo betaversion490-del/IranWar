@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>درخت کامل تصمیم‌گیری راهبردی - بازی بزرگ خاورمیانه</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 0; }
+:root {
+    --c-bg: #0a0e1a;
+    --c-text: #e8e6e3;
+    --c-accent: #16a34a;
+    --c-danger: #dc2626;
+    --c-warn: #d97706;
+    --c-info: #0ea5e9;
+    --c-purple: #a855f7;
+    --c-muted: #94a3b8;
+    --c-border: #1e293b;
+    --c-card: #111827;
+    --c-card-light: #1e293b;
+}
+* { box-sizing: border-box; }
+html, body {
+    margin: 0; padding: 0;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+    font-size: 11px;
+    line-height: 1.6;
+}
+@media screen {
+    html { background: #1a1a1a; display: flex; justify-content: center; }
+    body { width: 210mm; background: var(--c-bg); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+}
+
+/* COVER */
+.cover {
+    width: 210mm; height: 297mm;
+    padding: 35mm 25mm;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+    break-after: page;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+}
+.cover::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 30% 20%, rgba(22, 163, 74, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+.cover-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; }
+.cover-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.cover-badge {
+    background: rgba(22, 163, 74, 0.15); border: 1px solid rgba(22, 163, 74, 0.4);
+    color: var(--c-accent); padding: 6px 16px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+}
+.cover-date { color: var(--c-muted); font-size: 11px; text-align: left; }
+.cover-main { text-align: center; margin: auto 0; }
+.cover-icon { font-size: 64px; margin-bottom: 20px; }
+.cover-title {
+    font-size: 36px; font-weight: 900; line-height: 1.2; margin: 0 0 12px;
+    background: linear-gradient(135deg, #16a34a 0%, #a855f7 50%, #0ea5e9 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.cover-subtitle { font-size: 15px; color: var(--c-muted); margin: 0 0 24px; }
+.cover-desc {
+    font-size: 12px; color: var(--c-text); opacity: 0.7; line-height: 1.8;
+    max-width: 140mm; margin: 0 auto;
+}
+.cover-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 32px auto 0; max-width: 160mm; }
+.cover-stat {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px; text-align: center;
+}
+.cover-stat-num { font-size: 22px; font-weight: 900; color: var(--c-accent); }
+.cover-stat-label { font-size: 9px; color: var(--c-muted); margin-top: 2px; }
+.cover-footer { text-align: center; color: var(--c-muted); font-size: 10px; opacity: 0.6; }
+
+/* CONTENT */
+.main-content { padding: 16mm 14mm; }
+.section { margin-bottom: 18px; break-inside: avoid; }
+.section-title {
+    font-size: 18px; font-weight: 800; color: var(--c-accent);
+    margin: 0 0 8px; padding-bottom: 5px; border-bottom: 2px solid var(--c-accent);
+}
+.section-num {
+    display: inline-block; background: var(--c-accent); color: var(--c-bg);
+    width: 24px; height: 24px; line-height: 24px; text-align: center;
+    border-radius: 50%; font-size: 12px; margin-left: 6px;
+}
+.subsection-title {
+    font-size: 14px; font-weight: 700; color: var(--c-text);
+    margin: 12px 0 5px; padding-right: 8px; border-right: 3px solid var(--c-accent);
+}
+p { margin: 5px 0; text-align: justify; line-height: 1.7; }
+
+/* TREE PATH */
+.tree-path {
+    background: var(--c-card); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px; margin: 10px 0; break-inside: avoid;
+}
+.path-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--c-border);
+}
+.path-icon { font-size: 20px; }
+.path-title { font-size: 14px; font-weight: 700; flex: 1; }
+.path-prob {
+    background: var(--c-card-light); padding: 3px 8px; border-radius: 12px;
+    font-size: 10px; font-weight: 700; color: var(--c-accent);
+}
+.path-prob.danger { color: var(--c-danger); }
+.path-prob.warn { color: var(--c-warn); }
+.path-prob.high { color: var(--c-accent); }
+.path-flow {
+    display: flex; align-items: center; gap: 3px; margin: 8px 0; flex-wrap: wrap;
+}
+.path-step {
+    background: var(--c-card-light); border: 1px solid var(--c-border);
+    border-radius: 6px; padding: 4px 7px; font-size: 9px; font-weight: 600;
+    text-align: center; min-width: 55px;
+}
+.path-step.nuclear { border-color: var(--c-danger); color: var(--c-danger); }
+.path-step.military { border-color: var(--c-warn); color: var(--c-warn); }
+.path-step.diplomatic { border-color: var(--c-accent); color: var(--c-accent); }
+.path-step.alliance { border-color: var(--c-purple); color: var(--c-purple); }
+.path-step.asymmetric { border-color: var(--c-info); color: var(--c-info); }
+.path-step.proxy { border-color: var(--c-purple); color: var(--c-purple); background: rgba(168,85,247,0.1); }
+.path-step.new { border-color: #fbbf24; color: #fbbf24; background: rgba(251,191,36,0.1); }
+.path-arrow { color: var(--c-muted); font-size: 14px; }
+.path-result {
+    border: 1px solid var(--c-accent); border-radius: 8px; padding: 8px 10px;
+    margin-top: 6px; font-size: 10px;
+}
+.path-result.victory { border-color: var(--c-accent); background: linear-gradient(135deg, rgba(22, 163, 74, 0.15), transparent); }
+.path-result.defeat { border-color: var(--c-danger); background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), transparent); }
+.path-result.compromise { border-color: var(--c-warn); background: linear-gradient(135deg, rgba(217, 119, 6, 0.15), transparent); }
+.path-result.survival { border-color: var(--c-info); background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), transparent); }
+.path-result.destruction { border-color: var(--c-danger); background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), transparent); }
+.path-stages { margin: 6px 0; }
+.stage {
+    display: flex; gap: 6px; margin: 4px 0; padding: 5px 8px;
+    background: rgba(255,255,255,0.02); border-radius: 4px; font-size: 9px;
+}
+.stage-label { font-weight: 700; color: var(--c-accent); min-width: 50px; }
+.stage-content { flex: 1; color: var(--c-muted); }
+.path-actors {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin: 6px 0;
+}
+.actor-response {
+    background: rgba(255,255,255,0.02); border-radius: 4px; padding: 4px 6px; font-size: 9px;
+}
+.actor-name { font-weight: 700; color: var(--c-info); }
+.actor-action { color: var(--c-muted); }
+.perspective-box {
+    background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 6px; padding: 8px 10px; margin: 6px 0; break-inside: avoid;
+}
+.perspective-title { font-size: 10px; font-weight: 700; color: var(--c-purple); margin-bottom: 4px; }
+.perspective-content { font-size: 9px; color: var(--c-muted); line-height: 1.6; }
+.power-map {
+    background: var(--c-card-light); border-radius: 6px; padding: 8px; margin: 6px 0;
+    font-size: 9px; font-family: monospace; line-height: 1.5; white-space: pre; color: var(--c-muted);
+}
+table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 9px; }
+th { background: var(--c-accent); color: var(--c-bg); padding: 5px 6px; text-align: right; font-weight: 700; font-size: 9px; }
+td { padding: 5px 6px; border-bottom: 1px solid var(--c-border); text-align: right; }
+tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+ul, ol { padding-right: 16px; margin: 5px 0; }
+li { margin: 2px 0; line-height: 1.5; }
+.danger { color: var(--c-danger); font-weight: 700; }
+.warn { color: var(--c-warn); font-weight: 700; }
+.info { color: var(--c-info); font-weight: 700; }
+
+/* ENDING */
+.ending {
+    width: 210mm; height: 297mm; padding: 35mm 25mm;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+    break-before: page; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+}
+.ending-icon { font-size: 64px; margin-bottom: 16px; }
+.ending-title { font-size: 26px; font-weight: 900; color: var(--c-accent); margin: 0 0 10px; }
+.ending-text { font-size: 12px; color: var(--c-muted); max-width: 140mm; line-height: 1.8; }
+.ending-divider { width: 50px; height: 3px; background: var(--c-accent); margin: 18px auto; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+    <div class="cover-content">
+        <div class="cover-header">
+            <div class="cover-badge">درخت کامل تصمیم‌گیری راهبردی</div>
+            <div class="cover-date">تیر ۱۴۰۴<br>نسخه ۷.۰</div>
+        </div>
+        <div class="cover-main">
+            <div class="cover-icon">🌳</div>
+            <h1 class="cover-title">درخت کامل تصمیم‌گیری</h1>
+            <p class="cover-subtitle">مایندمپ جامع: کارت‌های مستقیم + نیابتی + ترکیبی</p>
+            <p class="cover-desc">
+                این درخت حاصل تحقیق از منابع ایرانی (IRNA، تسنیم، فارس، Khamenei.ir،
+                ایران اینترنشنال، BBC فارسی) و منابع غربی (CSIS، CFR، RAND، IAEA،
+                ISW، Soufan Center) است. شامل کارت‌های جدید: حمله به دیمونا، آب شیرین‌کن،
+                ماهواره‌ها، چاه‌های نفت، محاصره عربستان توسط حوثی‌ها.
+            </p>
+            <div class="cover-stats">
+                <div class="cover-stat"><div class="cover-stat-num">۱۵</div><div class="cover-stat-label">مسیر تصمیم</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۳۵+</div><div class="cover-stat-label">کارت استراتژیک</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۲۰</div><div class="cover-stat-label">پایان واقعی</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۱۴</div><div class="cover-stat-label">تحقیق موازی</div></div>
+            </div>
+        </div>
+        <div class="cover-footer">بر اساس منابع ایرانی و غربی · شامل کارت‌های نیابتی و ترکیبی</div>
+    </div>
+</div>
+
+<div class="main-content">
+
+<!-- 1. INTRO -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱</span>مقدمه: چرا درخت قبلی ناقص بود؟</h2>
+    <p>درخت‌های قبلی سه مشکل داشتند: (۱) فقط منابع غربی را در نظر می‌گرفتند، (۲) کارت‌های نیابتی را به‌طور کامل پوشش نمی‌دادند، (۳) کارت‌های جدید مثل حمله به زیرساخت‌های حیاتی اسرائیل (آب شیرین‌کن، دیمونا) و حمله به چاه‌های نفت عربستان را شامل نمی‌شدند.</p>
+    
+    <div class="perspective-box">
+        <div class="perspective-title">🔍 یافته کلیدی تحقیق جدید</div>
+        <div class="perspective-content">
+            <strong>۱. بحران رهبری غیرواقعی است:</strong> ترور نصرالله، فرماندهان سپاه، و سلطیمانی بحران ایجاد نکرد چون ایران رژیم «نهادمحور» است، نه «شخص‌محور». سپاه ۳۱ سپاه استانی برای دفاع موزاییکی دارد. بحران واقعی فقط از ترکیب «شکاف جانشینی + شکست نظامی + فروپاشی اقتصاد + اعتراضات همزمان» می‌آید (احتمال ۸-۱۵٪).<br><br>
+            <strong>۲. کارت‌های نیابتی جدا نیستند — زنجیره‌ای‌اند:</strong> حوثی‌ها می‌توانند عربستان را محاصره کنند، حزب‌الله می‌تواند زیرساخت اسرائیل را بزند، شبه‌نظامیان عراقی پایگاه‌های آمریکا را هدف قرار دهند — همه هم‌زمان.<br><br>
+            <strong>۳. کارت‌های جدید کشف شد:</strong> حمله به آب شیرین‌کن اسرائیل (۸۰٪ آب!)، حمله به دیمونا، حمله به چاه‌های نفت عربستان، مختل کردن GPS، قطع کابل‌های زیردریایی، حمله به ماهواره‌ها.
+        </div>
+    </div>
+</div>
+
+<!-- 2. NEW CARDS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۲</span>کارت‌های استراتژیک جدید</h2>
+    
+    <h3 class="subsection-title">🏠 حمله به زیرساخت‌های حیاتی اسرائیل</h3>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">💧</div>
+            <div class="path-title">حمله به آب شیرین‌کن‌های اسرائیل</div>
+            <div class="path-prob high">احتمال موفقیت: بالا</div>
+        </div>
+        <p>اسرائیل ۵ آب شیرین‌کن غول‌پیکر در ساحل مدیترانه دارد (اشکلون، اشدود، پالماخیم، سورک، هادرا). این تأسیسات <strong>۸۰٪ آب آشامیدنی</strong> اسرائیل را تأمین می‌کنند. سورک بزرگ‌ترین آب شیرین‌کن جهان است و به‌تنهایی ۲۰٪ آب اسرائیل را تولید می‌کند. همه در نوار ساحلی باریک متمرکزند — هدف‌گذاری خطی آسان. اگر چند آب شیرین‌کن هم‌زمان قطع شوند، <strong>بحران آب فوری</strong> در عرض روزها رخ می‌دهد.</p>
+        <div class="perspective-box">
+            <div class="perspective-title">📊 داده واقعی</div>
+            <div class="perspective-content">
+                Atlantic Council: «حملات به آب شیرین‌کن‌ها در جنگ ایران، آینده‌ای تاریک را پیش‌بینی می‌کند.» در جنگ ۲۰۲۶، نبردها به زیرساخت‌های کلیدی آب شیرین‌کن نزدیک شد (Times of Israel). ایران همچنین به آب شیرین‌کن کویت ضربه زد.
+            </div>
+        </div>
+    </div>
+
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">☢️</div>
+            <div class="path-title">حمله به سایت هسته‌ای دیمونا</div>
+            <div class="path-prob danger">خط قرمز: خطر پاسخ هسته‌ای</div>
+        </div>
+        <p>دیمونا قلب برنامه هسته‌ای اعلام‌نشده اسرائیل در صحرای نقب است. اسرائیل ~۹۰ کلاهک هسته‌ای دارد که پلوتونیوم آن‌ها از دیمونا تأمین شده. فاصله از غرب ایران ~۱۲۰۰ کیلومتر — در برد موشک‌های سجیل، عماد، خرمشهر. ISNA صراحتاً تهدید کرد: «اگر اسرائیل به دنبال تغییر رژیم باشد، ایران دیمونا را هدف قرار خواهد داد.» در جنگ ۲۰۲۵، موشک‌های ایران به اَراد و دیمونا اصابت کرد و ۱۸۰ نفر مجروح شدند. <strong>خطر:</strong> اسرائیل ممکن است حمله به دیمونا را به‌عنوان حمله هسته‌ای تفسیر کرده و با پاسخ هسته‌ای واکنش نشان دهد.</p>
+    </div>
+
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">⚡</div>
+            <div class="path-title">حمله به شبکه برق اسرائیل</div>
+            <div class="path-prob">متوسط-بالا</div>
+        </div>
+        <p>نیروگاه‌های گازی اوروت رابین (هادرا)، روتنبرگ (اشکلون)، ایدان (اشکلون) — اهداف بزرگ و ثابت. حمله سایبری به PLCها (CyberAv3ngers) در ۲۰۲۳ ثابت کرد ایران می‌تواند به سیستم‌های کنترل صنعتی نفوذ کند. کارشناسان هشدار داده‌اند جنگ تمام‌عیار حزب‌الله می‌تواند برق را هفته‌ها قطع کند.</p>
+    </div>
+
+    <h3 class="subsection-title">🛢️ حمله به زیرساخت‌های نفتی عربستان</h3>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🛢️</div>
+            <div class="path-title">حمله به چاه‌های نفت و خط لوله شرق-غرب</div>
+            <div class="path-prob high">احتمال موفقیت: بالا</div>
+        </div>
+        <p>حمله ۲۰۱۹ به آرامکو (آبقیق و خریص): ۵.۷ میلیون بشکه در روز کاهش تولید (۵٪ عرضه جهانی). خط لوله شرق-غرب (۱۲۰۰ کیلومتر، ۷ میلیون بشکه/روز) تنها مسیر صادرات نفت عربستان در زمان جنگ است. در آوریل ۲۰۲۶، حمله پهپادی به ایستگاه پمپاژ این خط لوله، ۶۰۰٬۰۰۰ بشکه در روز تولید عربستان را قطع کرد. قطع همزمان آبقیق + رأس تنوره + خط لوله می‌تواند صادرات عربستان را بیش از ۵۰٪ کاهش دهد.</p>
+    </div>
+
+    <h3 class="subsection-title">🛰️ حمله به ماهواره‌ها و سیستم‌های ناوبری</h3>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🛰️</div>
+            <div class="path-title">مختل کردن GPS در خاورمیانه</div>
+            <div class="path-prob high">کارت کاملاً عملیاتی</div>
+        </div>
+        <p>اخلال GPS از فوریه ۲۰۲۶ به شدت افزایش یافت و نزدیک به ۱۰۰۰ شناور را تحت تأثیر قرار داد. ایران در ۲۰۱۱ هواپیمای RQ-170 آمریکا را با تکنیک spoofing GPS به زمین نشاند. تجربه‌ای کاملاً اثبات‌شده. تأثیر: اختلال در ناوبری هواپیماها، انحراف موشک‌های هدایت‌شونده، خطر برخورد کشتی‌های تجاری.</p>
+    </div>
+
+    <h3 class="subsection-title">🔌 کارت‌های سایبری و اطلاعاتی</h3>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">💻</div>
+            <div class="path-title">حمله سایبری به زیرساخت آمریکا</div>
+            <div class="path-prob">متوسط-بالا</div>
+        </div>
+        <p>CyberAv3ngers (مرتبط با IRGC) در ۲۰۲۳ به دستگاه‌های PLC یونیترونیکس در بخش آب و انرژی آمریکا نفوذ کرد. ۲۰۲۶: هکرهای ایرانی به بخش‌های انرژی و آب آمریکا حمله می‌کنند (Politico). تجربه ۲۰۱۳: نفوذ به سد باومن در نیویورک. تجربه ۲۰۱۲-۲۰۱۳: DDoS به ۴۶ بانک آمریکایی.</p>
+    </div>
+
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">📡</div>
+            <div class="path-title">قطع کابل‌های زیردریایی دریای سرخ</div>
+            <div class="path-prob">متوسط-بالا</div>
+        </div>
+        <p>در ۲۰۲۴ و ۲۰۲۵، چندین کابل زیردریایی اینترنت در دریای سرخ قطع شد (Seacom، AAE-1، EIG). ~۲۵-۳۰٪ ترافیک اینترنت اروپا-آسیا از این کابل‌ها عبور می‌کند. مایکروسافت تأیید کرد «خاورمیانه ممکن است افزایش تأخیر را تجربه کند.» نگرانی جدی از دخالت حوثی‌ها (با دستور ایران).</p>
+    </div>
+</div>
+
+<!-- 3. PROXY PATHS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۳</span>مسیرهای نیابتی کامل</h2>
+
+    <h3 class="subsection-title">مسیر الف: محاصره کامل دریایی</h3>
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">⚓</div>
+            <div class="path-title">حوثی (دریای سرخ) + حزب‌الله (مدیترانه) + ایران (خلیج فارس)</div>
+            <div class="path-prob warn">۸-۱۲٪ (کامل) / ۱۸-۲۵٪ (نیمه)</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step proxy">حوثی: باب‌المندب</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حزب‌الله: حیفا</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step military">ایران: هرمز</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step new">۳۰-۴۰٪ تجارت جهانی مختل</div>
+        </div>
+        <p>سه گلوگاه بحرانی تجارت جهانی هم‌زمان: باب‌المندب (۱۲٪ تجارت)، هرمز (۲۰٪ نفت)، مدیترانه شرقی. قیمت نفت به ۱۰۰-۱۲۰ دلار. آمریکا ظرف ۲-۴ هفته محاصره را می‌شکند ولی شوک جهانی می‌زند.</p>
+        <div class="path-result compromise">
+            <strong>پایان: محاصره نیمه ۲-۸ هفته + شوک جهانی + فرسایش</strong>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">مسیر ب: محاصره عربستان توسط حوثی‌ها</h3>
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🇸🇦</div>
+            <div class="path-title">حوثی: بنادر + چاه‌های نفت + شهرهای جنوبی</div>
+            <div class="path-prob high">۳۵-۵۰٪ (پراکنده)</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step proxy">حوثی: ینبع</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حوثی: جده</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حوثی: آبقیق</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حوثی: جیزان/ابها</div>
+        </div>
+        <p>حوثی‌ها می‌توانند بنادر عربستان را مختل کنند، چاه‌های نفت را هدف قرار دهند (مدل ۲۰۱۹)، و شهرهای جنوبی را بمباران کنند. حق بیمه جنگی از ۰.۰۷٪ به ۱٪ ارزش کشتی رسید. عربستان خط لوله شرق-غرب را به ۷ میلیون بشکه رسانده تا خطر را کم کند.</p>
+        <div class="path-result compromise">
+            <strong>پایان: شوک نفتی موقت + فرسایش اقتصادی عربستان</strong>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">مسیر ج: حمله به زیرساخت اسرائیل توسط حزب‌الله</h3>
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">⚡</div>
+            <div class="path-title">حزب‌الله: برق + آب شیرین‌کن + دیمونا</div>
+            <div class="path-prob warn">۳۰-۴۰٪ (برق/آب) / ۲-۵٪ (دیمونا)</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step proxy">حزب‌الله: برق</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حزب‌الله: آب شیرین‌کن</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step nuclear">ایران: دیمونا</div>
+        </div>
+        <p>حزب‌الله می‌تواند شبکه برق را هفته‌ها قطع کند. آب شیرین‌کن‌ها (۸۰٪ آب اسرائیل) اهداف آسیب‌پذیری هستند. حمله به دیمونا = خط قرمز پایان‌ناپذیر — احتمال پاسخ هسته‌ای اسرائیل. حزب‌الله پس از ۲۰۲۴ ضعیف شده (۸۵٪ زرادخانه نابود شده) ولی هنوز ۱۱٬۰۰۰-۱۳٬۰۰۰ راکت دارد.</p>
+        <div class="path-result defeat">
+            <strong>پایان (دیمونا): جنگ هسته‌ای منطقه‌ای — فاجعه</strong><br>
+            <strong>پایان (برق/آب): فرسایش اقتصادی اسرائیل + شکست نظامی حزب‌الله</strong>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">مسیر د: حمله به پایگاه‌های آمریکا توسط شبه‌نظامیان عراقی</h3>
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🎯</div>
+            <div class="path-title">شبه‌نظامیان: عین‌الاسد + اربیل + منطقه سبز</div>
+            <div class="path-prob high">۴۰-۵۵٪ (پراکنده)</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step proxy">عین‌الاسد</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">اربیل</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">منطقه سبز</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step new">سایبری</div>
+        </div>
+        <p>از اکتبر ۲۰۲۳: ۱۸۰+ حمله به پایگاه‌های آمریکا. برج ۲۲ (اردن): ۳ کشته آمریکایی. تجربه ۲۰۱۹: محاصره سفارت آمریکا در بغداد → منجر به ترور سلطیمانی. خطر: تلفات زیاد آمریکایی = حمله مستقیم آمریکا به ایران.</p>
+        <div class="path-result compromise">
+            <strong>پایان: فرسایش مستقل + خطر پله‌گذاری به جنگ مستقیم</strong>
+        </div>
+    </div>
+</div>
+
+<!-- 4. COMBINED PATHS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۴</span>مسیرهای ترکیبی (مستقیم + نیابتی)</h2>
+
+    <h3 class="subsection-title">مسیر و: دیپلماسی + حوثی‌ها (وضعیت فعلی)</h3>
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🕊️</div>
+            <div class="path-title">دیپلماسی + فعال‌سازی حوثی‌ها</div>
+            <div class="path-prob high">۵۵-۷۰٪ (وضعیت فعلی)</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step diplomatic">دیپلماسی</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حوثی: دریای سرخ</div>
+            <div class="path-arrow">→</div>
+            <div class="path-step diplomatic">فشار نامتقارن</div>
+        </div>
+        <p>ایران «چوب و هویج» می‌دهد: مذاکره می‌کند و هم‌زمان حوثی‌ها را فعال نگه می‌دارد. این عملاً از نوامبر ۲۰۲۳ در حال اجراست. موفق‌ترین مدل ایران تاکنون — فشار مداوم اقتصادی روی غرب با هزینه کم.</p>
+        <div class="path-result victory">
+            <strong>پایان: نظم نامتقارن پایدار + فرسایش غرب</strong>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">مسیر ز: فرسایش همه‌جانبه</h3>
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">⏳</div>
+            <div class="path-title">صبر + همه نیابتی‌ها (بدون جنگ مستقیم)</div>
+            <div class="path-prob high">۴۵-۶۰٪</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step diplomatic">صبر</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حوثی</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حزب‌الله</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">عراقی</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step new">سایبری</div>
+        </div>
+        <p>فشار چندلایه مداوم: تجارت دریایی آسیب می‌بیند، اقتصاد اسرائیل فرسایشی، پایگاه‌های آمریکا تحت فشار، عربستان نگران. مسابقه استقامت — ممکن است طرف ایرانی قبل از غرب بشکند (تورم، فرار مغزها).</p>
+        <div class="path-result compromise">
+            <strong>پایان: مسابقه استقامت + احتمال تغییر رژیم از درون</strong>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">مسیر هـ: بمب + محاصره</h3>
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">☢️</div>
+            <div class="path-title">بمب اتم + محاصره دریایی کامل</div>
+            <div class="path-prob danger">۲-۴٪</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step nuclear">بمب</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step military">هرمز</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">باب‌المندب</div>
+        </div>
+        <p>آزمایش بمب + بستن هرمز + باب‌المندب = تقابل مستقیم با تمام دکترین بازدارندگی آمریکا/اسرائیل. احتمال ضربه پیش‌دگیرانه به‌شدت بالا.</p>
+        <div class="path-result destruction">
+            <strong>پایان: جنگ گسترده با خطر تبادل هسته‌ای</strong>
+        </div>
+    </div>
+</div>
+
+<!-- 5. LEADERSHIP CRISIS ANALYSIS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۵</span>تحلیل بحران رهبری: چرا غیرواقعی است</h2>
+    
+    <div class="perspective-box">
+        <div class="perspective-title">🔍 یافته کلیدی</div>
+        <div class="perspective-content">
+            <strong>ترور رهبران بحران ایجاد نکرد:</strong><br>
+            • ترور نصرالله (۲۰۲۴): حزب‌الله سریعاً نعیم قاسم را جانشین کرد، حملات ادامه یافت.<br>
+            • ترور سلطیمانی (۲۰۲۰): پاسخ نمادین (عین‌الاسد)، سپاه نهادی است نه فرد، حتی همبستگی ملی موقت ایجاد کرد.<br>
+            • ترور فرماندهان سپاه (۲۰۲۴-۲۰۲۵): جایگزینی سریع، تخریب توان عملیاتی اما نه فروپاشی سازمانی.<br><br>
+            <strong>چرا؟</strong> ایران رژیم «نهادمحور» است: رهبر + مجمع خبرگان + شورای امنیت ملی + سپاه (۳۱ سپاه استانی برای دفاع موزاییکی) + ارتش + بسیج. ترور یک نفر کل سیستم را از کار نمی‌اندازد.<br><br>
+            <strong>چه چیزی واقعاً بحران ایجاد می‌کند؟</strong> ترکیب هم‌زمان: (۱) شکاف جانشینی درون خبرگان + (۲) شکست نظامی بزرگ + (۳) فروپاشی اقتصاد + (۴) اعتراضات گسترده همزمان. احتمال این هم‌زمانی: ۸-۱۵٪ در ۵ سال.
+        </div>
+    </div>
+</div>
+
+<!-- 6. COMPLETE TREE TABLE -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۶</span>جدول کامل مسیرها</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>مسیر</th>
+                <th>کارت‌ها</th>
+                <th>احتمال</th>
+                <th>پایان واقعی</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>۱</td><td>هسته‌ای کامل</td><td>NPT → ۹۰٪ → بمب</td><td>۲۰-۲۵٪</td><td>بازدارندگی هسته‌ای</td></tr>
+            <tr><td>۲</td><td>دیپلماتیک</td><td>دیپلماسی → عربستان → چین</td><td>۱۵-۲۰٪</td><td>توافق کوچک</td></tr>
+            <tr><td>۳</td><td>نظامی کامل</td><td>موشکی → حزب‌الله → هرمز</td><td>۲۵-۳۰٪</td><td>شکست استراتژیک</td></tr>
+            <tr><td>۴</td><td>ضد غربی</td><td>روسیه → چین → بمب</td><td>۱۰-۱۵٪</td><td>بلوک CRINK</td></tr>
+            <tr><td>۵</td><td>فرسایشی</td><td>صبر → حوثی → صبر</td><td>۴۰-۵۰٪</td><td>بحران رهبری</td></tr>
+            <tr><td>۶</td><td>ترکیبی</td><td>دیپلماسی → شکست → موشکی</td><td>۲۰-۲۵٪</td><td>چرخه توافق-جنگ</td></tr>
+            <tr><td>۷</td><td>کره شمالی</td><td>NPT → کلاهک → آزمایش</td><td>۱۵-۲۵٪</td><td>بمب سریع</td></tr>
+            <tr><td>۸</td><td>مردمسازی</td><td>بسیج → دفاع</td><td>۱۰-۱۵٪</td><td>بقا با هزینه</td></tr>
+            <tr><td>۹</td><td>عربستان</td><td>عادی‌سازی → چین → صبر</td><td>۳۵-۴۵٪</td><td>نفوذ نسبی</td></tr>
+            <tr><td>۱۰</td><td>افراطی</td><td>زمینی → ICBM</td><td class="danger">۱-۳٪</td><td>جنگ هسته‌ای</td></tr>
+            <tr><td>۱۱</td><td>محاصره دریایی</td><td>حوثی + حزب‌الله + ایران</td><td>۸-۲۵٪</td><td>شوک جهانی موقت</td></tr>
+            <tr><td>۱۲</td><td>محاصره عربستان</td><td>حوثی: بنادر + چاه‌ها</td><td>۳۵-۵۰٪</td><td>شوک نفتی</td></tr>
+            <tr><td>۱۳</td><td>زیرساخت اسرائیل</td><td>حزب‌الله: برق + آب + دیمونا</td><td>۳۰-۴۰٪</td><td>فرسایش / فاجعه</td></tr>
+            <tr><td>۱۴</td><td>پایگاه‌های آمریکا</td><td>عراقی: عین‌الاسد + اربیل</td><td>۴۰-۵۵٪</td><td>فرسایش مستمر</td></tr>
+            <tr><td>۱۵</td><td>دیپلماسی + نیابتی</td><td>دیپلماسی + حوثی</td><td class="info">۵۵-۷۰٪</td><td>نظم نامتقارن پایدار</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 7. THREE MOST LIKELY -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۷</span>سه مسیر محتمل‌ترین (ترکیبی)</h2>
+    
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🅰️</div>
+            <div class="path-title">مسیر A: دیپلماسی + فرسایش نیابتی (۵۵-۷۰٪)</div>
+            <div class="path-prob high">محتمل‌ترین</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step diplomatic">دیپلماسی</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">حوثی</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">سایبری</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step diplomatic">صبر</div>
+        </div>
+        <p>وضعیت فعلی. ایران مذاکره می‌کند + حوثی‌ها را فعال نگه می‌دارد + حملات سایبری. فشار نامتقارن با هزینه کم. موفق‌ترین مدل ایران.</p>
+        <div class="path-result victory">
+            <strong>پایان: نظم نامتقارن پایدار + کاهش تدریجی جاه‌طلبی آمریکا</strong>
+        </div>
+    </div>
+
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🅱️</div>
+            <div class="path-title">مسیر B: فرسایش همه‌جانبه (۴۵-۶۰٪)</div>
+            <div class="path-prob high">محتمل</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step diplomatic">صبر</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step proxy">همه نیابتی‌ها</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step new">سایبری + GPS</div>
+        </div>
+        <p>فشار چندلایه مداوم بدون جنگ مستقیم. مسابقه استقامت. اقتصاد ایران هم فرسایشی — ممکن است قبل از غرب بشکند.</p>
+        <div class="path-result compromise">
+            <strong>پایان: مسابقه استقامت + احتمال تغییر رژیم از درون (گورباچف)</strong>
+        </div>
+    </div>
+
+    <div class="tree-path">
+        <div class="path-header">
+            <div class="path-icon">🅲️</div>
+            <div class="path-title">مسیر C: بمب از طریق بازسازی (۲۰-۲۵٪)</div>
+            <div class="path-prob warn">محتمل</div>
+        </div>
+        <div class="path-flow">
+            <div class="path-step military">شکست</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step nuclear">بازسازی</div>
+            <div class="path-arrow">+</div>
+            <div class="path-step nuclear">بمب</div>
+        </div>
+        <p>ایران پس از شکست نظامی (مثل ۲۰۲۵) برنامه را بازسازی می‌کند و به بمب می‌رسد. پنجره ۱۸-۳۶ ماه.</p>
+        <div class="path-result victory">
+            <strong>پایان: بازدارندگی هسته‌ای + مسابقه تسلیحاتی</strong>
+        </div>
+    </div>
+</div>
+
+<!-- 8. SOURCES -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۸</span>منابع (ایرانی + غربی)</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--c-card);border-radius:6px;padding:8px;">
+            <div style="font-weight:700;color:var(--c-accent);font-size:11px;margin-bottom:4px;">🇮🇷 منابع ایرانی</div>
+            <ul style="font-size:9px;">
+                <li>IRNA، تسنیم، فارس، Khamenei.ir</li>
+                <li>خبرآنلاین، تابناک، مشرق</li>
+                <li>ایران اینترنشنال (مخالف)</li>
+                <li>BBC فارسی، DW فارسی</li>
+                <li>رادیو فردا (مخالف)</li>
+                <li>ویکی‌پدیا فارسی، ویکی‌شیعه</li>
+                <li>المسیره (حوثی)</li>
+            </ul>
+        </div>
+        <div style="background:var(--c-card);border-radius:6px;padding:8px;">
+            <div style="font-weight:700;color:var(--c-info);font-size:11px;margin-bottom:4px;">🌍 منابع غربی</div>
+            <ul style="font-size:9px;">
+                <li>IAEA، ISIS، CSIS، CFR، RAND</li>
+                <li>IISS، SIPRI، Carnegie، Brookings</li>
+                <li>Belfer Center (Harvard)، ISW</li>
+                <li>Soufan Center، Washington Institute</li>
+                <li>Reuters، AP، BBC، CNN، Al Jazeera</li>
+                <li>UK Parliament، US Congress، CISA</li>
+                <li>Atlantic Council، Baker Institute</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- ENDING -->
+<div class="ending">
+    <div class="ending-icon">🌳</div>
+    <h1 class="ending-title">پایان درخت کامل</h1>
+    <div class="ending-divider"></div>
+    <p class="ending-text">
+        این درخت بر اساس ۱۴ تحقیق موازی از منابع ایرانی و غربی ساخته شده است.
+        ۱۵ مسیر تصمیم، ۳۵+ کارت استراتژیک (شامل کارت‌های جدید)، و ۲۰ پایان واقعی.
+        حقیقت در ترکیب دیدگاه‌ها و کارت‌های زنجیره‌ای است.
+    </p>
+    <div class="ending-divider"></div>
+    <p class="ending-text" style="font-size:11px;opacity:0.6">
+        نسخه ۷.۰ · تیر ۱۴۰۴<br>
+        منابع: IRNA، تسنیم، فارس + IAEA، CSIS، CFR، RAND، ISW، Soufan Center
+    </p>
+</div>
+
+</body>
+</html>
