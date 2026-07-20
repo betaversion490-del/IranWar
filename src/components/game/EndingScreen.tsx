@@ -83,6 +83,13 @@ export function EndingScreen() {
               </div>
 
               <div className="inline-block px-3 sm:px-4 py-2 rounded-xl glass">
+                <div className="text-[10px] sm:text-xs text-muted-foreground">احتمال واقعی</div>
+                <div className="text-xs sm:text-base font-bold" style={{ color: ending.color }}>
+                  {ending.realProbability}
+                </div>
+              </div>
+
+              <div className="inline-block px-3 sm:px-4 py-2 rounded-xl glass">
                 <div className="text-[10px] sm:text-xs text-muted-foreground">بازه زمانی</div>
                 <div className="text-xs sm:text-base font-bold" style={{ color: ending.color }}>
                   {ending.timeframe}
@@ -110,6 +117,20 @@ export function EndingScreen() {
           <h3 className="font-bold text-base sm:text-lg mb-3">📖 سناریوی آینده</h3>
           <p className="text-xs sm:text-sm text-foreground leading-relaxed">{ending.longDescription}</p>
         </motion.div>
+
+        {/* Historical Basis */}
+        {ending.historicalBasis && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.55 }}
+            className="glass rounded-2xl p-3 sm:p-4 md:p-5 mb-4 border-r-4"
+            style={{ borderRightColor: ending.color }}
+          >
+            <h3 className="font-bold text-base sm:text-lg mb-2">📚 مبنای تاریخی</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{ending.historicalBasis}</p>
+          </motion.div>
+        )}
 
         {/* Outcome details */}
         <motion.div
@@ -164,7 +185,7 @@ export function EndingScreen() {
                   .map((item, idx) => (
                     <div key={idx} className="space-y-1">
                       <div className="flex items-center justify-between text-xs sm:text-base">
-                        <span className="flex items-center gap-1 sm:gap-2">
+                        <span className="flex items-center gap-1 sm:gap-2 flex-wrap">
                           <span>{item.ending.icon}</span>
                           <span className="font-medium">{item.ending.name}</span>
                           <span className="text-[10px] sm:text-xs text-muted-foreground">({item.ending.timeframe})</span>
@@ -172,6 +193,9 @@ export function EndingScreen() {
                         <span className="font-bold font-num" style={{ color: item.ending.color }}>
                           {(item.probability * 100).toFixed(1)}%
                         </span>
+                      </div>
+                      <div className="text-[9px] sm:text-[10px] text-muted-foreground/70 mb-1">
+                        واقعی: {item.ending.realProbability}
                       </div>
                       <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
                         <motion.div

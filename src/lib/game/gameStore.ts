@@ -310,15 +310,15 @@ function checkEarlyEnding(
   iranCard: GameCard,
   enemyCards: GameCard[]
 ): string | null {
-  // 1. Nuclear bomb successfully built and tested (Iran played nuclear breakout)
+  // 1. Nuclear deterrence achieved (Iran played nuclear breakout + high progress)
   if (iranCard.id === "iran_nuclear_breakout" && state.nuclearProgress >= 85) {
-    return "iran_nuclear_power";
+    return "iran_nuclear_deterrence";
   }
 
   // 2. Nuclear war triggered (any nuclear strike played)
   const allCards = [iranCard, ...enemyCards];
   if (allCards.some(c => c.id === "us_nuclear_strike" || c.id === "israel_nuclear_strike")) {
-    return "regional_nuclear_war";
+    return "nuclear_war_regional";
   }
 
   // 3. Iran's strategic defeat (military capability destroyed + war escalation max)
@@ -328,22 +328,32 @@ function checkEarlyEnding(
 
   // 4. Regime change (economic collapse + low domestic support)
   if (state.economicStability <= 10 && state.domesticSupport <= 15) {
-    return "regime_change_iran";
+    return "regime_change_from_within";
   }
 
-  // 5. US withdrawal (high Iranian deterrence + regional influence)
+  // 5. US withdrawal of ambition (high Iranian deterrence + regional influence)
   if (state.deterrence >= 85 && state.regionalInfluence >= 85 && state.warEscalation < 40) {
-    return "us_withdrawal";
+    return "us_withdrawal_ambition";
   }
 
-  // 6. Historic peace (high negotiation chance + low war escalation)
+  // 6. Comprehensive peace (high negotiation chance + low war escalation)
   if (state.negotiationChanceMult >= 2.5 && state.warEscalation < 30) {
-    return "historic_peace";
+    return "comprehensive_peace";
   }
 
-  // 7. Ground invasion triggered Israel collapse scenario
-  if (iranCard.id === "iran_ground_invasion" && state.militaryCapability > 50) {
-    return "israel_collapse";
+  // 7. Israel strategic weakening (high regional influence + israel isolation)
+  if (state.regionalInfluence >= 90 && state.israelIsolationMult >= 2.0) {
+    return "israel_strategic_weakening";
+  }
+
+  // 8. Iran's Perestroyka (high regime change + high negotiation)
+  if (state.regimeChangeMult >= 2.0 && state.negotiationChanceMult >= 2.0) {
+    return "iran_perestroyka";
+  }
+
+  // 9. Libya scenario (Iran gives up nuclear program - played diplomacy card with very low nuclear progress)
+  if (iranCard.id === "iran_diplomacy" && state.nuclearProgress < 20 && state.negotiationChanceMult >= 2.5) {
+    return "libya_scenario";
   }
 
   return null;
