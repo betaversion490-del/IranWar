@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تحلیل کامل راهبردی - بازی بزرگ خاورمیانه</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 0; }
+:root {
+    --c-bg: #0a0e1a;
+    --c-text: #e8e6e3;
+    --c-accent: #16a34a;
+    --c-danger: #dc2626;
+    --c-warn: #d97706;
+    --c-info: #0ea5e9;
+    --c-purple: #a855f7;
+    --c-muted: #94a3b8;
+    --c-border: #1e293b;
+    --c-card: #111827;
+    --c-card-light: #1e293b;
+}
+* { box-sizing: border-box; }
+html, body {
+    margin: 0; padding: 0;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+    font-size: 12px;
+    line-height: 1.7;
+}
+@media screen {
+    html { background: #1a1a1a; display: flex; justify-content: center; }
+    body { width: 210mm; background: var(--c-bg); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+}
+
+/* COVER */
+.cover {
+    width: 210mm; height: 297mm;
+    padding: 35mm 25mm;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+    break-after: page;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+}
+.cover::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 30% 20%, rgba(22, 163, 74, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(220, 38, 38, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+.cover-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; }
+.cover-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.cover-badge {
+    background: rgba(22, 163, 74, 0.15); border: 1px solid rgba(22, 163, 74, 0.4);
+    color: var(--c-accent); padding: 6px 16px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+}
+.cover-date { color: var(--c-muted); font-size: 11px; text-align: left; }
+.cover-main { text-align: center; margin: auto 0; }
+.cover-icon { font-size: 64px; margin-bottom: 20px; }
+.cover-title {
+    font-size: 38px; font-weight: 900; line-height: 1.2; margin: 0 0 12px;
+    background: linear-gradient(135deg, #16a34a 0%, #fbbf24 50%, #dc2626 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.cover-subtitle { font-size: 16px; color: var(--c-muted); margin: 0 0 24px; }
+.cover-desc {
+    font-size: 12px; color: var(--c-text); opacity: 0.7; line-height: 1.8;
+    max-width: 140mm; margin: 0 auto;
+}
+.cover-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 32px auto 0; max-width: 160mm; }
+.cover-stat {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px; text-align: center;
+}
+.cover-stat-num { font-size: 22px; font-weight: 900; color: var(--c-accent); }
+.cover-stat-label { font-size: 9px; color: var(--c-muted); margin-top: 2px; }
+.cover-footer { text-align: center; color: var(--c-muted); font-size: 10px; opacity: 0.6; }
+
+/* CONTENT */
+.main-content { padding: 18mm 16mm; }
+.section { margin-bottom: 20px; break-inside: avoid; }
+.section-title {
+    font-size: 20px; font-weight: 800; color: var(--c-accent);
+    margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--c-accent);
+}
+.section-num {
+    display: inline-block; background: var(--c-accent); color: var(--c-bg);
+    width: 26px; height: 26px; line-height: 26px; text-align: center;
+    border-radius: 50%; font-size: 13px; margin-left: 6px;
+}
+.subsection-title {
+    font-size: 15px; font-weight: 700; color: var(--c-text);
+    margin: 14px 0 6px; padding-right: 10px; border-right: 3px solid var(--c-accent);
+}
+p { margin: 6px 0; text-align: justify; line-height: 1.8; }
+.card {
+    background: var(--c-card); border: 1px solid var(--c-border);
+    border-radius: 8px; padding: 10px 12px; margin: 8px 0; break-inside: avoid;
+}
+.card-accent { border-right: 4px solid var(--c-accent); }
+.card-danger { border-right: 4px solid var(--c-danger); }
+.card-warn { border-right: 4px solid var(--c-warn); }
+.card-info { border-right: 4px solid var(--c-info); }
+.card-purple { border-right: 4px solid var(--c-purple); }
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0; }
+.stat-box {
+    background: var(--c-card-light); border-radius: 6px; padding: 8px 6px; text-align: center;
+}
+.stat-value { font-size: 16px; font-weight: 800; color: var(--c-accent); display: block; }
+.stat-label { font-size: 9px; color: var(--c-muted); margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 10px; }
+th { background: var(--c-accent); color: var(--c-bg); padding: 6px 8px; text-align: right; font-weight: 700; font-size: 10px; }
+td { padding: 6px 8px; border-bottom: 1px solid var(--c-border); text-align: right; }
+tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+ul, ol { padding-right: 18px; margin: 6px 0; }
+li { margin: 3px 0; line-height: 1.6; }
+.highlight { background: rgba(22, 163, 74, 0.15); padding: 1px 4px; border-radius: 3px; font-weight: 600; }
+.danger { color: var(--c-danger); font-weight: 700; }
+.warn { color: var(--c-warn); font-weight: 700; }
+.info { color: var(--c-info); font-weight: 700; }
+.quote {
+    background: rgba(255,255,255,0.03); border-right: 4px solid var(--c-info);
+    padding: 8px 12px; margin: 8px 0; font-style: italic; color: var(--c-muted);
+    border-radius: 4px; break-inside: avoid; font-size: 11px;
+}
+.source { font-size: 9px; color: var(--c-muted); margin-top: 2px; opacity: 0.7; }
+.warning-box {
+    background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 6px; padding: 8px 12px; margin: 8px 0; break-inside: avoid;
+}
+.warning-title { color: var(--c-danger); font-weight: 700; margin-bottom: 4px; font-size: 12px; }
+.card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
+.mini-card {
+    background: var(--c-card); border: 1px solid var(--c-border);
+    border-radius: 6px; padding: 8px 10px; break-inside: avoid;
+}
+.mini-card-title { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+.mini-card-content { font-size: 10px; color: var(--c-muted); line-height: 1.5; }
+
+/* ENDING */
+.ending {
+    width: 210mm; height: 297mm; padding: 35mm 25mm;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+    break-before: page; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+}
+.ending-icon { font-size: 72px; margin-bottom: 20px; }
+.ending-title { font-size: 28px; font-weight: 900; color: var(--c-accent); margin: 0 0 12px; }
+.ending-text { font-size: 13px; color: var(--c-muted); max-width: 140mm; line-height: 1.8; }
+.ending-divider { width: 50px; height: 3px; background: var(--c-accent); margin: 20px auto; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+    <div class="cover-content">
+        <div class="cover-header">
+            <div class="cover-badge">سند تحلیلی جامع راهبردی</div>
+            <div class="cover-date">تیر ۱۴۰۴<br>نسخه ۵.۰</div>
+        </div>
+        <div class="cover-main">
+            <div class="cover-icon">🌍</div>
+            <h1 class="cover-title">بازی بزرگ خاورمیانه</h1>
+            <p class="cover-subtitle">تحلیل کامل کارت‌ها، ترکیب‌ها و سناریوهای پایان</p>
+            <p class="cover-desc">
+                این سند حاصل ۱۱ تحقیق موازی بر اساس داده‌های واقعی تا اواسط ۲۰۲۶ است.
+                تمامی ۲۰ کارت استراتژیک ایران، ۱۰ ترکیب مهم، و ۲۰ سناریوی پایان محتمل
+                با ذکر منابع معتبر تحلیل شده‌اند.
+            </p>
+            <div class="cover-stats">
+                <div class="cover-stat"><div class="cover-stat-num">۲۰</div><div class="cover-stat-label">کارت استراتژیک</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۱۰</div><div class="cover-stat-label">ترکیب مهم</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۲۰</div><div class="cover-stat-label">سناریوی پایان</div></div>
+                <div class="cover-stat"><div class="cover-stat-num">۱۱</div><div class="cover-stat-label">تحقیق موازی</div></div>
+            </div>
+        </div>
+        <div class="cover-footer">بر اساس داده‌های واقعی IAEA، CSIS، CFR، RAND، ISIS، Reuters، AP، BBC</div>
+    </div>
+</div>
+
+<div class="main-content">
+
+<!-- 1. EXECUTIVE SUMMARY -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱</span>خلاصه راهبردی</h2>
+    <div class="card card-accent">
+        <p><strong>وضعیت فعلی (اواسط ۲۰۲۶):</strong> ایران در ضعیف‌ترین موقعیت راهبردی خود از زمان جنگ ایران-عراق قرار دارد. پس از جنگ ۱۲ روزه (ژوئن ۲۰۲۵) و عملیات Epic Fury (فوریه ۲۰۲۶)، برنامه هسته‌ای آسیب دیده، محور مقاومت متلاشی شده، اقتصاد در حال فروپاشی (تورم ۶۲-۶۹٪، ریال ۱.۹ میلیون به دلار) و رهبری در بحران جانشینی است. با این حال، رژیم بر سر قدرت است و در حال بازسازی توان نظامی با کمک روسیه است.</p>
+    </div>
+    <div class="warning-box">
+        <div class="warning-title">⚠️ یافته کلیدی</div>
+        <p style="margin:0">تحلیل ۷ مورد تاریخی نشان می‌دهد: <strong>بمب تثبیت‌شده حمله پیش‌دگیرانه را غیرمحتمل می‌کند</strong>، اما پنجره بحرانی ۱۸-۳۶ ماه اول خطرناک است. درس لیبی (۲۰۰۳ توقف، ۲۰۱۱ سرنگونی) به ایران آموخته که توقف برنامه = حذف مصونیت.</p>
+    </div>
+    <table>
+        <thead><tr><th>سناریو</th><th>احتمال</th><th>بازه زمانی</th></tr></thead>
+        <tbody>
+            <tr><td>جنگ سایه‌ای + بحران رهبری</td><td>۴۰-۵۰٪</td><td>۳-۱۰ سال</td></tr>
+            <tr><td>بازدارندگی هسته‌ای ایران</td><td>۲۰-۲۵٪</td><td>۳-۱۰ سال</td></tr>
+            <tr><td>کاهش جاه‌طلبی آمریکا</td><td>۴۰-۴۵٪</td><td>۵-۱۵ سال</td></tr>
+            <tr><td>توافق کوچک (Less for Less)</td><td>۳۰-۳۵٪</td><td>در حال وقوع</td></tr>
+            <tr><td>شکست استراتژیک محدود</td><td>۲۵-۳۰٪</td><td>۱۸ ماه</td></tr>
+            <tr><td>تغییر رژیم از درون (گورباچف)</td><td>۲۰-۲۵٪</td><td>۳-۵ سال</td></tr>
+            <tr><td>بلوک شرقی CRINK</td><td>۳۰-۴۰٪</td><td>در حال شکل‌گیری</td></tr>
+            <tr><td>جنگ هسته‌ای منطقه‌ای</td><td class="danger">۳-۵٪</td><td>شرطی</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 2. NUCLEAR PROGRAM -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۲</span>برنامه هسته‌ای ایران</h2>
+    <p>ایران تنها کشور غیرسلاح‌دار هسته‌ای جهان است که تا ۶۰٪ اورانیوم را غنی‌سازی می‌کند. طبق گزارش IAEA (۳۱ مه ۲۰۲۵)، ذخیره اورانیوم ۶۰٪ به ۴۰۸.۶ کیلوگرم رسید و تا ژوئن ۲۰۲۵ به ۴۴۰ کیلوگرم افزایش یافت - کافی برای ساخت ~۱۰ بمب.</p>
+    <div class="stat-grid">
+        <div class="stat-box"><span class="stat-value">۶۰٪</span><span class="stat-label">سطح غنی‌سازی</span></div>
+        <div class="stat-box"><span class="stat-value">۴۴۰kg</span><span class="stat-label">ذخیره اورانیوم</span></div>
+        <div class="stat-box"><span class="stat-value">۲۲٬۰۰۰</span><span class="stat-label">سانتریفیوژ (پیش از حملات)</span></div>
+        <div class="stat-box"><span class="stat-value">~۱۰</span><span class="stat-label">بمب قابل ساخت</span></div>
+    </div>
+    <h3 class="subsection-title">زمان breakout</h3>
+    <p>پیش از حملات ۲۰۲۵: تقریباً صفر (UK Parliament). پس از حملات: ۱-۳ ماه (IranWarRoom). ISIS تخمین می‌زند ایران می‌توانست ذخیره ۶۰٪ را طی ۳ هفته به اورانیوم بسیار غنی‌شده تبدیل کند.</p>
+    <h3 class="subsection-title">تأثیر حملات ۲۰۲۵ و ۲۰۲۶</h3>
+    <p><strong>جنگ ۱۲ روزه (۱۳-۲۴ ژوئن ۲۰۲۵):</strong> اسرائیل ۱۳ ژوئن حمله را آغاز کرد. در ۲۲ ژوئن، آمریکا با B-2 و GBU-57 MOP به فردو، نطنز و اصفهان حمله کرد. نطنز «نابودشده»، فردو و اصفهان «آسیب بسیار شدید». با این حال، >۴۰۰ کیلوگرم اورانیوم ۶۰٪ باقی ماند.</p>
+    <p><strong>Operation Epic Fury (۲۸ فوریه ۲۰۲۶):</strong> ۹۰۰ حمله در ۱۲ ساعت. اهداف: رهبری، سایت‌های هسته‌ای، زیرساخت موشکی. ۳ نظامی آمریکایی کشته شدند.</p>
+    <div class="quote">«برنامه هسته‌ای ویران اما دست‌نخورده است. شاید فقط ۶ ماه عقب افتاده باشد.» - CNN، ۱۶ نوامبر ۲۰۲۵</div>
+</div>
+
+<!-- 3. ECONOMY -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۳</span>اقتصاد ایران در حال فروپاشی</h2>
+    <div class="stat-grid">
+        <div class="stat-box"><span class="stat-value">۶۲-۶۹٪</span><span class="stat-label">تورم سالانه</span></div>
+        <div class="stat-box"><span class="stat-value">۱.۹M</span><span class="stat-label">ریال/دلار (ژوئیه ۲۰۲۶)</span></div>
+        <div class="stat-box"><span class="stat-value">-۲.۷٪</span><span class="stat-label">رشد GDP</span></div>
+        <div class="stat-box"><span class="stat-value">$۳۰۰B</span><span class="stat-label">GDP اسمی</span></div>
+    </div>
+    <h3 class="subsection-title">فرار مغزها</h3>
+    <div class="card card-warn">
+        <p>خروج سالانه نخبگان به <strong>۱۸۰٬۰۰۰ نفر</strong> می‌رسد - خسارت <strong>۶۰ میلیارد دلار</strong> در سال. در ۲۰۲۲، ۶٬۵۰۰ پزشک مهاجرت کردند. شمار دانشجویان ایرانی خارج از کشور در ۲۰۲۴ به رکورد تاریخی رسید.</p>
+    </div>
+    <h3 class="subsection-title">تولید نفت</h3>
+    <p>۳.۲-۳.۳ میلیون بشکه در روز (۲۰۲۵-۲۰۲۶). صادرات ~۲ میلیون بشکه. درآمد ۲۰۲۵: ~۴۱ میلیارد دلار. در آوریل ۲۰۲۶، تولید ۳۵۰ هزار بشکه کاهش یافت.</p>
+</div>
+
+<!-- 4. MILITARY -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۴</span>توان نظامی ایران</h2>
+    <p>ایران بزرگترین زرادخانه موشکی خاورمیانه را دارد (CSIS). پیش از جنگ ۲۰۲۵: ۳٬۰۰۰+ موشک بالستیک. در جنگ ۱۲ روزه: ۵۰۰-۵۵۰ موشک + ۱٬۰۰۰ پهپاد شلیک شد.</p>
+    <table>
+        <thead><tr><th>موشک</th><th>نوع</th><th>برد</th><th>یادداشت</th></tr></thead>
+        <tbody>
+            <tr><td>فتاح-۱</td><td>«مافوق صوت» (ادعا)</td><td>~۱٬۴۰۰ km</td><td>IISS ادعای هایپرسونیک را اغراق‌آمیز می‌داند</td></tr>
+            <tr><td>خرمشهر-۴</td><td>سوخت مایع</td><td>~۲٬۰۰۰ km</td><td>بار مفیدی بزرگ</td></tr>
+            <tr><td>سجیل</td><td>سوخت جامد</td><td>~۲٬۰۰۰ km</td><td>نخستین‌بار در ۲۰۲۶</td></tr>
+            <tr><td>عماد/قدیر</td><td>سوخت مایع</td><td>۱٬۶۰۰-۱٬۸۰۰ km</td><td>نسخه‌های قدیمی</td></tr>
+        </tbody>
+    </table>
+    <div class="stat-grid">
+        <div class="stat-box"><span class="stat-value">۱۵۰-۱۹۰K</span><span class="stat-label">سپاه (فعال)</span></div>
+        <div class="stat-box"><span class="stat-value">۵-۱۵K</span><span class="stat-label">نیروی قدس</span></div>
+        <div class="stat-box"><span class="stat-value">۴۰-۹۰K</span><span class="stat-label">بسیج (فعال)</span></div>
+        <div class="stat-box"><span class="stat-value">۵۷۰K</span><span class="stat-label">کل نیروهای مسلح</span></div>
+    </div>
+</div>
+
+<!-- 5. AXIS OF RESISTANCE -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۵</span>محور مقاومت در حال متلاشی</h2>
+    <div class="warning-box">
+        <div class="warning-title">⚠️ ضربه راهبردی</div>
+        <p style="margin:0">سقوط اسد (۸ دسامبر ۲۰۲۴) کریدور زمینی ایران به حزب‌الله را قطع کرد. ایران ده‌ها میلیارد دلار برای حفظ اسد هزینه کرده بود.</p>
+    </div>
+    <h3 class="subsection-title">حزب‌الله پس از نصرالله</h3>
+    <p>نصرالله در سپتامبر ۲۰۲۴ کشته شد. ۵۰۰+ جنگجو کشته. اسرائیل ~نیمی از زرادخانه موشکی را نابود کرد. موجودی پیش از جنگ: ۴۰٬۰۰۰-۱۲۰٬۰۰۰ راکت. اکنون: «ضعیف‌تر از همیشه» (INSS).</p>
+    <h3 class="subsection-title">حوثی‌ها</h3>
+    <p>بحران دریای سرخ ادامه دارد. از نوامبر ۲۰۲۳ تا اکتبر ۲۰۲۴: ۱۹۰+ حمله. ۱۰-۱۵٪ تجارت دریایی جهان از باب‌المندب. ترافیک کانال سوئز ۵۰٪ کاهش. Prosperity Guardian (۲۰+ کشور) محدود موفق بود.</p>
+    <h3 class="subsection-title">حماس پس از ۷ اکتبر</h3>
+    <p>یحیی سنوار (اکتبر ۲۰۲۴) و محمد ضیف (ژانویه ۲۰۲۵) کشته شدند. ۱۷٬۰۰۰-۲۰٬۰۰۰ جنگجو کشته. حماس به شورش‌گر تبدیل شد. تلفات غزه تا می ۲۰۲۶: ۷۵٬۸۱۱+ کشته.</p>
+</div>
+
+<!-- 6. DIRECT CONFRONTATIONS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۶</span>درگیری‌های مستقیم ایران-اسرائیل</h2>
+    <table>
+        <thead><tr><th>رویداد</th><th>تاریخ</th><th>موشک/پهپاد</th><th>تلفات اسرائیل</th><th>تلفات ایران</th></tr></thead>
+        <tbody>
+            <tr><td>وعده صادق ۱</td><td>آوریل ۲۰۲۴</td><td>۳۰۰+ (۱۷۰ پهپاد + ۳۰ کروز + ۱۲۰ بالستیک)</td><td>۱ مجروح</td><td>—</td></tr>
+            <tr><td>وعده صادق ۲</td><td>اکتبر ۲۰۲۴</td><td>~۲۰۰ بالستیک</td><td>۰ کشته</td><td>—</td></tr>
+            <tr><td>جنگ ۱۲ روزه</td><td>ژوئن ۲۰۲۵</td><td>۵۰۰-۵۵۰ بالستیک + ۱٬۰۰۰ پهپاد</td><td>۲۸ کشته</td><td>۱٬۰۶۰-۱٬۱۹۰ کشته</td></tr>
+            <tr><td>Operation Epic Fury</td><td>فوریه ۲۰۲۶</td><td>۹۰۰ حمله آمریکایی-اسرائیلی</td><td>—</td><td>۵۲ فرمانده ارشد کشته</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 7. HISTORICAL LESSONS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۷</span>درس‌های تاریخی بمب هسته‌ای</h2>
+    <table>
+        <thead><tr><th>کشور</th><th>سال</th><th>حمله خارجی؟</th><th>رفع تحریم؟</th><th>نتیجه</th></tr></thead>
+        <tbody>
+            <tr><td>کره شمالی</td><td>۲۰۰۶</td><td>خیر</td><td>خیر (۱۸ سال)</td><td>مصونیت نظامی، انزوا</td></tr>
+            <tr><td>پاکستان</td><td>۱۹۹۸</td><td>خیر</td><td>بله (۲۰۰۱)</td><td>پذیرش کامل</td></tr>
+            <tr><td>هند</td><td>۱۹۷۴/۹۸</td><td>خیر</td><td>بله (۲۰۰۸)</td><td>شریک آمریکا</td></tr>
+            <tr><td>آفریقای جنوبی</td><td>۱۹۸۹</td><td>—</td><td>—</td><td>تنها dismantle موفق</td></tr>
+            <tr><td>لیبی</td><td>۲۰۰۳</td><td>—</td><td>موقتاً</td><td class="danger">سرنگونی ۲۰۱۱</td></tr>
+            <tr><td>عراق</td><td>—</td><td>بله (۱۹۸۱، ۲۰۰۳)</td><td>—</td><td>برنامه متوقف نشد</td></tr>
+            <tr><td>سوریه</td><td>—</td><td>بله (۲۰۰۷)</td><td>—</td><td>ضربه زودهنگام مؤثر</td></tr>
+        </tbody>
+    </table>
+    <div class="card card-accent">
+        <h4 style="margin:0 0 6px;color:var(--c-accent)">درس‌های کلیدی:</h4>
+        <ol>
+            <li><strong>بمب تثبیت‌شده حمله را غیرمحتمل می‌کند</strong> (کره شمالی، پاکستان، هند)</li>
+            <li><strong>پنجره بحرانی ۱۸-۳۶ ماه</strong> (احتمال حمله اسرائیل ۵۰-۶۵٪)</li>
+            <li><strong>پس از تثبیت، آمریکا به containment روی می‌آورد</strong></li>
+            <li><strong>توقف برنامه = حذف مصونیت = سرنگونی</strong> (درس لیبی)</li>
+            <li><strong>تحریم‌ها به‌تدریج رفع می‌شوند</strong> (مدل پاکستان/هند)</li>
+        </ol>
+    </div>
+</div>
+
+<!-- 8. ALL 20 CARDS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۸</span>تحلیل کامل ۲۰ کارت استراتژیک ایران</h2>
+    
+    <h3 class="subsection-title">☢️ کارت‌های هسته‌ای (۳ کارت)</h3>
+    <div class="card-grid">
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۱. ساخت بمب اتم</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۳۵ هسته‌ای، +۳۰ بازدارندگی، -۲۵ اقتصاد<br>
+                <strong>احتمال حمله آمریکا:</strong> ۶۰-۷۵٪ (پیش از آزمایش) → ۲۰-۳۰٪ (پس از تثبیت)<br>
+                <strong>احتمال حمله اسرائیل:</strong> ۸۰-۹۰٪ (پیش از آزمایش) → ۴۰-۵۰٪ (پس از)<br>
+                <strong>پاسخ منطقه:</strong> عربستان کلاهک از پاکستان (۶۰-۷۰٪)، ترکیه برنامه مستقل (۲۰-۳۰٪)<br>
+                <strong>تحریم‌ها:</strong> تشدید بی‌سابقه، چین/روسیه محدود<br>
+                <strong>زمان تثبیت:</strong> ۶-۱۸ ماه مینیاتوری‌سازی، ۲-۴ سال بازدارندگی پایدار<br>
+                <strong>احتمال موفقیت:</strong> ۳۰-۵۰٪
+            </div>
+        </div>
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۲. خروج کامل از NPT</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۵ هسته‌ای، +۱۰ بازدارندگی، -۱۰ اقتصاد<br>
+                <strong>عواقب حقوقی:</strong> ماده X - اخطار ۹۰ روزه، ارجاع به شورای امنیت<br>
+                <strong>پاسخ:</strong> قطعنامه فصل VII (اقدام نظامی مجاز)<br>
+                <strong>احتمال حمله:</strong> ۳۰-۵۰٪<br>
+                <strong>تفاوت با بمب:</strong> هنوز راه برگشت وجود دارد<br>
+                <strong>احتمال موفقیت:</strong> ۲۰-۳۰٪
+            </div>
+        </div>
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۳. دریافت کلاهک از کره شمالی</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۲۵ هسته‌ای، +۱۸ بازدارندگی، -۱۸ اقتصاد<br>
+                <strong>احتمال انتقال:</strong> ۲۰-۳۰٪ (کره شمالی هرگز کلاهک نداده)<br>
+                <strong>مسیر:</strong> هوایی (تهران-پیونگ‌یانگ)، دریایی (نامپو-بندرعباس)<br>
+                <strong>کشف:</strong> NSA SIGINT، ماهواره‌ها، IAEA<br>
+                <strong>پاسخ:</strong> قطعنامه فوری + حمله پیش‌دگیرانه (۶۰-۷۰٪)<br>
+                <strong>احتمال موفقیت:</strong> ۱۵-۲۵٪
+            </div>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">⚔️ کارت‌های نظامی (۴ کارت)</h3>
+    <div class="card-grid">
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۴. حمله موشکی به اسرائیل</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۸ بازدارندگی، -۸ توان نظامی، +۱۵ حمایت داخلی<br>
+                <strong>وعده صادق ۱:</strong> ۳۰۰+ پرتابه، ~۹۹٪ رهگیری، ۰ کشته<br>
+                <strong>وعده صادق ۲:</strong> ۲۰۰ بالستیک، آسیب به نواتیم<br>
+                <strong>وعده صادق ۳:</strong> ۵۵۰ موشک + ۱۰۰۰ پهپاد، ۲۸ کشته اسرائیلی<br>
+                <strong>پاسخ اسرائیل:</strong> ۸۰-۹۰٪ حمله متقابل<br>
+                <strong>پاسخ آمریکا:</strong> ۷۰-۸۰٪ مداخله مستقیم
+            </div>
+        </div>
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۵. حمله زمینی به اسرائیل</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> -۳۰ توان نظامی، +۲۵ حمایت داخلی<br>
+                <strong>قابلیت:</strong> عملاً غیرممکن (فاصله ۱۵۰۰ کیلومتر، عدم قابلیت آبی‌خاکی)<br>
+                <strong>پاسخ اسرائیل:</strong> ۱۰۰٪ حمله شدید (احتمالاً هسته‌ای)<br>
+                <strong>پاسخ آمریکا:</strong> ۹۵٪ حمله هوایی<br>
+                <strong>تلفات نیروی مهاجم:</strong> ۹۰٪+<br>
+                <strong>احتمال موفقیت:</strong> ۵-۱۰٪ (غیرعملیاتی)
+            </div>
+        </div>
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۶. ساخت موشک قاره‌پیما (ICBM)</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۳۰ بازدارندگی، -۱۰ توان نظامی، -۲۰ اقتصاد<br>
+                <strong>توان فعلی:</strong> موشک ۲۰۰۰ کیلومتری (سجیل، خرمشهر)<br>
+                <strong>زمان ساخت ICBM:</strong> ۳-۷ سال (۲-۴ سال با کمک روسیه/کره شمالی)<br>
+                <strong>پاسخ آمریکا:</strong> ۷۰-۸۰٪ حمله پیش‌دگیرانه<br>
+                <strong>خط قرمز آمریکا:</strong> «قابل قبول نیست»<br>
+                <strong>احتمال موفقیت:</strong> ۲۰-۳۰٪
+            </div>
+        </div>
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۷. حمله به پایگاه‌های آمریکا</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۵ بازدارندگی، -۸ توان نظامی، +۲۰ حمایت داخلی<br>
+                <strong>عین‌الاسد (۲۰۲۰):</strong> ۱۱ موشک، ۱۱۰+ مجروح TBI، ۰ کشته<br>
+                <strong>برج ۲۲ (۲۰۲۴):</strong> ۳ کشته آمریکایی<br>
+                <strong>۱۶۰+ حمله:</strong> اکتبر ۲۰۲۳ تا فوریه ۲۰۲۴<br>
+                <strong>پاسخ آمریکا:</strong> ۸۰٪ حمله متقابل<br>
+                <strong>احتمال تکرار:</strong> ۷۰-۸۰٪
+            </div>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">🛡️ کارت‌های نیابتی (۴ کارت)</h3>
+    <div class="card-grid">
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۸. فعال‌سازی حزب‌الله</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۴ نفوذ، +۱۲ بازدارندگی، +۸ توان نظامی<br>
+                <strong>زرادخانه پیش از ۲۰۲۴:</strong> ۱۰۰٬۰۰۰-۱۵۰٬۰۰۰ راکت<br>
+                <strong>پس از جنگ ۲۰۲۴:</strong> ۸۵-۹۰٪ نابود شده، ~۳۰٬۰۰۰ باقی‌مانده<br>
+                <strong>توان شلیک:</strong> ۵۰۰-۱۰۰۰/روز (پیش)، ۵۰-۱۰۰/روز (اکنون)<br>
+                <strong>پاسخ اسرائیل:</strong> ۹۰٪ جنگ تمام‌عیار<br>
+                <strong>تلفات لبنان (۲۰۲۴):</strong> ۴٬۱۰۰+ کشته
+            </div>
+        </div>
+        <div class="mini-card card-info">
+            <div class="mini-card-title">۹. فعال‌سازی حوثی‌ها</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۸ نفوذ، +۶ بازدارندگی، +۳ توان نظامی<br>
+                <strong>حملات:</strong> ۱۹۰+ حمله به دریای سرخ (۲۰۲۳-۲۰۲۴)<br>
+                <strong>تجارت جهانی:</strong> ۱۰-۱۵٪ از باب‌المندب، ۳۰٪ کانتینری<br>
+                <strong>کانال سوئز:</strong> ۵۰٪ کاهش ترافیک<br>
+                <strong>پاسخ آمریکا:</strong> Prosperity Guardian (۲۰+ کشور)<br>
+                <strong>وضعیت:</strong> حوثی‌ها هنوز فعال‌اند<br>
+                <strong>احتمال موفقیت:</strong> ۴۰-۵۰٪
+            </div>
+        </div>
+        <div class="mini-card card-info">
+            <div class="mini-card-title">۱۰. شبه‌نظامیان عراقی</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۶ نفوذ، +۵ بازدارندگی، +۲ توان نظامی<br>
+                <strong>گروه‌ها:</strong> کتیب حزب‌الله، عصائب اهل‌حق، نوجباء<br>
+                <strong>حملات:</strong> ۱۶۰+ حمله به پایگاه‌های آمریکا<br>
+                <strong>برج ۲۲:</strong> ۳ کشته آمریکایی<br>
+                <strong>پاسخ آمریکا:</strong> حمله هوایی به کتیب حزب‌الله<br>
+                <strong>وضعیت:</strong> تعلیق حملات (ژانویه ۲۰۲۴)، اما ادامه محدود
+            </div>
+        </div>
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۱۱. حماس و جهاد</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۰ نفوذ، +۵ بازدارندگی، +۲ توان نظامی<br>
+                <strong>۷ اکتبر:</strong> ۱٬۲۰۰ کشته اسرائیلی، ۲۵۰+ گروگان<br>
+                <strong>توان اولیه:</strong> ۲۵٬۰۰۰-۳۰٬۰۰۰ جنگجو<br>
+                <strong>پس از جنگ غزه:</strong> ۱۷٬۰۰۰-۲۰٬۰۰۰ کشته<br>
+                <strong>وضعیت:</strong> به شورش‌گر تبدیل شد<br>
+                <strong>تلفات غزه:</strong> ۷۵٬۸۱۱+ کشته (می ۲۰۲۶)
+            </div>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">🌊 کارت‌های نامتقارن (۳ کارت)</h3>
+    <div class="card-grid">
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۱۲. بستن تنگه هرمز</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۸ بازدارندگی، -۱۵ اقتصاد، +۱۴ نفوذ<br>
+                <strong>نفت جهان:</strong> ۲۰ میلیون بشکه/روز (۲۷٪ تجارت نفت)<br>
+                <strong>مدت قابل بستن:</strong> چند روز تا ۲ هفته<br>
+                <strong>قیمت نفت:</strong> ۱۰۰-۲۰۰ دلار<br>
+                <strong>پاسخ آمریکا:</strong> ۹۰٪+ حمله گسترده (Earnest Will)<br>
+                <strong>مشکل:</strong> خود ایران ۸۰٪ صادراتش از هرمز
+            </div>
+        </div>
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۱۳. بستن باب‌المندب</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۵ بازدارندگی، -۸ اقتصاد، +۱۲ نفوذ<br>
+                <strong>تجارت جهانی:</strong> ۱۰-۱۵٪ (۳۰٪ کانتینری)<br>
+                <strong>ارزش:</strong> >۱ تریلیون دلار سالانه<br>
+                <strong>پاسخ آمریکا:</strong> Prosperity Guardian<br>
+                <strong>تأثیر:</strong> کاهش ۵۰٪ ترافیک کانال سوئز<br>
+                <strong>احتمال موفقیت:</strong> ۴۰-۵۰٪
+            </div>
+        </div>
+        <div class="mini-card card-accent">
+            <div class="mini-card-title">۱۴. حمله پهپادی انبوه</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۸ بازدارندگی، +۶ توان نظامی، +۲ اقتصاد<br>
+                <strong>انواع:</strong> شاهد-۱۳۶ (برد ۲۰۰۰ کیلومتر)، آرش، مهاجر-۶<br>
+                <strong>وعده صادق ۱:</strong> ۱۷۰ پهپاد<br>
+                <strong>وعده صادق ۳:</strong> ۱۰۰۰+ پهپاد<br>
+                <strong>هزینه شاهد-۱۳۶:</strong> $۲۰٬۰۰۰-$۵۰٬۰۰۰<br>
+                <strong>هزینه رهگیر Patriot:</strong> $۴ میلیون<br>
+                <strong>نسبت هزینه:</strong> ۱۰۰:۱ (نامتقارنی اقتصادی)
+            </div>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">🕊️ کارت‌های دیپلماتیک (۳ کارت)</h3>
+    <div class="card-grid">
+        <div class="mini-card card-info">
+            <div class="mini-card-title">۱۵. دیپلماسی فعال</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> -۸ هسته‌ای، +۱۲ اقتصاد، +۶ حمایت داخلی<br>
+                <strong>تجربه برجام:</strong> ۲۰۱۵ امضا، ۲۰۱۸ خروج ترامپ<br>
+                <strong>آمریکا به تعهدات عمل کرد؟</strong> تا ۲۰۱۸ بله<br>
+                <strong>ایران به تعهدات عمل کرد؟</strong> تا ۲۰۱۹ بله<br>
+                <strong>مذاکرات ۲۰۲۵:</strong> مسقط، بی‌نتیجه<br>
+                <strong>احتمال موفقیت:</strong> ۲۰-۳۰٪ (کوتاه‌مدت)
+            </div>
+        </div>
+        <div class="mini-card card-accent">
+            <div class="mini-card-title">۱۶. عادی‌سازی با عربستان</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۸ نفوذ، +۱۰ بازدارندگی، +۸ اقتصاد<br>
+                <strong>توافق پکن:</strong> ۱۰ مارس ۲۰۲۳، میانجی‌گری چین<br>
+                <strong>وضعیت:</strong> سفارتخانه‌ها بازگشایی شد<br>
+                <strong>مانع:</strong> برنامه هسته‌ای، حوثی‌ها، حقوق بشر<br>
+                <strong>تأثیر بر اسرائیل:</strong> تضعیف پیمان ابراهیم<br>
+                <strong>احتمال موفقیت:</strong> ۳۰-۴۰٪
+            </div>
+        </div>
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۱۷. صبر استراتژیک</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۴ هسته‌ای، -۸ حمایت داخلی، -۶ اقتصاد<br>
+                <strong>تجربه:</strong> جنگ ایران-عراق، تحریم‌ها ۲۰۱۲-۲۰۱۵<br>
+                <strong>هزینه:</strong> تورم مزمن، فرار مغزها، پیر شدن زیرساخت<br>
+                <strong>مزیت:</strong> حفظ نظام، توسعه موشکی/هسته‌ای<br>
+                <strong>پس از ۲۰۲۵:</strong> به چالش کشیده شد<br>
+                <strong>احتمال موفقیت:</strong> ۳۰-۴۰٪
+            </div>
+        </div>
+    </div>
+
+    <h3 class="subsection-title">🤝 کارت‌های ائتلاف (۳ کارت)</h3>
+    <div class="card-grid">
+        <div class="mini-card card-purple">
+            <div class="mini-card-title">۱۸. اتحاد با روسیه</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۲۵ بازدارندگی، +۱۲ توان نظامی، +۵ اقتصاد<br>
+                <strong>پیمان ۲۰۲۵:</strong> ۱۷ ژانویه، مشارکت راهبردی جامع<br>
+                <strong>کمک‌ها:</strong> Su-35 (۵۰ فروند)، S-400، موتور موشکی<br>
+                <strong>وضعیت:</strong> تا ۲۰۲۵ هیچ‌کدام تحویل نشده<br>
+                <strong>ورود مستقیم جنگ:</strong> ۱۰-۲۰٪<br>
+                <strong>تأثیر بر اوکراین:</strong> شاهد-۱۳۶ به روسیه
+            </div>
+        </div>
+        <div class="mini-card card-purple">
+            <div class="mini-card-title">۱۹. گسترش پکت با چین</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۱۵ اقتصاد، +۱۲ بازدارندگی، +۱۰ نفوذ<br>
+                <strong>پکت ۲۰۲۱:</strong> $۴۰۰ میلیارد در ۲۵ سال<br>
+                <strong>واقعیت:</strong> <$۲۰ میلیارد در ۴ سال<br>
+                <strong>خرید نفت:</strong> بزرگترین خریدار، تخفیف ۳۰-۴۰٪<br>
+                <strong>درآمد ۲۰۲۵:</strong> ~$۳۱.۲ میلیارد<br>
+                <strong>ورود مستقیم جنگ:</strong> ۵-۱۰٪
+            </div>
+        </div>
+        <div class="mini-card card-accent">
+            <div class="mini-card-title">۲۰. مردم‌سازی و بسیج</div>
+            <div class="mini-card-content">
+                <strong>اثر:</strong> +۲۵ حمایت داخلی، +۱۲ توان نظامی، -۱۰ اقتصاد<br>
+                <strong>تجربه:</strong> جنگ ایران-عراق، ۱۰۰٬۰۰۰-۳۰۰٬۰۰۰ کشته بسیجی<br>
+                <strong>اعضای فعال:</strong> ~۹۰٬۰۰۰<br>
+                <strong>قابل فراخوان:</strong> ۴۰۰٬۰۰۰-۶۰۰٬۰۰۰<br>
+                <strong>۲۰۲۵:</strong> ۱+ میلیون پرسنل اعلام شد<br>
+                <strong>مشکل:</strong> مقاومت اجتماعی در شرایط فعلی
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 9. COMBINATIONS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۹</span>تحلیل ۱۰ ترکیب مهم کارت‌ها</h2>
+    <div class="card-grid">
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۱. بمب اتم + اتحاد با روسیه</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> بمب + S-400/Su-35 از روسیه<br>
+                <strong>اثر:</strong> بازدارندگی به‌شدت تقویت می‌شود. حمله پیش‌دگیرانه خطرناک‌تر (S-400 تهدید F-35)<br>
+                <strong>پاسخ:</strong> آمریکا به containment روی می‌آورد<br>
+                <strong>احتمال موفقیت:</strong> ۵۰-۶۰٪
+            </div>
+        </div>
+        <div class="mini-card card-accent">
+            <div class="mini-card-title">۲. دیپلماسی + عادی‌سازی عربستان</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> بازگشت به برجام + روابط کامل با عربستان<br>
+                <strong>اثر:</strong> کاهش تنش، رفع بخشی تحریم، کاهش انزوا<br>
+                <strong>پاسخ:</strong> اسرائیل نگران، آمریکا حمایت<br>
+                <strong>احتمال موفقیت:</strong> ۳۰-۴۰٪
+            </div>
+        </div>
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۳. حمله موشکی + حزب‌الله + هرمز</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> حمله همه‌جانبه + فعال‌سازی حزب‌الله + بستن هرمز<br>
+                <strong>اثر:</strong> حداکثر فشار، اما حزب‌الله ضعیف، هرمز شمشیر دو لبه<br>
+                <strong>پاسخ:</strong> حمله گسترده آمریکا-اسرائیل<br>
+                <strong>احتمال موفقیت نظامی:</strong> ۲۰-۳۰٪<br>
+                <strong>هزینه اقتصادی:</strong> فاجعه‌بار
+            </div>
+        </div>
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۴. حمله زمینی + ICBM</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> حمله زمینی (غیرممکن) + ICBM<br>
+                <strong>اثر:</strong> حمله زمینی شکست، ICBM تهدید آمریکا<br>
+                <strong>پاسخ:</strong> حمله پیش‌دگیرانه آمریکا<br>
+                <strong>احتمال موفقیت:</strong> ۵-۱۰٪ (غیرعملیاتی)
+            </div>
+        </div>
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۵. صبر استراتژیک + حوثی‌ها</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> صبر + فعال نگه‌داشتن حوثی‌ها<br>
+                <strong>اثر:</strong> فشار مداوم بر تجارت جهانی، تضعیف تدریجی اقتصاد<br>
+                <strong>پاسخ:</strong> Prosperity Guardian ادامه<br>
+                <strong>احتمال موفقیت:</strong> ۴۰-۵۰٪
+            </div>
+        </div>
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۶. دیپلماسی + حمله موشکی</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> مذاکره همزمان با حمله (فشار + گفتگو)<br>
+                <strong>اثر:</strong> مدل کره شمالی (بمب، سپس مذاکره از موضع قوت)<br>
+                <strong>پاسخ:</strong> آمریکا ممکن است تن دهد<br>
+                <strong>احتمال موفقیت:</strong> ۲۰-۳۰٪
+            </div>
+        </div>
+        <div class="mini-card card-purple">
+            <div class="mini-card-title">۷. اتحاد چین + بمب اتم</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> بمب + حمایت اقتصادی چین<br>
+                <strong>اثر:</strong> چین پول و نفت‌خرد، ایران بمب دارد<br>
+                <strong>اما:</strong> چین در صورت بمب فاصله می‌گیرد<br>
+                <strong>احتمال موفقیت:</strong> ۲۵-۳۵٪
+            </div>
+        </div>
+        <div class="mini-card card-danger">
+            <div class="mini-card-title">۸. خروج NPT + کلاهک کره شمالی</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> خروج + خرید کلاهک<br>
+                <strong>اثر:</strong> میان‌بر به بمب<br>
+                <strong>پاسخ:</strong> حمله پیش‌دگیرانه (۶۰-۸۰٪)<br>
+                <strong>احتمال موفقیت:</strong> ۱۵-۲۵٪
+            </div>
+        </div>
+        <div class="mini-card card-accent">
+            <div class="mini-card-title">۹. عادی‌سازی عربستان + اتحاد چین</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> توافق با عربستان + پکت چین<br>
+                <strong>اثر:</strong> کاهش انزوا + سرمایه چینی + بازار عربستان<br>
+                <strong>پاسخ:</strong> آمریکا نگران نفوذ چین<br>
+                <strong>احتمال موفقیت:</strong> ۳۵-۴۵٪ (بهترین گزینه اقتصادی)
+            </div>
+        </div>
+        <div class="mini-card card-warn">
+            <div class="mini-card-title">۱۰. مردمسازی + حمله موشکی</div>
+            <div class="mini-card-content">
+                <strong>سناریو:</strong> بسیج گسترده + حمله موشکی<br>
+                <strong>اثر:</strong> بسیج برای دفاع داخلی مفید، برای حمله به اسرائیل بی‌فایده<br>
+                <strong>پاسخ:</strong> حمله گسترده متقابل<br>
+                <strong>احتمال موفقیت:</strong> ۲۰-۳۰٪
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 10. ENDINGS -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۰</span>۲۰ سناریوی پایان محتمل</h2>
+    
+    <h3 class="subsection-title">محتمل‌ترین مسیرها</h3>
+    <table>
+        <thead><tr><th>#</th><th>سناریو</th><th>احتمال</th><th>بازه</th><th>نتیجه برای ایران</th></tr></thead>
+        <tbody>
+            <tr><td>۱</td><td>جنگ سایه‌ای + بحران رهبری</td><td>۴۰-۵۰٪</td><td>۳-۱۰ سال</td><td>تحول بزرگ</td></tr>
+            <tr><td>۲</td><td>بازدارندگی هسته‌ای</td><td>۲۰-۲۵٪</td><td>۳-۱۰ سال</td><td>پیروزی</td></tr>
+            <tr><td>۳</td><td>کاهش جاه‌طلبی آمریکا</td><td>۴۰-۴۵٪</td><td>۵-۱۵ سال</td><td>پیروزی نسبی</td></tr>
+            <tr><td>۴</td><td>توافق کوچک (Less for Less)</td><td>۳۰-۳۵٪</td><td>در حال وقوع</td><td>سازش</td></tr>
+            <tr><td>۵</td><td>شکست استراتژیک محدود</td><td>۲۵-۳۰٪</td><td>۱۸ ماه</td><td>شکست</td></tr>
+            <tr><td>۶</td><td>تغییر رژیم از درون (گورباچف)</td><td>۲۰-۲۵٪</td><td>۳-۵ سال</td><td>شکست/تحول</td></tr>
+            <tr><td>۷</td><td>بلوک شرقی CRINK</td><td>۳۰-۴۰٪</td><td>در حال شکل‌گیری</td><td>سازش</td></tr>
+            <tr><td>۸</td><td>جنگ فرسایشی طولانی</td><td>۳۰-۳۵٪</td><td>۳-۲۰ سال</td><td>سازش</td></tr>
+            <tr><td>۹</td><td>توافق جامع (More for More)</td><td>۸-۱۲٪</td><td>۲-۱۰ سال</td><td>سازش</td></tr>
+            <tr><td>۱۰</td><td>پرسترویکای ایرانی</td><td>۱۰-۱۵٪</td><td>۵-۱۵ سال</td><td>تحول</td></tr>
+            <tr><td>۱۱</td><td>تضعیف استراتژیک اسرائیل</td><td>۱۵-۲۰٪</td><td>۲۰+ سال</td><td>پیروزی بلندمدت</td></tr>
+            <tr><td>۱۲</td><td>بقای رژیم با هزینه (کره شمالی)</td><td>۱۵-۲۰٪</td><td>—</td><td>بقا</td></tr>
+            <tr><td>۱۳</td><td>سناریوی لیبی</td><td>۵-۸٪</td><td>—</td><td>شکست</td></tr>
+            <tr><td>۱۴</td><td>تغییر رژیم از بیرون</td><td>۵-۸٪</td><td>—</td><td>شکست</td></tr>
+            <tr><td>۱۵</td><td>خروج کامل آمریکا</td><td>۸-۱۲٪</td><td>۱۰ سال</td><td>پیروزی</td></tr>
+            <tr><td>۱۶</td><td>عادی‌سازی کامل با غرب</td><td>۱۰-۱۵٪</td><td>۲۰۴۰+</td><td>سازش</td></tr>
+            <tr><td>۱۷</td><td>جنگ چندجبهه‌ای گسترده</td><td>۱۵-۲۰٪</td><td>—</td><td>شکست/تخریب</td></tr>
+            <tr><td>۱۸</td><td>شکست + بازسازی + بمب</td><td>۱۵-۲۰٪</td><td>۲۰۲۷-۲۰۲۸</td><td>پیروزی</td></tr>
+            <tr><td>۱۹</td><td>توافق + شکست + جنگ</td><td>۲۰-۲۵٪</td><td>۲۰۲۶-۲۰۲۷</td><td>شکست</td></tr>
+            <tr><td>۲۰</td><td>جنگ هسته‌ای منطقه‌ای</td><td class="danger">۳-۵٪</td><td>شرطی</td><td class="danger">تخریب</td></tr>
+        </tbody>
+    </table>
+
+    <h3 class="subsection-title">سه مسیر ترکیبی محتمل‌ترین</h3>
+    <div class="card card-accent">
+        <h4 style="margin:0 0 6px;color:var(--c-accent)">مسیر A (۳۵٪): فرسایش + تغییر تدریجی</h4>
+        <p style="margin:0">جنگ سایه‌ای + کاهش جاه‌طلبی آمریکا + CRINK → در نهایت تغییر رژیم از درون (گورباچف ایرانی). بمب هرگز ساخته نمی‌شود چون رژیم قبل از آن ساقط می‌شود.</p>
+    </div>
+    <div class="card card-danger">
+        <h4 style="margin:0 0 6px;color:var(--c-danger)">مسیر B (۲۰٪): بمب از طریق بازسازی</h4>
+        <p style="margin:0">شکست + بازسازی + بمب → بازدارندگی هسته‌ای. ایران در پنجره ۱۸-۳۶ ماه به بمب می‌رسد. آمریکا/اسرائیل یا حمله می‌کنند یا می‌پذیرند.</p>
+    </div>
+    <div class="card card-warn">
+        <h4 style="margin:0 0 6px;color:var(--c-warn)">مسیر C (۲۰٪): چرخه توافق-شکست-جنگ</h4>
+        <p style="margin:0">توافق موقت → شکست → جنگ محدود → توافق مجدد. چرخه JCPOA تکرار می‌شود در فشرده‌شده‌تر. هر چرخه ایران ضعیف‌تر.</p>
+    </div>
+</div>
+
+<!-- 11. SOURCES -->
+<div class="section">
+    <h2 class="section-title"><span class="section-num">۱۱</span>منابع و مراجع</h2>
+    <div class="card-grid">
+        <div class="mini-card">
+            <div class="mini-card-title">منابع تحلیلی</div>
+            <div class="mini-card-content">
+                IAEA، ISIS، CSIS، CFR، RAND، IISS، SIPRI، Carnegie، Brookings، Belfer Center (Harvard)، Quincy Institute، OSW، INSS، Soufan Center، ISW، CNAS، Stimson Center
+            </div>
+        </div>
+        <div class="mini-card">
+            <div class="mini-card-title">منابع رسمی</div>
+            <div class="mini-card-content">
+                UN Security Council، US Congress (CRS)، US State Department، UK Parliament، US Treasury OFAC، Costs of War (Brown)
+            </div>
+        </div>
+        <div class="mini-card">
+            <div class="mini-card-title">منابع خبری</div>
+            <div class="mini-card-content">
+                Reuters، AP، BBC، Al Jazeera، CNN، Times of Israel، Iran International، Jerusalem Post، NPR، Financial Times
+            </div>
+        </div>
+        <div class="mini-card">
+            <div class="mini-card-title">داده‌های اقتصادی</div>
+            <div class="mini-card-content">
+                IMF (WEO 2026)، World Bank (MPO)، Deutsche Bank Research، Columbia Energy Policy، EPRINC
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- ENDING -->
+<div class="ending">
+    <div class="ending-icon">🎯</div>
+    <h1 class="ending-title">پایان سند</h1>
+    <div class="ending-divider"></div>
+    <p class="ending-text">
+        این سند بر اساس ۱۱ تحقیق موازی و داده‌های واقعی تا اواسط ۲۰۲۶ تدوین شده است.
+        تمامی ۲۰ کارت، ۱۰ ترکیب، و ۲۰ سناریوی پایان با ذکر منابع تحلیل شده‌اند.
+    </p>
+    <div class="ending-divider"></div>
+    <p class="ending-text" style="font-size:11px;opacity:0.6">
+        نسخه ۵.۰ · تیر ۱۴۰۴<br>
+        بر اساس IAEA، CSIS، CFR، RAND، ISIS، OSW، Reuters، AP، BBC
+    </p>
+</div>
+
+</body>
+</html>
