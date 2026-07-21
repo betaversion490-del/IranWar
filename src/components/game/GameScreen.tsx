@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { useGameStore } from "@/lib/game/gameStore";
 import {
   iranCards, usCards, israelCards, arabCards, natoCards, nkRussiaChinaCards,
-  getPrepTime, historyCards, activeCards, infraCards,
+  getPrepTime, historyCards, infraCards,
   categoryInfo, rarityInfo, actorInfo,
   type GameCard,
 } from "@/lib/game/cardsData";
@@ -14,7 +14,7 @@ import {
   comboDefinitions, type CardEnrichment,
 } from "@/lib/game/cardEnrichments";
 import { TechTreePanel } from "./TechTreePanel";
-import { NewsTicker } from "./BattleEffects";
+import { WarModeOverlay, AchievementSystem, ComboFlashOverlay, CardPlayGlow, ParticleBurst } from "./GameEffects";
 
 // ============================================================
 // ELIXIR BAR (Phase 1.1)
@@ -76,10 +76,10 @@ function MiniCard({
   return (
     <motion.button
       onClick={onClick}
-      whileHover={!disabled ? { scale: 1.08, y: -4 } : {}}
+      whileHover={!disabled ? { scale: 1.08, y: -4, rotateZ: -1 } : {}}
       whileTap={!disabled ? { scale: 0.95 } : {}}
       disabled={disabled}
-      className="relative rounded-lg shrink-0 overflow-hidden"
+      className={`relative rounded-lg shrink-0 overflow-hidden card-3d-tilt rarity-${card.rarity}`}
       style={{
         width: size, height: size * 1.35,
         background: actor.gradient,
@@ -89,6 +89,14 @@ function MiniCard({
       }}
     >
       <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: rar.color }} />
+      {/* Rarity glow border */}
+      {(card.rarity === 'legendary' || card.rarity === 'apocalyptic') && (
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `linear-gradient(135deg, ${rar.color}30 0%, transparent 30%, transparent 70%, ${rar.color}30 100%)`,
+          }}
+        />
+      )}
       <div className="flex items-center justify-center pt-1.5" style={{ fontSize: size * 0.32 }}>{card.icon}</div>
       <div className="text-center px-0.5 mt-0.5 font-bold leading-tight" style={{ fontSize: size * 0.1 }}>{card.name}</div>
 
@@ -113,30 +121,6 @@ function MiniCard({
         <div className="absolute top-0.5 left-0.5 text-[6px] bg-amber-500/30 text-amber-300 px-0.5 rounded">📚</div>
       )}
     </motion.button>
-  );
-}
-
-// ============================================================
-// ACTIVE CARD (currently happening - news)
-// ============================================================
-function ActiveCardItem({ card }: { card: typeof activeCards[0] }) {
-  const statusColor = card.status === 'active' ? '#dc2626' : card.status === 'preparing' ? '#fbbf24' : '#0ea5e9';
-  return (
-    <div
-      className="rounded-lg shrink-0 p-1.5 flex flex-col items-center justify-center relative"
-      style={{
-        width: 56, height: 72,
-        background: 'rgba(255,255,255,0.03)',
-        border: `1.5px solid ${statusColor}60`,
-      }}
-    >
-      {card.status === 'active' && (
-        <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-      )}
-      <div className="text-lg">{card.icon}</div>
-      <div className="text-[6px] font-bold text-center leading-tight mt-0.5" style={{ color: statusColor }}>{card.name}</div>
-      <div className="text-[5px] text-muted-foreground">{card.actor}</div>
-    </div>
   );
 }
 
@@ -453,13 +437,10 @@ function CardDetailModal({ card, onClose }: { card: GameCard | null; onClose: ()
             {enr?.sources ? (
               <>
                 {enr.sources.iranian && enr.sources.iranian.length > 0 && (
-                  <SourceGroup title="🇮🇷 منابع ایرانی" items={enr.sources.iranian} color="#22c55e" />
-                )}
-                {enr.sources.western && enr.sources.western.length > 0 && (
-                  <SourceGroup title="🌍 منابع غربی" items={enr.sources.western} color="#3b82f6" />
+                  <SourceGroup title="🇮🇷 منابع رسمی ایرانی" items={enr.sources.iranian} color="#22c55e" />
                 )}
                 {enr.sources.international && enr.sources.international.length > 0 && (
-                  <SourceGroup title="🌐 منابع بین‌المللی" items={enr.sources.international} color="#a855f7" />
+                  <SourceGroup title="🌐 منابع بین‌المللی (تأییدی)" items={enr.sources.international} color="#a855f7" />
                 )}
                 {enr.sources.academic && enr.sources.academic.length > 0 && (
                   <SourceGroup title="🎓 منابع آکادمیک" items={enr.sources.academic} color="#f59e0b" />
@@ -570,6 +551,31 @@ export function GameScreen() {
   const [showInfra, setShowInfra] = useState(false);
   const [showComboList, setShowComboList] = useState(false);
   const [showTechTree, setShowTechTree] = useState(false);
+  const [comboFlashTrigger, setComboFlashTrigger] = useState(0);
+  const [comboFlashName, setComboFlashName] = useState<string | null>(null);
+  const [cardPlayTrigger, setCardPlayTrigger] = useState(0);
+  const [shakeTrigger, setShakeTrigger] = useState(0);
+  const prevMoveLogLength = useRef(0);
+
+  // Detect new combo activations for flash effect
+  useEffect(() => {
+    if (moveLog.length > prevMoveLogLength.current) {
+      const lastMove = moveLog[moveLog.length - 1];
+      if (lastMove?.combos && lastMove.combos.length > 0) {
+        const newest = lastMove.combos[lastMove.combos.length - 1];
+        setComboFlashName(newest.name);
+        setComboFlashTrigger(t => t + 1);
+      }
+      if (lastMove?.iranCard) {
+        setCardPlayTrigger(t => t + 1);
+        // Shake on heavy cards
+        if (lastMove.iranCard.rarity === 'apocalyptic' || lastMove.iranCard.rarity === 'legendary') {
+          setShakeTrigger(t => t + 1);
+        }
+      }
+    }
+    prevMoveLogLength.current = moveLog.length;
+  }, [moveLog]);
 
   // === Phase 1.1: Elixir tick ===
   useEffect(() => {
@@ -658,9 +664,8 @@ export function GameScreen() {
       {/* === BATTLE ARENA (Phase 1.3) === */}
       <BattleArena />
 
-      {/* === TIMELINE + ACTIVE CARDS === */}
+      {/* === TIMELINE === */}
       <div className="shrink-0 px-2 py-1 space-y-1">
-        {/* Timeline */}
         <div className="flex items-center gap-1">
           <span className="text-[8px] font-bold text-amber-400 shrink-0">📜</span>
           <div className="flex-1 flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', direction: 'ltr' }}>
@@ -676,13 +681,6 @@ export function GameScreen() {
                 <span className="text-[5px] text-emerald-400 mt-0.5">نوبت{m.turn}</span>
               </div>
             ))}
-          </div>
-        </div>
-        {/* Active cards */}
-        <div className="flex items-center gap-1">
-          <span className="text-[8px] font-bold text-rose-400 shrink-0 animate-pulse">🔴 زنده</span>
-          <div className="flex-1 flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-            {activeCards.map((ac) => (<ActiveCardItem key={ac.id} card={ac} />))}
           </div>
         </div>
       </div>
@@ -776,11 +774,12 @@ export function GameScreen() {
         <HiddenMetricsBar />
       </div>
 
-      {/* Phase 3.3: News ticker (bottom) */}
-      <NewsTicker />
-
-      {/* Combo Alert */}
+      {/* === Visual Effects === */}
+      <WarModeOverlay />
       <ComboAlert />
+      <ComboFlashOverlay comboName={comboFlashName} trigger={comboFlashTrigger} />
+      <CardPlayGlow trigger={cardPlayTrigger} />
+      <AchievementSystem />
 
       {/* Modals */}
       <CardDetailModal card={selectedCard ?? null} onClose={() => store.selectCard(null)} />

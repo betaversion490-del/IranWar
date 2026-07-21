@@ -451,3 +451,174 @@
 .red-alert-bg {
   animation: red-alert 1s ease-in-out infinite;
 }
+
+/* ============================================================
+   PHASE 3+: RARITY GLOW & VISUAL POLISH (Round 2)
+   ============================================================ */
+
+/* Rarity-based glow effects for cards */
+.rarity-common {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.rarity-rare {
+  box-shadow: 0 0 8px rgba(59,130,246,0.4), 0 2px 4px rgba(0,0,0,0.3);
+}
+.rarity-epic {
+  box-shadow: 0 0 12px rgba(168,85,247,0.5), 0 0 24px rgba(168,85,247,0.2), 0 2px 4px rgba(0,0,0,0.3);
+}
+.rarity-legendary {
+  box-shadow: 0 0 16px rgba(251,191,36,0.6), 0 0 32px rgba(251,191,36,0.3), 0 2px 4px rgba(0,0,0,0.4);
+  animation: legendary-pulse 2.5s ease-in-out infinite;
+}
+.rarity-apocalyptic {
+  box-shadow: 0 0 20px rgba(220,38,38,0.7), 0 0 40px rgba(220,38,38,0.4), 0 0 60px rgba(124,58,237,0.2);
+  animation: apocalyptic-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes legendary-pulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(251,191,36,0.6), 0 0 32px rgba(251,191,36,0.3), 0 2px 4px rgba(0,0,0,0.4); }
+  50% { box-shadow: 0 0 24px rgba(251,191,36,0.8), 0 0 48px rgba(251,191,36,0.5), 0 2px 4px rgba(0,0,0,0.4); }
+}
+
+@keyframes apocalyptic-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(220,38,38,0.7), 0 0 40px rgba(220,38,38,0.4), 0 0 60px rgba(124,58,237,0.2); }
+  50% { box-shadow: 0 0 30px rgba(220,38,38,0.9), 0 0 60px rgba(220,38,38,0.6), 0 0 90px rgba(124,58,237,0.4); }
+}
+
+/* Screen shake on big events */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-3px, -2px); }
+  20% { transform: translate(3px, 2px); }
+  30% { transform: translate(-2px, 3px); }
+  40% { transform: translate(2px, -3px); }
+  50% { transform: translate(-3px, 1px); }
+  60% { transform: translate(3px, -1px); }
+  70% { transform: translate(-1px, 2px); }
+  80% { transform: translate(1px, -2px); }
+  90% { transform: translate(-2px, -1px); }
+}
+.screen-shake {
+  animation: screen-shake 0.5s ease-in-out;
+}
+
+/* Particle burst on card impact */
+@keyframes particle-burst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--px, 30px), var(--py, -30px)) scale(0); opacity: 0; }
+}
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: particle-burst 0.8s ease-out forwards;
+}
+
+/* War mode overlay - when escalation > 70 */
+@keyframes war-mode-pulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.3; }
+}
+.war-mode-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(220,38,38,0.2) 100%);
+  animation: war-mode-pulse 2s ease-in-out infinite;
+}
+
+.war-mode-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  box-shadow: inset 0 0 100px 20px rgba(220,38,38,0.4);
+}
+
+/* 3D card tilt on hover */
+.card-3d-tilt {
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease-out;
+  perspective: 600px;
+}
+.card-3d-tilt:hover {
+  transform: rotateX(8deg) rotateY(-8deg) translateY(-6px) scale(1.05);
+}
+
+/* Achievement notification slide-in */
+@keyframes achievement-in {
+  0% { transform: translateX(120%); opacity: 0; }
+  10% { transform: translateX(0); opacity: 1; }
+  90% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+.achievement-notification {
+  animation: achievement-in 5s ease-in-out forwards;
+}
+
+/* Big stat change flash */
+@keyframes stat-flash-up {
+  0% { background: rgba(34,197,94,0); }
+  20% { background: rgba(34,197,94,0.3); }
+  100% { background: rgba(34,197,94,0); }
+}
+@keyframes stat-flash-down {
+  0% { background: rgba(239,68,68,0); }
+  20% { background: rgba(239,68,68,0.3); }
+  100% { background: rgba(239,68,68,0); }
+}
+.stat-flash-up { animation: stat-flash-up 1s ease-out; }
+.stat-flash-down { animation: stat-flash-down 1s ease-out; }
+
+/* Card played glow ring */
+@keyframes play-glow {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.7); }
+  100% { box-shadow: 0 0 0 20px rgba(34,197,94,0); }
+}
+.play-glow {
+  animation: play-glow 0.8s ease-out;
+}
+
+/* Elixir bar refill animation */
+@keyframes elixir-refill {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); background: #06b6d4; }
+  100% { transform: scale(1); }
+}
+.elixir-refill {
+  animation: elixir-refill 0.3s ease-out;
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+}
+
+/* Battle arena grid lines */
+.arena-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Combo lightning effect */
+@keyframes combo-lightning {
+  0%, 100% { opacity: 0; }
+  10%, 30%, 50% { opacity: 1; }
+  20%, 40% { opacity: 0.3; }
+}
+.combo-lightning {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(45deg, transparent 40%, rgba(251,191,36,0.4) 50%, transparent 60%);
+  animation: combo-lightning 0.6s ease-in-out;
+}
