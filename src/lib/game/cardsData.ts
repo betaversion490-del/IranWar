@@ -33,6 +33,38 @@ export type CardEffects = {
   israelIsolation?: number; // شانس انزوای اسرائیل
 };
 
+export type CardSources = {
+  iranian?: string[];   // منابع رسمی ایرانی
+  western?: string[];   // منابع غربی (CSIS, RAND, ISIS, CFR...)
+  international?: string[]; // IAEA, UN, IMF, SIPRI...
+  academic?: string[];  // مقالات آکادمیک
+};
+
+export type RealData = {
+  // Nuclear
+  currentEnrichment?: string;       // درصد غنی‌سازی فعلی
+  breakoutTime?: string;            // زمان لازم برای ساخت بمب
+  centrifugesActive?: string;       // تعداد سانتریفیوژ فعال
+  stockpile?: string;               // ذخیره اورانیوم
+  // Military
+  missileInventory?: string;        // موجودی موشک
+  missileRange?: string;            // برد موشک
+  droneInventory?: string;          // پهپاد
+  troopsActive?: string;            // نیروی فعال
+  // Economic
+  oilExports?: string;              // صادرات نفت (bpd)
+  forexReserves?: string;           // ذخایر ارزی
+  gdp?: string;
+  sanctions?: string;               // تعداد/نوع تحریم‌ها
+  // Diplomatic
+  alliesStrength?: string;          // قدرت متحدان
+  proxyNetwork?: string;            // شبکه نیابتی
+  // Other
+  realProbability?: string;         // احتمال وقوع در دنیای واقعی
+  historicalParallel?: string;      // الگوی تاریخی مشابه
+  lastUpdate?: string;              // آخرین بروزرسانی داده
+};
+
 export type GameCard = {
   id: string;
   name: string;
@@ -48,16 +80,31 @@ export type GameCard = {
   used: boolean;
   usedContext?: string;
   aiWeight?: number;
-  counters?: string[];
+  counters?: string[];              // IDs of cards this one counters
+  counteredBy?: string[];           // IDs of cards that counter this one
   requiresHighWarEscalation?: boolean;
   requiresNuclearProgress?: number;
   relatedHistoryEra?: string;
-  // NEW: Preparation time in seconds (real-time). 0 = instant
+  // Preparation time in seconds (real-time). 0 = instant
   prepTime?: number;
-  // NEW: Historical reference for card detail
+  // Historical reference for card detail
   historicalRef?: string;
-  // NEW: Related past cards (IDs from history)
+  // Related past cards (IDs from history)
   relatedPastCards?: string[];
+  // === NEW Phase 1.1: Elixir cost ===
+  cost?: number;                    // 2 (light) | 4 (medium) | 6 (heavy) | 8 (super-heavy)
+  // === NEW Phase 1.4: Combo tags ===
+  comboTags?: string[];             // "axis_of_resistance" | "nuclear_deterrence" | "asymmetric_full" | ...
+  // === NEW Phase 2.1: Real sources ===
+  sources?: CardSources;
+  // === NEW Phase 2.2: Real data ===
+  realData?: RealData;
+  // === NEW Phase 4.1: Tech tree prerequisites ===
+  prerequisites?: string[];         // Card IDs that must be played first
+  // === NEW Phase 4.3: Hidden mechanics ===
+  detectionRisk?: number;           // 0-100 chance of being detected by enemy before activation
+  // Image URL for visual (Phase 3)
+  imageRef?: string;                // emoji-based or asset path
 };
 
 // ============================================================

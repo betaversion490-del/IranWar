@@ -281,3 +281,173 @@
     overflow: visible;
   }
 }
+
+/* ============================================================
+   PHASE 3: BATTLE ANIMATIONS & EFFECTS
+   ============================================================ */
+
+/* Missile launch trail */
+@keyframes missile-launch {
+  0% { transform: translate(0, 0) rotate(-45deg); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(var(--mx, 200px), var(--my, -100px)) rotate(-45deg); opacity: 0; }
+}
+.missile-trail {
+  position: absolute;
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(180deg, #fbbf24 0%, #dc2626 50%, transparent 100%);
+  border-radius: 2px;
+  filter: blur(0.5px);
+  animation: missile-launch 1.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Cyber attack green code rain */
+@keyframes cyber-rain {
+  0% { transform: translateY(-100%); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+.cyber-rain {
+  position: absolute;
+  font-family: monospace;
+  color: #10b981;
+  font-size: 10px;
+  animation: cyber-rain 3s linear forwards;
+  pointer-events: none;
+  text-shadow: 0 0 4px #10b981;
+}
+
+/* Explosion shockwave */
+@keyframes shockwave {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(4); opacity: 0; }
+}
+.shockwave {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid #fbbf24;
+  animation: shockwave 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+/* News ticker scrolling */
+@keyframes news-scroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.news-ticker-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: news-scroll 30s linear infinite;
+  padding-right: 50px;
+}
+
+/* Pulsing danger glow */
+@keyframes danger-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(220,38,38,0.3), inset 0 0 5px rgba(220,38,38,0.1); }
+  50% { box-shadow: 0 0 20px rgba(220,38,38,0.7), inset 0 0 15px rgba(220,38,38,0.3); }
+}
+.danger-glow {
+  animation: danger-glow 2s ease-in-out infinite;
+}
+
+/* Combo activation flash */
+@keyframes combo-flash {
+  0% { background: rgba(251,191,36,0); }
+  50% { background: rgba(251,191,36,0.2); }
+  100% { background: rgba(251,191,36,0); }
+}
+.combo-flash {
+  animation: combo-flash 0.6s ease-out;
+}
+
+/* Card played entrance */
+@keyframes card-played {
+  0% { transform: translateY(50px) scale(0.5); opacity: 0; }
+  60% { transform: translateY(-10px) scale(1.15); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.card-played {
+  animation: card-played 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Elixir bar pulse when full */
+@keyframes elixir-full-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.elixir-full {
+  animation: elixir-full-pulse 1s ease-in-out infinite;
+}
+
+/* Scan line for active intel */
+@keyframes scan-line {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}
+.scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+  animation: scan-line 2s linear infinite;
+  pointer-events: none;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Glass morphism (strong) */
+.glass-strong {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Tech tree node */
+.tech-node {
+  transition: all 0.3s ease;
+}
+.tech-node.unlocked {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 10px rgba(34,197,94,0.4);
+}
+.tech-node.locked {
+  opacity: 0.4;
+  filter: grayscale(0.5);
+}
+.tech-node.available {
+  border-color: #fbbf24 !important;
+  animation: pulse-amber 2s infinite;
+}
+
+@keyframes pulse-amber {
+  0%, 100% { box-shadow: 0 0 5px rgba(251,191,36,0.3); }
+  50% { box-shadow: 0 0 15px rgba(251,191,36,0.6); }
+}
+
+/* Font utility for Persian numerals */
+.font-num {
+  font-feature-settings: "tnum" 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Israeli airstrike red warning */
+@keyframes red-alert {
+  0%, 100% { background: rgba(220,38,38,0.05); }
+  50% { background: rgba(220,38,38,0.25); }
+}
+.red-alert-bg {
+  animation: red-alert 1s ease-in-out infinite;
+}
