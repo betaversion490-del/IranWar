@@ -39,7 +39,7 @@ export type GameCard = {
   nameEn: string;
   category: CardCategory;
   actor: CardActor;
-  actorLabel: string; // نمایش فارسی فاعل
+  actorLabel: string;
   description: string;
   longDescription: string;
   effects: CardEffects;
@@ -47,14 +47,17 @@ export type GameCard = {
   rarity: "common" | "rare" | "epic" | "legendary" | "apocalyptic";
   used: boolean;
   usedContext?: string;
-  // AI selection: probability weight 0-100
   aiWeight?: number;
-  // Strong counters: if Iran plays these, this card is much more likely
   counters?: string[];
-  // Required conditions to play (for AI)
   requiresHighWarEscalation?: boolean;
   requiresNuclearProgress?: number;
   relatedHistoryEra?: string;
+  // NEW: Preparation time in seconds (real-time). 0 = instant
+  prepTime?: number;
+  // NEW: Historical reference for card detail
+  historicalRef?: string;
+  // NEW: Related past cards (IDs from history)
+  relatedPastCards?: string[];
 };
 
 // ============================================================
@@ -1840,3 +1843,201 @@ export const actorInfo: Record<CardActor, { label: string; color: string; gradie
     gradient: "linear-gradient(135deg, oklch(0.25 0.08 0 / 0.9), oklch(0.2 0.06 0 / 0.95))",
   },
 };
+
+
+// ============================================================
+// PREPARATION TIMES (real-time seconds)
+// Based on research: 1 game day ≈ 0.5 seconds
+// ============================================================
+export const cardPrepTimes: Record<string, number> = {
+  // Iran - instant (hours)
+  "iran_missile_strike": 0,
+  "iran_drone_swarm": 0,
+  "iran_cyber": 0,
+  "iran_patience": 0,
+  "iran_mobilization": 0,
+  // Iran - fast (days, 2-5 sec)
+  "iran_hormuz": 3,
+  "iran_houthi": 3,
+  "iran_iraq_militias": 2,
+  "iran_hamas": 2,
+  "iran_hezbollah_full": 2,
+  "iran_bab_el_mandeb": 3,
+  // Iran - medium (weeks-months, 10-20 sec)
+  "iran_diplomacy": 10,
+  "iran_oil_weapon": 10,
+  "iran_npt_withdraw": 15,
+  "iran_saudi_normalize": 15,
+  "iran_strike_us_bases": 0,
+  // Iran - long (months, 20-40 sec)
+  "iran_nuclear_breakout": 40,
+  "iran_nk_nuclear_deal": 35,
+  "iran_russia_alliance": 30,
+  "iran_china_deal": 25,
+  // Iran - very long (years, 40-60 sec)
+  "iran_ground_invasion": 50,
+  "iran_icbm": 60,
+  
+  // US - all instant (AI plays immediately)
+  "us_sanctions_max": 0,
+  "us_strike_nukes": 0,
+  "us_carrier_group": 0,
+  "us_negotiation_deception": 0,
+  "us_cyber_offensive": 0,
+  "us_aid_israel": 0,
+  "us_intel_opposition": 0,
+  "us_ground_invasion": 0,
+  "us_nuclear_strike": 0,
+  "us_withdraw_me": 0,
+  "us_nuclear_umbrella": 0,
+  "us_target_irgc": 0,
+  "us_oil_blockade": 0,
+  "us_hormuz_operation": 0,
+  "us_strike_iraq_militias": 0,
+  
+  // Israel - all instant
+  "israel_air_strike": 0,
+  "israel_assassination": 0,
+  "israel_nuclear_facility": 0,
+  "israel_preemptive": 0,
+  "israel_sabotage": 0,
+  "israel_hezbollah_war": 0,
+  "israel_nuclear_strike": 0,
+  "israel_cyber": 0,
+  "israel_assassinate_leader": 0,
+  "israel_strike_iran_oil": 0,
+  "israel_hamas_war": 0,
+  "israel_diplomatic_isolate": 0,
+  "israel_strike_syria": 0,
+  "israel_second_strike": 0,
+  "israel_nuclear_ambiguity_end": 0,
+  
+  // Arab - all instant
+  "arab_us_alliance": 0,
+  "arab_us_bases": 0,
+  "arab_oil_increase": 0,
+  "arab_patriot_defense": 0,
+  "arab_normalize_israel": 0,
+  "arab_saudi_nuke": 0,
+  "arab_jordan_air_corridor": 0,
+  "arab_iraq_pressure": 0,
+  
+  // NATO - all instant
+  "nato_logistics": 0,
+  "nato_prosperity_guardian": 0,
+  "nato_turkey_article5": 0,
+  "nato_eu_sanctions": 0,
+  "nato_uk_france_direct": 0,
+  
+  // NK/Russia/China - all instant
+  "nk_missile_tech": 0,
+  "russia_veto": 0,
+  "russia_s400": 0,
+  "china_oil_buyer": 0,
+  "china_infra_investment": 0,
+};
+
+// Helper function to get prep time
+export function getPrepTime(cardId: string): number {
+  return cardPrepTimes[cardId] ?? 0;
+}
+
+// NEW: Infrastructure cards (ناجوانمردانه)
+export type InfraCard = {
+  id: string;
+  name: string;
+  icon: string;
+  target: string;
+  description: string;
+  prepTime: number;
+  impact: string;
+  isIranTarget: boolean; // true = Iran attacks, false = enemy attacks Iran
+};
+
+export const infraCards: InfraCard[] = [
+  // Iran → Israel
+  { id: "infra_water_israel", name: "آب شیرین‌کن اسرائیل", icon: "💧", target: "🇮🇱 اسرائیل", description: "۸۰٪ آب آشامیدنی اسرائیل", prepTime: 3, impact: "بحران آب فوری", isIranTarget: true },
+  { id: "infra_power_israel", name: "شبکه برق اسرائیل", icon: "⚡", target: "🇮🇱 اسرائیل", description: "نیروگاه‌های گازی حیفا/اشکلون", prepTime: 3, impact: "قطع برق هفت‌ها", isIranTarget: true },
+  { id: "infra_dimona", name: "سایت دیمونا", icon: "☢️", target: "🇮🇱 اسرائیل", description: "قلب هسته‌ای اسرائیل - خط قرمز", prepTime: 3, impact: "ریسک پاسخ هسته‌ای", isIranTarget: true },
+  { id: "infra_airport_israel", name: "فرودگاه بن گوریون", icon: "✈️", target: "🇮🇱 اسرائیل", description: "بزرگ‌ترین فرودگاه اسرائیل", prepTime: 2, impact: "قطع پروازها", isIranTarget: true },
+  { id: "infra_haifa_port", name: "بندر حیفا", icon: "🛢️", target: "🇮🇱 اسرائیل", description: "پالایشگاه + بندر", prepTime: 3, impact: "اختلال سوخت", isIranTarget: true },
+  // Iran → Saudi
+  { id: "infra_oil_fields", name: "چاه‌های نفت عربستان", icon: "🛢️", target: "🇸🇦 عربستان", description: "آبقیق: ۵٪ کاهش جهانی", prepTime: 3, impact: "شوک نفتی", isIranTarget: true },
+  { id: "infra_pipeline", name: "خط لوله شرق-غرب", icon: "🛢️", target: "🇸🇦 عربستان", description: "۷ میلیون بشکه/روز", prepTime: 3, impact: "قطع صادرات", isIranTarget: true },
+  { id: "infra_saudi_cities", name: "شهرهای جنوبی", icon: "🏠", target: "🇸🇦 عربستان", description: "جیزان، ابها، نجران", prepTime: 2, impact: "فشار روانی", isIranTarget: true },
+  // Enemy → Iran
+  { id: "infra_natanz", name: "سایت نطنز/فردو", icon: "☢️", target: "🇮🇷 ایران", description: "B-2 + MOP بمباران", prepTime: 0, impact: "تأخیر ۱-۲ سال", isIranTarget: false },
+  { id: "infra_missile_sites", name: "پایگاه‌های موشکی", icon: "🚀", target: "🇮🇷 ایران", description: "۳۶۰ حمله در ۲۷ استان", prepTime: 0, impact: "کاهش توان موشکی", isIranTarget: false },
+  { id: "infra_kharg", name: "جزیره خارک", icon: "🛢️", target: "🇮🇷 ایران", description: "پایانه صادرات نفت", prepTime: 0, impact: "قطع صادرات نفت", isIranTarget: false },
+  { id: "infra_iran_power", name: "شبکه برق ایران", icon: "⚡", target: "🇮🇷 ایران", description: "اعتراف ایران به حمله", prepTime: 0, impact: "فلج اقتصادی", isIranTarget: false },
+  // Asymmetric
+  { id: "infra_gps", name: "مختل کردن GPS", icon: "🛰️", target: "🌍 منطقه", description: "۱۰۰۰+ شناور تحت تأثیر", prepTime: 0, impact: "اختلال ناوبری", isIranTarget: true },
+  { id: "infra_cables", name: "کابل‌های زیردریایی", icon: "📡", target: "🌍 منطقه", description: "۲۵-۳۰٪ اینترنت اروپا-آسیا", prepTime: 2, impact: "اختلال اینترنت", isIranTarget: true },
+  { id: "infra_cyber_us", name: "سایبری آمریکا", icon: "💻", target: "🇺🇸 آمریکا", description: "CyberAv3ngers → PLC", prepTime: 20, impact: "اختلال زیرساخت", isIranTarget: true },
+];
+
+// Historical cards for timeline
+export type HistoryCard = {
+  id: string;
+  date: string;
+  actor: string;
+  title: string;
+  icon: string;
+  result: "yes" | "no" | "partial";
+  effect: string;
+};
+
+export const historyCards: HistoryCard[] = [
+  { id: "h01", date: "۱۳۳۲/۵/۲۸", actor: "🇺🇸", title: "کودتای ۲۸ مرداد", icon: "💥", result: "yes", effect: "نمادین" },
+  { id: "h02", date: "۱۳۴۳/۷/۲۱", actor: "🇺🇸", title: "کاپیتولاسیون", icon: "⚖️", result: "yes", effect: "نمادین" },
+  { id: "h03", date: "۱۳۵۷/۱۱/۲۲", actor: "🇮🇷", title: "انقلاب اسلامی", icon: "🕌", result: "yes", effect: "بسیارفعال" },
+  { id: "h04", date: "۱۳۵۸/۸/۱۳", actor: "🇮🇷", title: "گروگان‌گیری سفارت", icon: "🏛️", result: "partial", effect: "بسیارفعال" },
+  { id: "h05", date: "۱۳۵۹/۶/۳۱", actor: "🇮🇶", title: "جنگ ایران-عراق", icon: "⚔️", result: "partial", effect: "فعال" },
+  { id: "h06", date: "۱۳۶۷/۵/۱۲", actor: "🇺🇸", title: "سرنگونی پرواز ۶۵۵", icon: "✈️", result: "yes", effect: "فعال روانی" },
+  { id: "h07", date: "۱۳۸۱", actor: "🇺🇸", title: "افشای نطنز", icon: "☢️", result: "yes", effect: "بسیارفعال" },
+  { id: "h08", date: "۱۳۸۹/۷/۵", actor: "🇺🇸🇮🇱", title: "استاکس‌نت", icon: "💻", result: "partial", effect: "سابقه" },
+  { id: "h09", date: "۱۳۹۴/۴/۲۳", actor: "🇮🇷🇺🇸", title: "برجام (JCPOA)", icon: "✍️", result: "partial", effect: "مرده" },
+  { id: "h10", date: "۱۳۹۷/۲/۱۸", actor: "🇺🇸", title: "خروج از برجام", icon: "🚪", result: "yes", effect: "بسیارفعال" },
+  { id: "h11", date: "۱۳۹۸/۱۰/۱۳", actor: "🇺🇸", title: "ترور سلطیمانی", icon: "🎯", result: "yes", effect: "فعال نمادین" },
+  { id: "h12", date: "۱۳۹۹/۹/۷", actor: "🇮🇱", title: "ترور فخری‌زاده", icon: "🔬", result: "yes", effect: "فعال نمادین" },
+  { id: "h13", date: "۱۴۰۲/۷/۱۵", actor: "🇵🇸", title: "۷ اکتبر / طوفان الاقصی", icon: "🌪️", result: "yes", effect: "بسیارفعال" },
+  { id: "h14", date: "۱۴۰۳/۱/۲۴", actor: "🇮🇷", title: "وعده صادق ۱", icon: "🚀", result: "partial", effect: "سابقه" },
+  { id: "h15", date: "۱۴۰۳/۵/۱۰", actor: "🇮🇱", title: "ترور هنیه در تهران", icon: "🎯", result: "yes", effect: "فعال نمادین" },
+  { id: "h16", date: "۱۴۰۳/۷/۶", actor: "🇮🇱", title: "ترور نصرالله", icon: "🎯", result: "yes", effect: "بسیارفعال" },
+  { id: "h17", date: "۱۴۰۳/۹/۱۸", actor: "🇸🇾", title: "سقوط اسد", icon: "📉", result: "yes", effect: "بسیارفعال" },
+  { id: "h18", date: "۱۴۰۴/۳/۲۳", actor: "🇮🇱🇺🇸", title: "جنگ ۱۲ روزه", icon: "🔥", result: "partial", effect: "بسیارفعال" },
+  { id: "h19", date: "۱۴۰۴/۱۲/۹", actor: "🇺🇸🇮🇱", title: "ترور خامنه‌ای", icon: "💔", result: "yes", effect: "تحول‌ساز" },
+  { id: "h20", date: "۱۴۰۵/۳", actor: "🇮🇷", title: "جانشینی مجتبی خامنه‌ای", icon: "🔄", result: "yes", effect: "فعال" },
+  { id: "h21", date: "۱۴۰۵/۴", actor: "🇮🇷🇺🇸", title: "مذاکرات اسلام‌آباد (شکست)", icon: "🕊️", result: "no", effect: "سابقه" },
+  { id: "h22", date: "۱۴۰۵/۵", actor: "🇮🇷🇺🇸", title: "MOU موقت (فروپاشیده)", icon: "📝", result: "partial", effect: "مرده" },
+];
+
+// ============================================================
+// CURRENTLY ACTIVE CARDS (در حال اجرا - اخبار روزانه)
+// ============================================================
+export type ActiveCard = {
+  id: string;
+  name: string;
+  icon: string;
+  actor: string;
+  status: "active" | "preparing" | "recent";
+  description: string;
+  source: string;
+};
+
+export const activeCards: ActiveCard[] = [
+  // Active operations
+  { id: "a01", name: "حملات هوایی شبانه آمریکا", icon: "✈️", actor: "🇺🇸", status: "active", description: "ده شب متوالی بمباران اهداف نظامی ایران", source: "Reuters/CENTCOM" },
+  { id: "a02", name: "محاصره دریایی هرمز", icon: "⚓", actor: "🇺🇸", status: "active", description: "ترامپ بازگرداندن محاصره را اعلام کرد", source: "AP/NPR" },
+  { id: "a03", name: "حملات ایران به نفت‌کش‌ها", icon: "🛢️", actor: "🇮🇷", status: "active", description: "۳ نفت‌کش تجاری هدف قرار گرفت", source: "CNN/Reuters" },
+  { id: "a04", name: "حملات سپاه به پایگاه‌های آمریکا", icon: "🎯", actor: "🇮🇷", status: "active", description: "حمله به بحرین، کویت، التنف. ۳ کشته آمریکا", source: "Reuters/CBS" },
+  { id: "a05", name: "حملات سایبری به زیرساخت آمریکا", icon: "💻", actor: "🇮🇷", status: "active", description: "APTهای ایرانی به PLC و OT نفوذ کرده‌اند", source: "CISA/CSIS" },
+  { id: "a06", name: "تحریم نفت ایران (بازگشته)", icon: "💸", actor: "🇺🇸", status: "active", description: "لایسنس GL X لغو شد. تحریم کامل نفت", source: "OFAC/CNN" },
+  { id: "a07", name: "حوثی‌ها: حمله به دریای سرخ", icon: "🚢", actor: "🇾🇪", status: "active", description: "دو کشتی تجاری غرق شدند", source: "ISW" },
+  { id: "a08", name: "بازسازی حزب‌الله (~۱ میلیارد دلار)", icon: "🇱🇧", actor: "🇮🇷", status: "active", description: "ایران در حال انتقال بودجه برای بازسازی", source: "Terrorism-info" },
+  // Preparing
+  { id: "a09", name: "بازسازی سایت‌های هسته‌ای", icon: "☢️", actor: "🇮🇷", status: "preparing", description: "فعالیت در فردو، کوه تبر، تالاگانو", source: "ISIS/FDD" },
+  { id: "a10", name: "پیشنهاد آتش‌بس ۱۰ روزه", icon: "🕊️", actor: "🇵🇰🇶🇦", status: "preparing", description: "میانجی‌گران پیشنهاد آتش‌بس داده‌اند", source: "Axios/ToI" },
+  { id: "a11", name: "گزینه جنگ همه‌جانبه ترامپ", icon: "⚠️", actor: "🇺🇸", status: "preparing", description: "ترامپ در حال بررسی گزینه شدیدتر", source: "Axios" },
+  { id: "a12", name: "تعلیق همکاری IAEA", icon: "📜", actor: "🇮🇷", status: "preparing", description: "پارلمان قانون تعلیق گذرانده", source: "Reuters/BBC" },
+];

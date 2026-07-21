@@ -1,398 +1,511 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useGameStore } from "@/lib/game/gameStore";
-import { iranCards, categoryInfo, rarityInfo, actorInfo, type GameCard } from "@/lib/game/cardsData";
-import { FlippableCard } from "./FlippableCard";
-import { RelevantHistoryPanel } from "./RelevantHistoryPanel";
-import { useState } from "react";
+import {
+  iranCards, usCards, israelCards, arabCards, natoCards, nkRussiaChinaCards,
+  getPrepTime, historyCards, infraCards,
+  categoryInfo, rarityInfo, actorInfo,
+  type GameCard,
+} from "@/lib/game/cardsData";
 
-function StatBar({
-  label,
-  value,
-  color,
-  icon,
-  change,
+// === CLASH ROYALE STYLE CARD ===
+function GameCardItem({
+  card, onClick, prepRemaining, disabled, small, faceDown,
 }: {
-  label: string;
-  value: number;
-  color: string;
-  icon: string;
-  change?: number;
+  card: GameCard;
+  onClick?: () => void;
+  prepRemaining?: number;
+  disabled?: boolean;
+  small?: boolean;
+  faceDown?: boolean;
 }) {
+  const cat = categoryInfo[card.category];
+  const rar = rarityInfo[card.rarity];
+  const actor = actorInfo[card.actor];
+  const prepTime = getPrepTime(card.id);
+  const isPreparing = prepRemaining !== undefined && prepRemaining > 0;
+
+  if (faceDown) {
+    return (
+      <div
+        className="relative rounded-lg flex items-center justify-center shrink-0"
+        style={{
+          width: small ? 50 : 64,
+          height: small ? 70 : 88,
+          background: "linear-gradient(135deg, #1e293b, #0f172a)",
+          border: "2px solid #334155",
+        }}
+      >
+        <span className="text-xl opacity-40">❓</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-0.5 relative">
-      <div className="flex items-center justify-between text-[10px]">
-        <span className="flex items-center gap-1 text-muted-foreground">
-          <span>{icon}</span>
-          <span>{label}</span>
-        </span>
-        <div className="flex items-center gap-1">
-          {change !== undefined && change !== 0 && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.5, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className={`text-[9px] font-bold font-num px-1 rounded ${
-                change > 0
-                  ? "bg-emerald-500/20 text-emerald-300"
-                  : "bg-rose-500/20 text-rose-300"
-              }`}
-            >
-              {change > 0 ? "+" : ""}{change}
-            </motion.span>
-          )}
-          <span className="font-bold font-num text-xs" style={{ color }}>
-            {value}
-          </span>
+    <motion.button
+      onClick={onClick}
+      whileHover={!disabled ? { scale: 1.08, y: -4 } : {}}
+      whileTap={!disabled ? { scale: 0.95 } : {}}
+      disabled={disabled}
+      className="relative rounded-lg shrink-0 overflow-hidden"
+      style={{
+        width: small ? 52 : 64,
+        height: small ? 72 : 88,
+        background: actor.gradient,
+        border: `2px solid ${isPreparing ? '#fbbf24' : rar.color + '80'}`,
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+      }}
+    >
+      {/* Rarity top bar */}
+      <div className="absolute top-0 left-0 right-0 h-1" style={{ background: rar.color }} />
+
+      {/* Icon */}
+      <div className="flex items-center justify-center pt-2" style={{ fontSize: small ? 18 : 22 }}>
+        {card.icon}
+      </div>
+
+      {/* Title */}
+      <div className="text-center px-0.5 mt-0.5 font-bold leading-tight" style={{ fontSize: small ? 6 : 7 }}>
+        {card.name}
+      </div>
+
+      {/* Prep time indicator */}
+      {prepTime > 0 && !isPreparing && !small && (
+        <div className="absolute bottom-0.5 right-0.5 bg-black/60 rounded px-1 text-[6px] font-bold text-amber-300">
+          ⏱{prepTime}s
         </div>
+      )}
+
+      {/* Preparing countdown */}
+      {isPreparing && (
+        <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center rounded-lg">
+          <div className="text-[6px] text-amber-300 font-bold">آماده‌سازی</div>
+          <div className="text-base font-black text-amber-300">{prepRemaining}</div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500/30">
+            <div
+              className="h-full bg-amber-400 transition-all"
+              style={{ width: `${((prepTime - prepRemaining) / prepTime) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Used marker */}
+      {card.used && !isPreparing && (
+        <div className="absolute top-1 left-0.5 text-[6px] bg-amber-500/30 text-amber-300 px-0.5 rounded">📚</div>
+      )}
+    </motion.button>
+  );
+}
+
+// === STAT BAR (compact) ===
+function StatPill({ label, value, color, change }: { label: string; value: number; color: string; change?: number }) {
+  return (
+    <div className="flex items-center gap-1 shrink-0">
+      <div className="relative w-8 h-8 rounded-full flex items-center justify-center" style={{ border: `2px solid ${color}` }}>
+        <span className="text-[9px] font-black font-num" style={{ color }}>{value}</span>
+        {change !== undefined && change !== 0 && (
+          <motion.span
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute -top-2 text-[7px] font-bold"
+            style={{ color: change > 0 ? '#22c55e' : '#ef4444' }}
+          >
+            {change > 0 ? '+' : ''}{change}
+          </motion.span>
+        )}
       </div>
-      <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
-        <motion.div
-          className="h-full rounded-full"
-          style={{ backgroundColor: color }}
-          initial={{ width: 0 }}
-          animate={{ width: `${value}%` }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        />
-      </div>
+      <span className="text-[7px] text-muted-foreground hidden sm:block">{label}</span>
     </div>
   );
 }
 
-function EnemyResponseCard({ card }: { card: GameCard }) {
+// === CARD DETAIL MODAL ===
+function CardDetailModal({ card, onClose }: { card: GameCard | null; onClose: () => void }) {
+  if (!card) return null;
   const cat = categoryInfo[card.category];
   const rar = rarityInfo[card.rarity];
   const actor = actorInfo[card.actor];
-
-  return (
-    <motion.div
-      initial={{ scale: 0.7, opacity: 0, y: 20 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
-      exit={{ scale: 0.5, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 200 }}
-      className="rounded-xl p-2.5 sm:p-3 relative overflow-hidden"
-      style={{ background: actor.gradient, border: `1px solid ${actor.color}80` }}
-    >
-      <div className="flex items-start gap-2">
-        <div className="text-xl sm:text-2xl shrink-0">{card.icon}</div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1 mb-1 flex-wrap">
-            <span
-              className="text-[8px] sm:text-[9px] px-1 py-0.5 rounded font-bold"
-              style={{ backgroundColor: actor.color + "30", color: actor.color }}
-            >
-              {card.actorLabel}
-            </span>
-            <span
-              className="text-[8px] sm:text-[9px] px-1 py-0.5 rounded font-bold"
-              style={{ backgroundColor: cat.color + "30", color: cat.color }}
-            >
-              {cat.icon}
-            </span>
-            <span
-              className="text-[8px] sm:text-[9px] px-1 py-0.5 rounded font-bold"
-              style={{ backgroundColor: rar.color + "30", color: rar.color }}
-            >
-              {rar.label}
-            </span>
-          </div>
-          <h4 className="font-bold text-xs sm:text-sm leading-tight mb-1">{card.name}</h4>
-          <p className="text-[9px] sm:text-[10px] text-muted-foreground/80 leading-relaxed line-clamp-2">
-            {card.description}
-          </p>
-        </div>
-      </div>
-
-      {/* Effects */}
-      <div className="mt-2 pt-2 border-t border-border/20 flex flex-wrap gap-0.5">
-        {Object.entries(card.effects).slice(0, 4).map(([key, val]) => {
-          const numVal = typeof val === "number" ? val : 0;
-          const isMult = numVal > 0 && numVal < 2 && !Number.isInteger(numVal);
-          const display = isMult ? `×${numVal.toFixed(2)}` : `${numVal > 0 ? "+" : ""}${numVal}`;
-          return (
-            <span
-              key={key}
-              className={`text-[8px] sm:text-[9px] px-1 py-0.5 rounded font-num ${
-                numVal > 0 ? "bg-emerald-500/15 text-emerald-300" : "bg-rose-500/15 text-rose-300"
-              }`}
-            >
-              {display}
-            </span>
-          );
-        })}
-      </div>
-
-      {/* Used context */}
-      {card.usedContext && (
-        <div className="mt-1.5 text-[8px] sm:text-[9px] text-amber-300/80">
-          📚 {card.usedContext}
-        </div>
-      )}
-    </motion.div>
-  );
-}
-
-export function GameScreen() {
-  const store = useGameStore();
-  const {
-    turn,
-    maxTurns,
-    nuclearProgress,
-    regionalInfluence,
-    economicStability,
-    domesticSupport,
-    militaryCapability,
-    deterrence,
-    warEscalation,
-    flippedCardId,
-    playedIranCard,
-    enemyResponses,
-    isResolving,
-    moveLog,
-    nextTurn,
-    earlyEndingTriggered,
-    lastStatChanges,
-  } = store;
-
-  const flippedCard = flippedCardId ? iranCards.find((c) => c.id === flippedCardId) : null;
-  const [activeFilter, setActiveFilter] = useState<string>("all");
-
-  const filteredIranCards = activeFilter === "all"
-    ? iranCards
-    : iranCards.filter((c) => c.category === activeFilter);
-
-  const categories = [
-    { id: "all", label: "همه" },
-    { id: "nuclear", label: "☢️" },
-    { id: "military", label: "⚔️" },
-    { id: "proxy", label: "🛡️" },
-    { id: "diplomatic", label: "🕊️" },
-    { id: "asymmetric", label: "🌊" },
-    { id: "extreme", label: "💀" },
-    { id: "alliance", label: "🤝" },
-    { id: "cyber", label: "💻" },
-    { id: "domestic", label: "👥" },
-  ];
+  const prepTime = getPrepTime(card.id);
+  const relatedHistory = historyCards.filter(h => card.relatedHistoryEra === h.id || h.id.startsWith("h"));
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-[100dvh] flex flex-col"
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
     >
-      {/* Top status bar */}
-      <div className="glass-strong border-b border-border/50 p-2.5 sm:p-3 sticky top-0 z-30 safe-top">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-            <button
-              onClick={() => store.setPhase("splash")}
-              className="text-xs text-muted-foreground hover:text-foreground"
-            >
-              ← خروج
-            </button>
-            <div className="text-center">
-              <div className="text-[10px] text-muted-foreground">نوبت</div>
-              <div className="font-bold font-num text-sm">
-                {turn} / {maxTurns}
-              </div>
+      <motion.div
+        initial={{ scale: 0.8, y: 30 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.8, y: 30 }}
+        onClick={(e) => e.stopPropagation()}
+        className="glass-strong rounded-2xl p-4 max-w-md w-full max-h-[80dvh] overflow-y-auto"
+        style={{ border: `2px solid ${actor.color}` }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-3xl">{card.icon}</span>
+            <div>
+              <h3 className="font-bold text-base">{card.name}</h3>
+              <div className="text-[10px] text-muted-foreground">{card.nameEn}</div>
             </div>
-            <button
-              onClick={() => store.setPhase("history")}
-              className="text-xs text-muted-foreground hover:text-foreground"
-            >
-              📚
-            </button>
+          </div>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg p-1">✕</button>
+        </div>
+
+        {/* Badges */}
+        <div className="flex gap-1 flex-wrap mb-3">
+          <span className="text-[9px] px-2 py-0.5 rounded font-bold" style={{ backgroundColor: actor.color + '20', color: actor.color }}>{card.actorLabel}</span>
+          <span className="text-[9px] px-2 py-0.5 rounded font-bold" style={{ backgroundColor: cat.color + '20', color: cat.color }}>{cat.icon} {cat.label}</span>
+          <span className="text-[9px] px-2 py-0.5 rounded font-bold" style={{ backgroundColor: rar.color + '20', color: rar.color }}>{rar.label}</span>
+          {prepTime > 0 && (
+            <span className="text-[9px] px-2 py-0.5 rounded font-bold bg-amber-500/20 text-amber-300">⏱ {prepTime} ثانیه آماده‌سازی</span>
+          )}
+          {prepTime === 0 && (
+            <span className="text-[9px] px-2 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-300">⚡ فوری</span>
+          )}
+        </div>
+
+        {/* Description */}
+        <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">{card.longDescription}</p>
+
+        {/* Used context */}
+        {card.usedContext && (
+          <div className="mb-3 p-2 rounded bg-amber-500/10 border border-amber-500/20">
+            <div className="text-[9px] text-amber-300 font-bold mb-0.5">📚 سابقه استفاده:</div>
+            <div className="text-[9px] text-amber-200/80">{card.usedContext}</div>
+          </div>
+        )}
+
+        {/* Effects */}
+        <div className="mb-3">
+          <div className="text-[9px] text-muted-foreground mb-1">اثرات:</div>
+          <div className="flex flex-wrap gap-1">
+            {Object.entries(card.effects).map(([key, val]) => {
+              const numVal = typeof val === 'number' ? val : 0;
+              const isMult = numVal > 0 && numVal < 2 && !Number.isInteger(numVal);
+              const display = isMult ? `×${numVal.toFixed(2)}` : `${numVal > 0 ? '+' : ''}${numVal}`;
+              return (
+                <span key={key} className={`text-[8px] px-1.5 py-0.5 rounded font-num ${numVal > 0 ? 'bg-emerald-500/15 text-emerald-300' : 'bg-rose-500/15 text-rose-300'}`}>
+                  {key.replace(/([A-Z])/g, ' $1').trim()}: {display}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Related history */}
+        {relatedHistory.length > 0 && (
+          <div className="mb-3">
+            <div className="text-[9px] text-muted-foreground mb-1">📜 رویدادهای مرتبط:</div>
+            <div className="space-y-1">
+              {relatedHistory.slice(0, 3).map((h, i) => (
+                <div key={i} className="flex items-center gap-1 text-[8px] bg-white/5 rounded px-1.5 py-1">
+                  <span>{h.icon}</span>
+                  <span className="text-info font-bold">{h.date}</span>
+                  <span>{h.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Play button */}
+        {card.actor === "iran" && (
+          <button
+            onClick={() => {
+              if (prepTime === 0) {
+                useGameStore.getState().playCard(card.id);
+              } else {
+                useGameStore.getState().startPreparation(card.id);
+              }
+              onClose();
+            }}
+            className="w-full py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            {prepTime === 0 ? '▶ بازی کردن' : `⏱ شروع آماده‌سازی (${prepTime}s)`}
+          </button>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// === ALL CARDS VIEW ===
+function AllCardsView({ side, onClose }: { side: "iran" | "enemy"; onClose: () => void }) {
+  const cards = side === "iran" ? iranCards : [...usCards, ...israelCards, ...arabCards, ...natoCards];
+  const selectCard = useGameStore((s) => s.selectCard);
+  const selectedCardId = useGameStore((s) => s.selectedCardId);
+  const selectedCard = selectedCardId ? [...iranCards, ...usCards, ...israelCards, ...arabCards, ...natoCards, ...nkRussiaChinaCards].find(c => c.id === selectedCardId) : null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-40 bg-black/90 flex flex-col"
+    >
+      <div className="flex items-center justify-between p-3 glass-strong border-b">
+        <h3 className="font-bold text-sm">{side === "iran" ? "🇮🇷 همه کارت‌های ایران" : "🌍 همه کارت‌های دشمن"}</h3>
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">✕</button>
+      </div>
+      <div className="flex-1 overflow-y-auto p-3">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+          {cards.map((card) => (
+            <div key={card.id} className="flex flex-col items-center gap-1">
+              <GameCardItem card={card} onClick={() => selectCard(card.id)} />
+              <span className="text-[7px] text-muted-foreground text-center leading-tight">{card.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <CardDetailModal card={selectedCard} onClose={() => selectCard(null)} />
+    </motion.div>
+  );
+}
+
+// === MAIN GAME SCREEN ===
+export function GameScreen() {
+  const store = useGameStore();
+  const {
+    turn, maxTurns,
+    nuclearProgress, regionalInfluence, economicStability,
+    domesticSupport, militaryCapability, deterrence, warEscalation,
+    preparingCards, playedIranCard, enemyResponses, isResolving,
+    moveLog, nextTurn, earlyEndingTriggered, lastStatChanges,
+    selectedCardId, showAllCards,
+  } = store;
+
+  const [showInfra, setShowInfra] = useState(false);
+
+  // Tick preparation timer every second
+  useEffect(() => {
+    if (Object.keys(preparingCards).length === 0) return;
+    const interval = setInterval(() => {
+      store.tickPreparation();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [preparingCards, store]);
+
+  // All enemy cards for display
+  const allEnemyCards = [...usCards.slice(0, 6), ...israelCards.slice(0, 6)];
+
+  // Available Iran cards (not yet played this game)
+  const availableIranCards = iranCards.filter(c => !store.playedIranCardIds.includes(c.id));
+
+  // Selected card for detail
+  const selectedCard = selectedCardId
+    ? [...iranCards, ...usCards, ...israelCards, ...arabCards, ...natoCards, ...nkRussiaChinaCards].find(c => c.id === selectedCardId)
+    : null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="h-[100dvh] flex flex-col overflow-hidden"
+    >
+      {/* === TOP BAR (stats + turn) === */}
+      <div className="glass-strong border-b border-border/50 px-2 py-1.5 shrink-0">
+        <div className="flex items-center justify-between gap-1">
+          <button onClick={() => store.setPhase("splash")} className="text-[10px] text-muted-foreground hover:text-foreground">←</button>
+
+          {/* Stats - compact pills */}
+          <div className="flex items-center gap-1 overflow-x-auto">
+            <StatPill label="هسته‌ای" value={nuclearProgress} color="oklch(0.6 0.25 25)" change={lastStatChanges?.nuclearProgress} />
+            <StatPill label="بازدارندگی" value={deterrence} color="oklch(0.65 0.15 165)" change={lastStatChanges?.deterrence} />
+            <StatPill label="نظامی" value={militaryCapability} color="oklch(0.6 0.18 250)" change={lastStatChanges?.militaryCapability} />
+            <StatPill label="اقتصاد" value={economicStability} color="oklch(0.7 0.18 70)" change={lastStatChanges?.economicStability} />
+            <StatPill label="نفوذ" value={regionalInfluence} color="oklch(0.6 0.2 305)" change={lastStatChanges?.regionalInfluence} />
           </div>
 
-          <div className="h-1 bg-muted/40 rounded-full overflow-hidden">
+          <div className="text-center shrink-0">
+            <div className="text-[9px] text-muted-foreground">نوبت</div>
+            <div className="font-bold font-num text-xs">{turn}/{maxTurns}</div>
+          </div>
+        </div>
+
+        {/* War escalation bar */}
+        <div className="flex items-center gap-1 mt-1">
+          <span className="text-[8px] text-rose-400 shrink-0">🔥</span>
+          <div className="h-1 flex-1 bg-muted/40 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-l from-primary to-emerald-400"
-              initial={{ width: 0 }}
-              animate={{ width: `${(turn / maxTurns) * 100}%` }}
+              className="h-full rounded-full"
+              style={{ background: 'linear-gradient(90deg, #16a34a, #d97706, #dc2626)' }}
+              animate={{ width: `${warEscalation}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
+          <span className="text-[8px] font-bold font-num shrink-0" style={{ color: warEscalation > 70 ? '#dc2626' : warEscalation > 40 ? '#d97706' : '#16a34a' }}>{warEscalation}</span>
         </div>
       </div>
 
-      <div className="flex-1 p-2 sm:p-3 md:p-4 max-w-7xl mx-auto w-full">
-        {/* Iran Stats Dashboard */}
-        <div className="glass rounded-xl p-2.5 sm:p-3 mb-3 sm:mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-xs font-bold text-emerald-400">🇮🇷 شاخص‌های ایران</div>
-            <div className="text-[10px] text-muted-foreground">۶ شاخص حیاتی</div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 sm:gap-x-4 gap-y-1.5">
-            <StatBar label="هسته‌ای" value={nuclearProgress} color="oklch(0.6 0.25 25)" icon="☢️" change={lastStatChanges?.nuclearProgress} />
-            <StatBar label="بازدارندگی" value={deterrence} color="oklch(0.65 0.15 165)" icon="🛡️" change={lastStatChanges?.deterrence} />
-            <StatBar label="نظامی" value={militaryCapability} color="oklch(0.6 0.18 250)" icon="⚔️" change={lastStatChanges?.militaryCapability} />
-            <StatBar label="اقتصاد" value={economicStability} color="oklch(0.7 0.18 70)" icon="💰" change={lastStatChanges?.economicStability} />
-            <StatBar label="حمایت داخلی" value={domesticSupport} color="oklch(0.65 0.16 165)" icon="👥" change={lastStatChanges?.domesticSupport} />
-            <StatBar label="نفوذ منطقه‌ای" value={regionalInfluence} color="oklch(0.6 0.2 305)" icon="🌐" change={lastStatChanges?.regionalInfluence} />
-          </div>
+      {/* === ENEMY AREA (top, view only) === */}
+      <div className="shrink-0 py-1.5 px-2" style={{ height: '100px' }}>
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[9px] font-bold text-blue-400">🇺🇸🇮🇱 کارت‌های دشمن</span>
+          <button onClick={() => store.setShowAllCards("enemy")} className="text-[8px] text-muted-foreground hover:text-foreground">همه ←</button>
+        </div>
+        <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+          {allEnemyCards.map((card, i) => (
+            <GameCardItem key={card.id} card={card} small faceDown={i > 5} />
+          ))}
+        </div>
+      </div>
 
-          {/* War Escalation Meter */}
-          <div className="mt-2 pt-2 border-t border-border/20">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-bold text-rose-400">🔥 تشدید جنگ</span>
-              <span
-                className={`text-xs font-bold font-num ${
-                  warEscalation > 70 ? "text-rose-400 pulse-danger" : warEscalation > 40 ? "text-amber-400" : "text-emerald-400"
-                }`}
-              >
-                {warEscalation > 70 ? "بحرانی" : warEscalation > 40 ? "متوسط" : "کنترل‌شده"} - {warEscalation}
-              </span>
-            </div>
-            <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, oklch(0.65 0.18 165), oklch(0.7 0.18 85), oklch(0.65 0.18 35), oklch(0.62 0.24 25))`,
-                  backgroundSize: "200% 100%",
-                }}
-                initial={{ width: 0 }}
-                animate={{ width: `${warEscalation}%` }}
-                transition={{ duration: 0.6 }}
-              />
+      {/* === TIMELINE (center, horizontal scroll) === */}
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="shrink-0 py-1 px-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-bold text-amber-400 shrink-0">📜 تایم‌لاین</span>
+            <div className="flex-1 flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+              {/* History cards (past) */}
+              {historyCards.slice().reverse().map((h, i) => (
+                <div key={h.id} className="shrink-0 flex flex-col items-center" style={{ opacity: 1 - i * 0.05 }}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${h.result === 'yes' ? '#16a34a' : h.result === 'no' ? '#dc2626' : '#d97706'}40` }}>
+                    {h.icon}
+                  </div>
+                  <span className="text-[6px] text-muted-foreground mt-0.5 text-center leading-none whitespace-nowrap">{h.date}</span>
+                </div>
+              ))}
+              {/* Played cards this game */}
+              {moveLog.map((m, i) => (
+                <div key={`p${i}`} className="shrink-0 flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: actorInfo[m.iranCard.actor].gradient, border: `1px solid ${actorInfo[m.iranCard.actor].color}` }}>
+                    {m.iranCard.icon}
+                  </div>
+                  <span className="text-[6px] text-emerald-400 mt-0.5">نوبت {m.turn}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Resolving area - shows played cards */}
+        {/* === RESOLVING AREA (center) === */}
         <AnimatePresence>
           {isResolving && (playedIranCard || enemyResponses.length > 0) && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="glass-strong rounded-2xl p-3 sm:p-4 mb-3 sm:mb-4 border-primary/30"
+              exit={{ opacity: 0, y: -10 }}
+              className="flex-1 flex flex-col items-center justify-center px-2 min-h-0"
             >
-              <div className="text-center text-xs text-muted-foreground mb-3">نتیجه نوبت {turn}</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="flex items-center justify-center gap-2 flex-wrap">
                 {playedIranCard && (
-                  <div>
-                    <div className="text-xs text-center text-emerald-400 mb-1.5 font-bold">🇮🇷 حرکت ایران</div>
-                    <EnemyResponseCard card={playedIranCard} />
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-[8px] text-emerald-400 font-bold">🇮🇷 ایران</span>
+                    <GameCardItem card={playedIranCard} disabled />
                   </div>
                 )}
                 {enemyResponses.map((card, idx) => (
-                  <div key={idx}>
-                    <div className="text-xs text-center mb-1.5 font-bold" style={{ color: actorInfo[card.actor].color }}>
-                      {card.actorLabel}
-                    </div>
-                    <EnemyResponseCard card={card} />
+                  <div key={idx} className="flex flex-col items-center gap-1">
+                    <span className="text-[8px] font-bold" style={{ color: actorInfo[card.actor].color }}>{card.actorLabel}</span>
+                    <GameCardItem card={card} disabled small />
                   </div>
                 ))}
               </div>
 
-              <div className="mt-4 text-center">
-                {earlyEndingTriggered ? (
-                  <div className="space-y-2">
-                    <div className="text-xs text-rose-400 font-bold animate-pulse">
-                      ⚠️ شرایط بحرانی ایجاد شد - بازی به پایان می‌رسد
-                    </div>
-                    <button
-                      onClick={() => nextTurn()}
-                      className="px-6 sm:px-8 py-3 bg-rose-600 text-white rounded-xl font-bold text-sm sm:text-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-rose-600/30"
-                    >
-                      🏁 مشاهده پایان
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => nextTurn()}
-                    className="px-6 sm:px-8 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm sm:text-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/30"
-                  >
-                    {turn >= maxTurns ? "🏁 نتیجه نهایی" : "← ادامه نوبت بعد"}
-                  </button>
-                )}
-              </div>
+              {earlyEndingTriggered ? (
+                <div className="mt-3 text-center">
+                  <div className="text-[10px] text-rose-400 font-bold animate-pulse mb-2">⚠️ شرایط بحرانی!</div>
+                  <button onClick={() => nextTurn()} className="px-6 py-2.5 bg-rose-600 text-white rounded-xl font-bold text-xs hover:scale-105 active:scale-95 transition-all">🏁 مشاهده پایان</button>
+                </div>
+              ) : (
+                <button onClick={() => nextTurn()} className="mt-3 px-6 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-xs hover:scale-105 active:scale-95 transition-all">
+                  {turn >= maxTurns ? "🏁 نتیجه نهایی" : "← ادامه"}
+                </button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Cards section */}
+        {/* === IRAN CARDS AREA (bottom) === */}
         {!isResolving && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <h3 className="text-sm sm:text-base md:text-lg font-bold">🎭 کارت‌های ایران</h3>
-              <span className="text-xs text-muted-foreground">{iranCards.length} کارت</span>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col min-h-0">
+            <div className="shrink-0 py-1 px-2 flex items-center justify-between">
+              <span className="text-[9px] font-bold text-emerald-400">🇮🇷 کارت‌های ایران</span>
+              <div className="flex gap-1">
+                <button onClick={() => setShowInfra(!showInfra)} className="text-[8px] px-2 py-0.5 glass rounded font-bold hover:text-foreground">🏗 زیرساخت</button>
+                <button onClick={() => store.setShowAllCards("iran")} className="text-[8px] px-2 py-0.5 glass rounded font-bold hover:text-foreground">همه ←</button>
+              </div>
             </div>
 
-            {/* Category filter - scrollable horizontally on mobile */}
-            <div className="flex gap-1.5 mb-3 overflow-x-auto pb-1 -mx-2 px-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveFilter(cat.id)}
-                  className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
-                    activeFilter === cat.id
-                      ? "bg-primary text-primary-foreground"
-                      : "glass text-muted-foreground hover:text-foreground"
-                  }`}
-                  aria-label={cat.id === "all" ? "همه" : cat.id}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Cards grid + side panel */}
-            <div className="grid lg:grid-cols-4 gap-3 sm:gap-4">
-              {/* Cards */}
-              <div className="lg:col-span-3">
-                <div
-                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 overflow-y-auto p-1"
-                  style={{ maxHeight: "60vh", WebkitOverflowScrolling: "touch" }}
-                >
-                  {filteredIranCards.map((card) => (
-                    <FlippableCard key={card.id} card={card} />
+            {/* Cards row */}
+            <div className="flex-1 px-2 pb-2 min-h-0 overflow-hidden">
+              {!showInfra ? (
+                <div className="flex gap-1.5 justify-center items-center h-full flex-wrap overflow-y-auto" style={{ maxHeight: '100%' }}>
+                  {availableIranCards.slice(0, 10).map((card) => (
+                    <GameCardItem
+                      key={card.id}
+                      card={card}
+                      prepRemaining={preparingCards[card.id]}
+                      onClick={() => {
+                        const prepTime = getPrepTime(card.id);
+                        if (prepTime === 0) {
+                          store.playCard(card.id);
+                        } else if (preparingCards[card.id] === undefined) {
+                          store.startPreparation(card.id);
+                        }
+                      }}
+                      disabled={isResolving || (preparingCards[card.id] !== undefined && preparingCards[card.id] > 0)}
+                    />
                   ))}
                 </div>
-              </div>
-
-              {/* Side panel - below cards on mobile, beside on desktop */}
-              <div className="lg:col-span-1 mt-3 lg:mt-0">
-                <RelevantHistoryPanel card={flippedCard || playedIranCard} />
-                {!flippedCard && !playedIranCard && (
-                  <div className="glass rounded-2xl p-3 sm:p-4">
-                    <div className="text-xs font-bold text-muted-foreground mb-2">💡 راهنما</div>
-                    <ul className="text-[10px] sm:text-[11px] text-muted-foreground/80 space-y-1.5 leading-relaxed">
-                      <li>• روی کارت ضربه بزنید تا ورق بخورد</li>
-                      <li>• 📚 = قبلاً در تاریخ استفاده شده</li>
-                      <li>• 💀 = کارت افراطی</li>
-                      <li>• ۲-۳ کارت پاسخ از دشمنان می‌آید</li>
-                      <li>• دشمنان: آمریکا، اسرائیل، عرب، ناتو</li>
-                      <li>• متحدان: کره شمالی، روسیه، چین</li>
-                    </ul>
-                  </div>
-                )}
-              </div>
+              ) : (
+                <div className="flex gap-1.5 justify-center items-center h-full flex-wrap overflow-y-auto" style={{ maxHeight: '100%' }}>
+                  {infraCards.filter(c => c.isIranTarget).map((infra) => (
+                    <button
+                      key={infra.id}
+                      onClick={() => {
+                        // Play infrastructure card as instant
+                        const fakeCard: GameCard = {
+                          id: infra.id,
+                          name: infra.name,
+                          nameEn: infra.id,
+                          category: "asymmetric",
+                          actor: "iran",
+                          actorLabel: "🇮🇷 ایران",
+                          description: infra.description,
+                          longDescription: `${infra.description} - ${infra.impact}`,
+                          effects: { deterrence: 8, warEscalation: 1.1 },
+                          icon: infra.icon,
+                          rarity: "epic",
+                          used: false,
+                        };
+                        store.playCard(fakeCard.id);
+                      }}
+                      disabled={isResolving}
+                      className="relative rounded-lg shrink-0 overflow-hidden p-1.5 flex flex-col items-center justify-center"
+                      style={{
+                        width: 60, height: 76,
+                        background: 'linear-gradient(135deg, oklch(0.22 0.08 35 / 0.9), oklch(0.18 0.05 35 / 0.95))',
+                        border: '2px solid oklch(0.55 0.18 35 / 0.5)',
+                        opacity: isResolving ? 0.5 : 1,
+                      }}
+                    >
+                      <div className="text-xl">{infra.icon}</div>
+                      <div className="text-[6px] font-bold text-center leading-tight mt-0.5">{infra.name}</div>
+                      <div className="text-[5px] text-amber-300/80 text-center">{infra.target}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         )}
-
-        {/* Move Log */}
-        {moveLog.length > 0 && (
-          <div className="mt-4 sm:mt-6 glass rounded-xl p-3 sm:p-4">
-            <h3 className="text-sm font-bold mb-2">📜 گزارش نوبت‌های گذشته</h3>
-            <div className="max-h-32 sm:max-h-40 overflow-y-auto space-y-2">
-              {[...moveLog].reverse().map((move, idx) => (
-                <div key={idx} className="text-xs border-r-2 border-primary/40 pr-2 py-1">
-                  <div className="text-muted-foreground mb-0.5">نوبت {move.turn}</div>
-                  <div className="text-foreground leading-relaxed">{move.summary}</div>
-                  <div className="text-muted-foreground/70 mt-0.5 text-[10px]">{move.effectsSummary}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* === MODALS === */}
+      <CardDetailModal card={selectedCard} onClose={() => store.selectCard(null)} />
+      <AnimatePresence>
+        {showAllCards && <AllCardsView side={showAllCards} onClose={() => store.setShowAllCards(null)} />}
+      </AnimatePresence>
     </motion.div>
   );
 }
