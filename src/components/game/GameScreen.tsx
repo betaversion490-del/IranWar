@@ -61,6 +61,15 @@ function MiniCard({
   const prepTime = getPrepTime(card.id);
   const cost = getCardCost(card.id);
   const isPreparing = prepRemaining !== undefined && prepRemaining > 0;
+  const [showTooltip, setShowTooltip] = useState(false);
+  const enr = getCardEnrichment(card.id);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  // Top 3 effects for preview
+  const topEffects = Object.entries(card.effects)
+    .filter(([_, v]) => typeof v === 'number' && v !== 0)
+    .sort((a, b) => Math.abs(b[1] as number) - Math.abs(a[1] as number))
+    .slice(0, 3);
 
   if (faceDown) {
     return (
@@ -74,53 +83,104 @@ function MiniCard({
   }
 
   return (
-    <motion.button
-      onClick={onClick}
-      whileHover={!disabled ? { scale: 1.08, y: -4, rotateZ: -1 } : {}}
-      whileTap={!disabled ? { scale: 0.95 } : {}}
-      disabled={disabled}
-      className={`relative rounded-lg shrink-0 overflow-hidden card-3d-tilt rarity-${card.rarity}`}
-      style={{
-        width: size, height: size * 1.35,
-        background: actor.gradient,
-        border: `2px solid ${isPreparing ? '#fbbf24' : rar.color + '80'}`,
-        opacity: disabled || !canAfford ? 0.5 : 1,
-        cursor: disabled || !canAfford ? 'not-allowed' : 'pointer',
-      }}
+    <div
+      className="relative shrink-0"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
     >
-      <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: rar.color }} />
-      {/* Rarity glow border */}
-      {(card.rarity === 'legendary' || card.rarity === 'apocalyptic') && (
-        <div className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `linear-gradient(135deg, ${rar.color}30 0%, transparent 30%, transparent 70%, ${rar.color}30 100%)`,
-          }}
-        />
-      )}
-      <div className="flex items-center justify-center pt-1.5" style={{ fontSize: size * 0.32 }}>{card.icon}</div>
-      <div className="text-center px-0.5 mt-0.5 font-bold leading-tight" style={{ fontSize: size * 0.1 }}>{card.name}</div>
+      <motion.button
+        onClick={onClick}
+        whileHover={!disabled ? { scale: 1.08, y: -4, rotateZ: -1 } : {}}
+        whileTap={!disabled ? { scale: 0.95 } : {}}
+        disabled={disabled}
+        className={`relative rounded-lg shrink-0 overflow-hidden card-3d-tilt rarity-${card.rarity}`}
+        style={{
+          width: size, height: size * 1.35,
+          background: actor.gradient,
+          border: `2px solid ${isPreparing ? '#fbbf24' : rar.color + '80'}`,
+          opacity: disabled || !canAfford ? 0.5 : 1,
+          cursor: disabled || !canAfford ? 'not-allowed' : 'pointer',
+        }}
+      >
+        <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: rar.color }} />
+        {/* Rarity glow border */}
+        {(card.rarity === 'legendary' || card.rarity === 'apocalyptic') && (
+          <div className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `linear-gradient(135deg, ${rar.color}30 0%, transparent 30%, transparent 70%, ${rar.color}30 100%)`,
+            }}
+          />
+        )}
+        <div className="flex items-center justify-center pt-1.5" style={{ fontSize: size * 0.32 }}>{card.icon}</div>
+        <div className="text-center px-0.5 mt-0.5 font-bold leading-tight" style={{ fontSize: size * 0.1 }}>{card.name}</div>
 
-      {showCost && (
-        <div className="absolute bottom-0.5 left-0.5 bg-fuchsia-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center text-[7px] font-bold border border-fuchsia-300">
-          {cost}
-        </div>
-      )}
-      {prepTime > 0 && !isPreparing && (
-        <div className="absolute bottom-0.5 right-0.5 bg-black/60 rounded px-0.5 text-[6px] font-bold text-amber-300">⏱{prepTime}</div>
-      )}
-      {isPreparing && (
-        <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center rounded-lg">
-          <div className="text-[6px] text-amber-300 font-bold">آماده‌سازی</div>
-          <div className="text-sm font-black text-amber-300">{prepRemaining}</div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500/30">
-            <div className="h-full bg-amber-400 transition-all" style={{ width: `${((prepTime - prepRemaining) / prepTime) * 100}%` }} />
+        {showCost && (
+          <div className="absolute bottom-0.5 left-0.5 bg-fuchsia-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center text-[7px] font-bold border border-fuchsia-300">
+            {cost}
           </div>
-        </div>
-      )}
-      {card.used && !isPreparing && (
-        <div className="absolute top-0.5 left-0.5 text-[6px] bg-amber-500/30 text-amber-300 px-0.5 rounded">📚</div>
-      )}
-    </motion.button>
+        )}
+        {prepTime > 0 && !isPreparing && (
+          <div className="absolute bottom-0.5 right-0.5 bg-black/60 rounded px-0.5 text-[6px] font-bold text-amber-300">⏱{prepTime}</div>
+        )}
+        {isPreparing && (
+          <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center rounded-lg">
+            <div className="text-[6px] text-amber-300 font-bold">آماده‌سازی</div>
+            <div className="text-sm font-black text-amber-300">{prepRemaining}</div>
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500/30">
+              <div className="h-full bg-amber-400 transition-all" style={{ width: `${((prepTime - prepRemaining) / prepTime) * 100}%` }} />
+            </div>
+          </div>
+        )}
+        {card.used && !isPreparing && (
+          <div className="absolute top-0.5 left-0.5 text-[6px] bg-amber-500/30 text-amber-300 px-0.5 rounded">📚</div>
+        )}
+      </motion.button>
+
+      {/* Preview tooltip */}
+      <AnimatePresence>
+        {showTooltip && !disabled && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            transition={{ duration: 0.15 }}
+            ref={tooltipRef}
+            className="absolute z-50 bottom-full right-0 mb-1 w-36 p-2 rounded-lg glass-strong pointer-events-none"
+            style={{ border: `1px solid ${actor.color}60` }}
+          >
+            <div className="text-[9px] font-bold mb-1" style={{ color: actor.color }}>{card.name}</div>
+            <div className="text-[7px] text-muted-foreground mb-1.5 leading-relaxed">{card.description}</div>
+            {/* Top effects */}
+            <div className="space-y-0.5">
+              {topEffects.map(([key, val]) => {
+                const numVal = val as number;
+                const isMult = numVal > 0 && numVal < 2 && !Number.isInteger(numVal);
+                const display = isMult ? `×${numVal.toFixed(2)}` : `${numVal > 0 ? '+' : ''}${numVal}`;
+                const statName = key.replace(/([A-Z])/g, ' $1').trim();
+                return (
+                  <div key={key} className="flex justify-between text-[7px]">
+                    <span className="text-muted-foreground">{statName}</span>
+                    <span className="font-bold font-num" style={{ color: numVal > 0 ? '#22c55e' : '#ef4444' }}>{display}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Combo indicator */}
+            {enr?.comboTags && enr.comboTags.length > 0 && (
+              <div className="mt-1 pt-1 border-t border-white/10 text-[7px] text-fuchsia-300">
+                ⚡ کمبو: {enr.comboTags.length}
+              </div>
+            )}
+            {/* Counter warning */}
+            {enr?.counteredBy && enr.counteredBy.length > 0 && (
+              <div className="mt-0.5 text-[7px] text-rose-300">
+                ⚠ {enr.counteredBy.length} پادکارت
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -279,6 +339,45 @@ function StatPill({ label, value, color, change }: { label: string; value: numbe
           </motion.span>
         )}
       </div>
+    </div>
+  );
+}
+
+// ============================================================
+// STATUS BADGE - خلاصه وضعیت کلی بازی
+// ============================================================
+function StatusBadge({ deterrence, economicStability, warEscalation, domesticSupport }: {
+  deterrence: number; economicStability: number; warEscalation: number; domesticSupport: number;
+}) {
+  // محاسبه امتیاز کلی وضعیت
+  const goodStats = [deterrence, economicStability, domesticSupport].filter(s => s >= 50).length;
+  const isCriticalWar = warEscalation >= 80;
+  const isCriticalEcon = economicStability <= 25;
+  const isCriticalDomestic = domesticSupport <= 30;
+
+  let status: { icon: string; label: string; color: string };
+  if (isCriticalWar || (isCriticalEcon && isCriticalDomestic)) {
+    status = { icon: "🔴", label: "بحرانی", color: "#dc2626" };
+  } else if (warEscalation >= 60 || isCriticalEcon || isCriticalDomestic) {
+    status = { icon: "🟡", label: "خطرناک", color: "#f59e0b" };
+  } else if (goodStats >= 2 && warEscalation < 50) {
+    status = { icon: "🟢", label: "مطلوب", color: "#22c55e" };
+  } else {
+    status = { icon: "⚪", label: "متوسط", color: "#94a3b8" };
+  }
+
+  return (
+    <div
+      className="px-1.5 py-0.5 rounded-full text-[8px] font-bold flex items-center gap-0.5"
+      style={{
+        background: status.color + "20",
+        border: `1px solid ${status.color}60`,
+        color: status.color,
+      }}
+      title={`وضعیت کلی: ${status.label}\nجنگ: ${warEscalation}\nاقتصاد: ${economicStability}\nحمایت: ${domesticSupport}`}
+    >
+      <span>{status.icon}</span>
+      <span>{status.label}</span>
     </div>
   );
 }
@@ -620,12 +719,29 @@ export function GameScreen() {
             <StatPill label="بازدارندگی" value={deterrence} color="oklch(0.65 0.15 165)" change={lastStatChanges?.deterrence} />
             <StatPill label="نظامی" value={militaryCapability} color="oklch(0.6 0.18 250)" change={lastStatChanges?.militaryCapability} />
             <StatPill label="اقتصاد" value={economicStability} color="oklch(0.7 0.18 70)" change={lastStatChanges?.economicStability} />
+            <StatPill label="حمایت" value={domesticSupport} color="oklch(0.65 0.2 350)" change={lastStatChanges?.domesticSupport} />
             <StatPill label="نفوذ" value={regionalInfluence} color="oklch(0.6 0.2 305)" change={lastStatChanges?.regionalInfluence} />
           </div>
-          <div className="text-center shrink-0"><div className="text-[9px] text-muted-foreground">نوبت</div><div className="font-bold font-num text-xs">{turn}/{maxTurns}</div></div>
+          <div className="flex items-center gap-1 shrink-0">
+            <StatusBadge deterrence={deterrence} economicStability={economicStability} warEscalation={warEscalation} domesticSupport={domesticSupport} />
+            <div className="text-center"><div className="text-[9px] text-muted-foreground">نوبت</div><div className="font-bold font-num text-xs">{turn}/{maxTurns}</div></div>
+          </div>
         </div>
+        {/* Turn progress bar */}
         <div className="flex items-center gap-1 mt-1">
-          <span className="text-[8px] text-rose-400 shrink-0">🔥</span>
+          <span className="text-[7px] text-muted-foreground shrink-0">پیشرفت بازی</span>
+          <div className="h-0.5 flex-1 bg-muted/30 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-primary/60 rounded-full"
+              animate={{ width: `${(turn / maxTurns) * 100}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          <span className="text-[7px] text-muted-foreground shrink-0">{maxTurns - turn} نوبت باقی‌مانده</span>
+        </div>
+        {/* War escalation bar */}
+        <div className="flex items-center gap-1 mt-0.5">
+          <span className="text-[8px] text-rose-400 shrink-0">🔥 جنگ</span>
           <div className="h-1 flex-1 bg-muted/40 rounded-full overflow-hidden"><motion.div className="h-full rounded-full" style={{ background: 'linear-gradient(90deg, #16a34a, #d97706, #dc2626)' }} animate={{ width: `${warEscalation}%` }} transition={{ duration: 0.5 }} /></div>
           <span className="text-[8px] font-bold font-num shrink-0" style={{ color: warEscalation > 70 ? '#dc2626' : warEscalation > 40 ? '#d97706' : '#16a34a' }}>{warEscalation}</span>
         </div>

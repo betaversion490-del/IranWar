@@ -1,0 +1,766 @@
+     1→import { create } from "zustand";
+     2→import {
+     3→  iranCards,
+     4→  usCards,
+     5→  israelCards,
+     6→  arabCards,
+     7→  natoCards,
+     8→  nkRussiaChinaCards,
+     9→  getPrepTime,
+    10→  type GameCard,
+    11→  type CardEffects,
+    12→} from "./cardsData";
+    13→import {
+    14→  getCardCost,
+    15→  getCardEnrichment,
+    16→  arePrereqsMet,
+    17→  detectActiveCombos,
+    18→  doesCardCounter,
+    19→  type ComboInfo,
+    20→} from "./cardEnrichments";
+    21→import { determineEnding, endings, type GameState as EngineState, type Ending } from "./endingsData";
+    22→
+    23→// ============================================================
+    24→// PHASE 1.1: ELIXIR SYSTEM
+    25→// ============================================================
+    26→const MAX_ELIXIR = 10;
+    27→const ELIXIR_TICK_MS = 2400; // +1 elixir every 2.4s (faster than CR for action)
+    28→const ENEMY_ELIXIR_TICK_MS = 3000; // slightly slower so player has edge
+    29→
+    30→// ============================================================
+    31→// PHASE 1.2: ENEMY AI
+    32→// ============================================================
+    33→type EnemyPlay = {
+    34→  card: GameCard;
+    35→  playedAt: number; // timestamp
+    36→};
+    37→
+    38→// ============================================================
+    39→// PHASE 1.3: BATTLE ARENA
+    40→// ============================================================
+    41→export type ArenaUnit = {
+    42→  id: string;          // unique instance id
+    43→  cardId: string;
+    44→  card: GameCard;
+    45→  side: "iran" | "enemy";
+    46→  position: number;    // 0-100, position on arena
+    47→  hp: number;          // 0-100
+    48→  attack: number;      // damage to opposing unit per tick
+    49→  speed: number;       // position change per tick
+    50→  state: "advancing" | "fighting" | "destroyed" | "impact";
+    51→  impactEffects?: { target: "iran" | "enemy"; effects: CardEffects; }; // when unit reaches end, applies effects
+    52→};
+    53→
+    54→// ============================================================
+    55→// PHASE 1.4: COMBO BONUS TRACKING
+    56→// ============================================================
+    57→export type ComboEvent = {
+    58→  combo: ComboInfo;
+    59→  turn: number;
+    60→  cardIds: string[];
+    61→};
+    62→
+    63→export type GameState = {
+    64→  phase: "splash" | "intro" | "history" | "game" | "ending";
+    65→  turn: number;
+    66→  maxTurns: number;
+    67→  // Iran stats
+    68→  nuclearProgress: number;
+    69→  regionalInfluence: number;
+    70→  economicStability: number;
+    71→  domesticSupport: number;
+    72→  militaryCapability: number;
+    73→  deterrence: number;
+    74→  // Probability multipliers
+    75→  warEscalation: number;
+    76→  nuclearBreakoutMult: number;
+    77→  regimeChangeMult: number;
+    78→  negotiationChanceMult: number;
+    79→  usWithdrawalMult: number;
+    80→  israelIsolationMult: number;
+    81→  // Cards
+    82→  playedIranCardIds: string[];
+    83→  playedIranCard: GameCard | null;
+    84→  enemyResponses: GameCard[];
+    85→  flippedCardId: string | null;
+    86→  moveLog: MoveEntry[];
+    87→  // Ending
+    88→  ending: Ending | null;
+    89→  endingProbability: number;
+    90→  allProbabilities: Array<{ ending: Ending; probability: number }> | null;
+    91→  isResolving: boolean;
+    92→  historyViewedEra: string | null;
+    93→  earlyEndingTriggered: string | null;
+    94→  lastStatChanges: Partial<Record<string, number>> | null;
+    95→  // Card preparation system
+    96→  preparingCards: Record<string, number>;
+    97→  // Selected card for detail view
+    98→  selectedCardId: string | null;
+    99→  // Show all cards view
+   100→  showAllCards: "iran" | "enemy" | null;
+   101→  // === NEW Phase 1.1: Elixir ===
+   102→  iranElixir: number;        // 0-10
+   103→  enemyElixir: number;       // 0-10
+   104→  lastElixirTick: number;    // timestamp
+   105→  lastEnemyElixirTick: number;
+   106→  // === NEW Phase 1.2: Enemy AI plays ===
+   107→  enemyPlays: EnemyPlay[];
+   108→  // === NEW Phase 1.3: Battle Arena ===
+   109→  arenaUnits: ArenaUnit[];
+   110→  arenaTick: number;
+   111→  // === NEW Phase 1.4: Combos ===
+   112→  activeCombos: ComboInfo[];
+   113→  comboHistory: ComboEvent[];
+   114→  // === NEW Phase 4.2: Manageable resources ===
+   115→  oilRevenue: number;          // $ billions/month
+   116→  missileStockpile: number;    // count
+   117→  enrichmentLevel: number;     // 5, 20, 60, 90 (%)
+   118→  forexReserves: number;       // $ billions
+   119→  hezbollahStrength: number;   // 0-100
+   120→  // === NEW Phase 4.3: Hidden mechanics ===
+   121→  iranDetectionLevel: number;  // 0-100, enemy intel on Iran
+   122→  enemyDetectionLevel: number; // 0-100, Iran intel on enemy
+   123→  // === NEW Phase 4.4: New indicators ===
+   124→  israelStrikeReadiness: number; // 0-100
+   125→  diplomaticPressure: number;    // 0-100
+   126→  domesticTolerance: number;     // 0-100, if 0 -> uprising
+   127→  regimeCollapseRisk: number;    // 0-100, hidden calc
+   128→};
+   129→
+   130→export type MoveEntry = {
+   131→  turn: number;
+   132→  iranCard: GameCard;
+   133→  enemyCards: GameCard[];
+   134→  summary: string;
+   135→  effectsSummary: string;
+   136→  combos?: ComboInfo[];
+   137→  countersUsed?: string[];
+   138→};
+   139→
+   140→const INITIAL_STATE = {
+   141→  phase: "splash" as const,
+   142→  turn: 1,
+   143→  maxTurns: 8,
+   144→  nuclearProgress: 55,
+   145→  regionalInfluence: 50,
+   146→  economicStability: 30,
+   147→  domesticSupport: 65,
+   148→  militaryCapability: 50,
+   149→  deterrence: 40,
+   150→  warEscalation: 55,
+   151→  nuclearBreakoutMult: 1.0,
+   152→  regimeChangeMult: 1.0,
+   153→  negotiationChanceMult: 1.0,
+   154→  usWithdrawalMult: 1.0,
+   155→  israelIsolationMult: 1.0,
+   156→  playedIranCardIds: [] as string[],
+   157→  playedIranCard: null,
+   158→  enemyResponses: [] as GameCard[],
+   159→  flippedCardId: null,
+   160→  moveLog: [] as MoveEntry[],
+   161→  ending: null,
+   162→  endingProbability: 0,
+   163→  allProbabilities: null,
+   164→  isResolving: false,
+   165→  historyViewedEra: null,
+   166→  earlyEndingTriggered: null,
+   167→  lastStatChanges: null,
+   168→  preparingCards: {} as Record<string, number>,
+   169→  selectedCardId: null,
+   170→  showAllCards: null as "iran" | "enemy" | null,
+   171→  iranElixir: 5,
+   172→  enemyElixir: 5,
+   173→  lastElixirTick: Date.now(),
+   174→  lastEnemyElixirTick: Date.now(),
+   175→  enemyPlays: [] as EnemyPlay[],
+   176→  arenaUnits: [] as ArenaUnit[],
+   177→  arenaTick: 0,
+   178→  activeCombos: [] as ComboInfo[],
+   179→  comboHistory: [] as ComboEvent[],
+   180→  // Resources (Phase 4.2)
+   181→  oilRevenue: 3.5,           // ~$3.5B/month from ~1.5 mbpd
+   182→  missileStockpile: 3000,
+   183→  enrichmentLevel: 60,       // current 60%
+   184→  forexReserves: 120,        // ~$120B
+   185→  hezbollahStrength: 45,     // post-war reduced
+   186→  // Hidden mechanics (Phase 4.3)
+   187→  iranDetectionLevel: 30,
+   188→  enemyDetectionLevel: 40,
+   189→  // New indicators (Phase 4.4)
+   190→  israelStrikeReadiness: 70,
+   191→  diplomaticPressure: 55,
+   192→  domesticTolerance: 60,
+   193→  regimeCollapseRisk: 15,
+   194→};
+   195→
+   196→function clamp(value: number, min = 0, max = 100): number {
+   197→  return Math.max(min, Math.min(max, value));
+   198→}
+   199→
+   200→function applyEffects(state: GameState, effects: CardEffects): Partial<GameState> {
+   201→  const next: Partial<GameState> = {};
+   202→  if (effects.nuclearProgress) next.nuclearProgress = clamp(state.nuclearProgress + effects.nuclearProgress);
+   203→  if (effects.regionalInfluence) next.regionalInfluence = clamp(state.regionalInfluence + effects.regionalInfluence);
+   204→  if (effects.economicStability) next.economicStability = clamp(state.economicStability + effects.economicStability);
+   205→  if (effects.domesticSupport) next.domesticSupport = clamp(state.domesticSupport + effects.domesticSupport);
+   206→  if (effects.militaryCapability) next.militaryCapability = clamp(state.militaryCapability + effects.militaryCapability);
+   207→  if (effects.deterrence) next.deterrence = clamp(state.deterrence + effects.deterrence);
+   208→  if (effects.warEscalation) {
+   209→    const delta = (effects.warEscalation - 1) * 25;
+   210→    next.warEscalation = clamp(state.warEscalation + delta);
+   211→  }
+   212→  if (effects.nuclearBreakout) next.nuclearBreakoutMult = state.nuclearBreakoutMult * effects.nuclearBreakout;
+   213→  if (effects.regimeChange) next.regimeChangeMult = state.regimeChangeMult * effects.regimeChange;
+   214→  if (effects.negotiationChance) next.negotiationChanceMult = state.negotiationChanceMult * effects.negotiationChance;
+   215→  if (effects.usWithdrawal) next.usWithdrawalMult = state.usWithdrawalMult * effects.usWithdrawal;
+   216→  if (effects.israelIsolation) next.israelIsolationMult = state.israelIsolationMult * effects.israelIsolation;
+   217→  return next;
+   218→}
+   219→
+   220→// ============================================================
+   221→// PHASE 1.2: ENEMY AI - real-time elixir-based card playing
+   222→// ============================================================
+   223→function selectEnemyPlay(state: GameState): GameCard | null {
+   224→  const allEnemies = [...usCards, ...israelCards, ...arabCards, ...natoCards];
+   225→  const available = allEnemies.filter(card => {
+   226→    const cost = getCardCost(card.id);
+   227→    if (cost > state.enemyElixir) return false;
+   228→    if (state.enemyPlays.find(p => p.card.id === card.id)) return false;
+   229→    if (card.requiresHighWarEscalation && state.warEscalation < 75) return false;
+   230→    return true;
+   231→  });
+   232→  if (available.length === 0) return null;
+   233→
+   234→  // Weighted random based on situation
+   235→  const weighted = available.map(card => {
+   236→    let weight = card.aiWeight ?? 10;
+   237→    // Escalate if war high
+   238→    if (state.warEscalation > 70 && card.category === "military") weight *= 1.5;
+   239→    if (state.warEscalation > 70 && card.rarity === "apocalyptic") weight *= 1.8;
+   240→    // React to Iran nuclear progress
+   241→    if (state.nuclearProgress > 75 && (card.id === "israel_preemptive" || card.id === "us_strike_nukes")) weight *= 2.5;
+   242→    if (state.nuclearProgress > 60 && card.id === "israel_nuclear_facility") weight *= 2;
+   243→    // React to Iran Hormuz
+   244→    if (state.playedIranCardIds.includes("iran_hormuz")) {
+   245→      if (card.id === "us_hormuz_operation" || card.id === "us_oil_blockade") weight *= 3;
+   246→    }
+   247→    // React to Iran proxy activity
+   248→    if (state.playedIranCardIds.some(id => ["iran_houthi", "iran_hezbollah_full", "iran_iraq_militias"].includes(id))) {
+   249→      if (card.id === "us_strike_iraq_militias" || card.id === "israel_hezbollah_war") weight *= 2;
+   250→    }
+   251→    // Prefer cheaper cards early, expensive later
+   252→    if (state.turn <= 3 && getCardCost(card.id) <= 4) weight *= 1.3;
+   253→    if (state.turn >= 5 && getCardCost(card.id) >= 5) weight *= 1.4;
+   254→    return { card, weight };
+   255→  });
+   256→
+   257→  const total = weighted.reduce((s, w) => s + w.weight, 0);
+   258→  let r = Math.random() * total;
+   259→  for (const item of weighted) {
+   260→    r -= item.weight;
+   261→    if (r <= 0) return item.card;
+   262→  }
+   263→  return weighted[weighted.length - 1].card;
+   264→}
+   265→
+   266→// ============================================================
+   267→// PHASE 1.3: ARENA UNIT SPAWN
+   268→// ============================================================
+   269→function spawnArenaUnit(card: GameCard, side: "iran" | "enemy"): ArenaUnit {
+   270→  // Different card types have different arena behaviors
+   271→  let hp = 50;
+   272→  let attack = 8;
+   273→  let speed = 6;
+   274→
+   275→  switch (card.category) {
+   276→    case "nuclear":
+   277→      hp = 20; attack = 100; speed = 12;
+   278→      break;
+   279→    case "military":
+   280→      hp = 70; attack = 12; speed = 8;
+   281→      break;
+   282→    case "proxy":
+   283→      hp = 40; attack = 6; speed = 7;
+   284→      break;
+   285→    case "cyber":
+   286→      hp = 25; attack = 15; speed = 15;
+   287→      break;
+   288→    case "diplomatic":
+   289→      hp = 35; attack = 4; speed = 4;
+   290→      break;
+   291→    case "economic":
+   292→      hp = 45; attack = 5; speed = 5;
+   293→      break;
+   294→    case "asymmetric":
+   295→      hp = 30; attack = 10; speed = 10;
+   296→      break;
+   297→    case "extreme":
+   298→      hp = 15; attack = 200; speed = 14;
+   299→      break;
+   300→    case "alliance":
+   301→      hp = 55; attack = 7; speed = 6;
+   302→      break;
+   303→    default:
+   304→      hp = 40; attack = 8; speed = 7;
+   305→  }
+   306→  // Rarity bonus
+   307→  if (card.rarity === "epic") { hp *= 1.2; attack *= 1.2; }
+   308→  if (card.rarity === "legendary") { hp *= 1.4; attack *= 1.4; }
+   309→  if (card.rarity === "apocalyptic") { hp *= 0.8; attack *= 2.5; speed *= 1.5; }
+   310→
+   311→  return {
+   312→    id: `${card.id}_${side}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+   313→    cardId: card.id,
+   314→    card,
+   315→    side,
+   316→    position: side === "iran" ? 5 : 95,
+   317→    hp,
+   318→    attack,
+   319→    speed,
+   320→    state: "advancing",
+   321→    impactEffects: { target: side === "iran" ? "enemy" : "iran", effects: card.effects },
+   322→  };
+   323→}
+   324→
+   325→// ============================================================
+   326→// PHASE 1.4: COMBO BONUS APPLICATION
+   327→// ============================================================
+   328→function applyComboBonuses(state: GameState, baseEffects: CardEffects, playedCardIds: string[]): CardEffects {
+   329→  const activeCombos = detectActiveCombos(playedCardIds);
+   330→  if (activeCombos.length === 0) return baseEffects;
+   331→
+   332→  const boosted = { ...baseEffects };
+   333→  for (const combo of activeCombos) {
+   334→    if (combo.type === "axis_of_resistance") {
+   335→      boosted.regionalInfluence = (boosted.regionalInfluence || 0) * combo.multiplier;
+   336→    }
+   337→    if (combo.type === "nuclear_deterrence") {
+   338→      boosted.deterrence = (boosted.deterrence || 0) * combo.multiplier;
+   339→      boosted.nuclearBreakout = (boosted.nuclearBreakout || 1) * combo.multiplier;
+   340→    }
+   341→    if (combo.type === "asymmetric_full") {
+   342→      boosted.warEscalation = boosted.warEscalation || 1;
+   343→      boosted.economicStability = (boosted.economicStability || 0) * combo.multiplier;
+   344→    }
+   345→    if (combo.type === "eastern_axis") {
+   346→      boosted.economicStability = (boosted.economicStability || 0) * combo.multiplier;
+   347→    }
+   348→  }
+   349→  return boosted;
+   350→}
+   351→
+   352→// ============================================================
+   353→// ENEMY RESPONSE SELECTION (used for resolve)
+   354→// ============================================================
+   355→function selectEnemyResponses(state: GameState, iranCard: GameCard): GameCard[] {
+   356→  const allEnemies = [...usCards, ...israelCards, ...arabCards, ...natoCards];
+   357→  const weighted = allEnemies.map((card) => {
+   358→    let weight = card.aiWeight ?? 10;
+   359→    if (card.counters?.includes(iranCard.id)) weight *= 3.5;
+   360→    if (iranCard.id === "iran_nuclear_breakout") {
+   361→      if (card.id === "us_strike_nukes" || card.id === "israel_nuclear_facility" || card.id === "israel_preemptive") weight *= 3;
+   362→      if (card.id === "us_nuclear_umbrella" || card.id === "arab_saudi_nuke") weight *= 2.5;
+   363→    }
+   364→    if (iranCard.id === "iran_hormuz") {
+   365→      if (card.id === "us_hormuz_operation") weight *= 4;
+   366→      if (card.id === "us_oil_blockade") weight *= 2.5;
+   367→    }
+   368→    if (iranCard.id === "iran_hezbollah_full" || iranCard.id === "iran_hamas") {
+   369→      if (card.id === "israel_hezbollah_war" || card.id === "israel_hamas_war") weight *= 3;
+   370→      if (card.id === "us_aid_israel") weight *= 2.5;
+   371→    }
+   372→    if (iranCard.id === "iran_missile_strike") {
+   373→      if (card.id === "us_aid_israel" || card.id === "israel_air_strike") weight *= 2.5;
+   374→    }
+   375→    if (iranCard.id === "iran_diplomacy" && card.id === "us_negotiation_deception") weight *= 3;
+   376→    if (card.requiresHighWarEscalation && state.warEscalation < 75) weight *= 0.2;
+   377→    // Add counter system: check counteredBy
+   378→    const cardEnr = getCardEnrichment(card.id);
+   379→    if (cardEnr?.counteredBy?.includes(iranCard.id)) weight *= 0.3; // this card is countered by Iran card
+   380→    return { card, weight };
+   381→  });
+   382→
+   383→  const selected: GameCard[] = [];
+   384→  const actorCount: Record<string, number> = {};
+   385→  const targetCount = Math.random() < 0.4 ? 3 : 2;
+   386→
+   387→  for (let i = 0; i < targetCount; i++) {
+   388→    const available = weighted.filter((w) => {
+   389→      if (selected.find((s) => s.id === w.card.id)) return false;
+   390→      if (actorCount[w.card.actor] >= 2) return false;
+   391→      return true;
+   392→    });
+   393→    if (available.length === 0) break;
+   394→    const total = available.reduce((s, i) => s + i.weight, 0);
+   395→    let r = Math.random() * total;
+   396→    let chosen = available[available.length - 1].card;
+   397→    for (const item of available) {
+   398→      r -= item.weight;
+   399→      if (r <= 0) { chosen = item.card; break; }
+   400→    }
+   401→    selected.push(chosen);
+   402→    actorCount[chosen.actor] = (actorCount[chosen.actor] || 0) + 1;
+   403→  }
+   404→
+   405→  if ((iranCard.category === "alliance" || iranCard.id === "iran_diplomacy") && selected.length < 3) {
+   406→    const thirdParty = [...nkRussiaChinaCards];
+   407→    const tp = thirdParty[Math.floor(Math.random() * thirdParty.length)];
+   408→    if (!selected.find((s) => s.id === tp.id)) selected.push(tp);
+   409→  }
+   410→  return selected;
+   411→}
+   412→
+   413→function checkEarlyEnding(state: GameState, iranCard: GameCard, enemyCards: GameCard[]): string | null {
+   414→  if (iranCard.id === "iran_nuclear_breakout" && state.nuclearProgress >= 85) return "iran_nuclear_deterrence";
+   415→  const allCards = [iranCard, ...enemyCards];
+   416→  if (allCards.some(c => c.id === "us_nuclear_strike" || c.id === "israel_nuclear_strike")) return "nuclear_war_regional";
+   417→  if (state.militaryCapability <= 15 && state.warEscalation >= 90) return "iran_strategic_defeat";
+   418→  if (state.economicStability <= 10 && state.domesticSupport <= 15) return "regime_change_from_within";
+   419→  if (state.deterrence >= 85 && state.regionalInfluence >= 85 && state.warEscalation < 40) return "us_withdrawal_ambition";
+   420→  if (state.negotiationChanceMult >= 2.5 && state.warEscalation < 30) return "comprehensive_peace";
+   421→  if (state.regionalInfluence >= 90 && state.israelIsolationMult >= 2.0) return "israel_strategic_weakening";
+   422→  return null;
+   423→}
+   424→
+   425→function calculateStatChanges(before: GameState, after: GameState): Partial<Record<string, number>> {
+   426→  const changes: Partial<Record<string, number>> = {};
+   427→  const keys: (keyof GameState)[] = ["nuclearProgress", "regionalInfluence", "economicStability", "domesticSupport", "militaryCapability", "deterrence", "warEscalation"];
+   428→  for (const key of keys) {
+   429→    const diff = (after[key] as number) - (before[key] as number);
+   430→    if (diff !== 0) changes[key] = diff;
+   431→  }
+   432→  return changes;
+   433→}
+   434→
+   435→export const useGameStore = create<GameState & {
+   436→  setPhase: (phase: GameState["phase"]) => void;
+   437→  startGame: () => void;
+   438→  resetGame: () => void;
+   439→  playCard: (cardId: string) => void;
+   440→  nextTurn: () => void;
+   441→  setHistoryViewedEra: (eraId: string | null) => void;
+   442→  flipCard: (cardId: string | null) => void;
+   443→  selectCard: (cardId: string | null) => void;
+   444→  setShowAllCards: (show: "iran" | "enemy" | null) => void;
+   445→  startPreparation: (cardId: string) => void;
+   446→  tickPreparation: () => void;
+   447→  cancelPreparation: (cardId: string) => void;
+   448→  // === NEW Phase 1.1: Elixir ===
+   449→  tickElixir: () => void;
+   450→  // === NEW Phase 1.2: Enemy AI tick ===
+   451→  tickEnemyAI: () => void;
+   452→  // === NEW Phase 1.3: Arena tick ===
+   453→  tickArena: () => void;
+   454→  // === NEW Phase 4.3: Hidden mechanics ===
+   455→  increaseIranDetection: (amount: number) => void;
+   456→  decreaseIranDetection: (amount: number) => void;
+   457→}>((set, get) => ({
+   458→  ...INITIAL_STATE,
+   459→
+   460→  setPhase: (phase) => set({ phase }),
+   461→  startGame: () => set({ ...INITIAL_STATE, phase: "game", lastElixirTick: Date.now(), lastEnemyElixirTick: Date.now() }),
+   462→  resetGame: () => set({ ...INITIAL_STATE, phase: "splash" }),
+   463→  setHistoryViewedEra: (eraId) => set({ historyViewedEra: eraId }),
+   464→  flipCard: (cardId) => set({ flippedCardId: cardId }),
+   465→  selectCard: (cardId) => set({ selectedCardId: cardId }),
+   466→  setShowAllCards: (show) => set({ showAllCards: show }),
+   467→
+   468→  // === PHASE 1.1: ELIXIR TICK ===
+   469→  tickElixir: () => {
+   470→    const state = get();
+   471→    const now = Date.now();
+   472→    let newIranElixir = state.iranElixir;
+   473→    let newEnemyElixir = state.enemyElixir;
+   474→    let newLastTick = state.lastElixirTick;
+   475→    let newLastEnemyTick = state.lastEnemyElixirTick;
+   476→
+   477→    if (now - state.lastElixirTick >= ELIXIR_TICK_MS && state.iranElixir < MAX_ELIXIR) {
+   478→      newIranElixir = Math.min(MAX_ELIXIR, state.iranElixir + 1);
+   479→      newLastTick = now;
+   480→    }
+   481→    if (now - state.lastEnemyElixirTick >= ENEMY_ELIXIR_TICK_MS && state.enemyElixir < MAX_ELIXIR) {
+   482→      newEnemyElixir = Math.min(MAX_ELIXIR, state.enemyElixir + 1);
+   483→      newLastEnemyTick = now;
+   484→    }
+   485→    if (newIranElixir !== state.iranElixir || newEnemyElixir !== state.enemyElixir) {
+   486→      set({ iranElixir: newIranElixir, enemyElixir: newEnemyElixir, lastElixirTick: newLastTick, lastEnemyElixirTick: newLastEnemyTick });
+   487→    }
+   488→  },
+   489→
+   490→  // === PHASE 1.2: ENEMY AI TICK ===
+   491→  tickEnemyAI: () => {
+   492→    const state = get();
+   493→    if (state.isResolving) return;
+   494→    // 15% chance per tick to play a card if enemy has enough elixir
+   495→    if (Math.random() > 0.15) return;
+   496→    const card = selectEnemyPlay(state);
+   497→    if (!card) return;
+   498→    const cost = getCardCost(card.id);
+   499→    if (cost > state.enemyElixir) return;
+   500→
+   501→    // Spawn arena unit
+   502→    const unit = spawnArenaUnit(card, "enemy");
+   503→    set({
+   504→      enemyElixir: state.enemyElixir - cost,
+   505→      enemyPlays: [...state.enemyPlays, { card, playedAt: Date.now() }],
+   506→      arenaUnits: [...state.arenaUnits, unit],
+   507→    });
+   508→  },
+   509→
+   510→  // === PHASE 1.3: ARENA TICK ===
+   511→  tickArena: () => {
+   512→    const state = get();
+   513→    if (state.arenaUnits.length === 0) return;
+   514→
+   515→    let units = state.arenaUnits.map(u => ({ ...u }));
+   516→    const appliedEffects: { iran: Partial<CardEffects>[]; enemy: Partial<CardEffects>[] } = { iran: [], enemy: [] };
+   517→    const destroyedIds: string[] = [];
+   518→
+   519→    // Advance / fight
+   520→    for (const unit of units) {
+   521→      if (unit.state === "destroyed") continue;
+   522→
+   523→      // Find nearest opposing unit
+   524→      const enemies = units.filter(u =>
+   525→        u.side !== unit.side &&
+   526→        u.state !== "destroyed" &&
+   527→        Math.abs(u.position - unit.position) < 15
+   528→      );
+   529→
+   530→      if (enemies.length > 0) {
+   531→        unit.state = "fighting";
+   532→        // Attack closest
+   533→        const target = enemies.sort((a, b) => Math.abs(a.position - unit.position) - Math.abs(b.position - unit.position))[0];
+   534→        target.hp -= unit.attack;
+   535→        if (target.hp <= 0) {
+   536→          target.state = "destroyed";
+   537→          destroyedIds.push(target.id);
+   538→        }
+   539→      } else {
+   540→        // Advance
+   541→        unit.state = "advancing";
+   542→        const direction = unit.side === "iran" ? 1 : -1;
+   543→        unit.position += unit.speed * direction;
+   544→
+   545→        // Check if reached opposing end
+   546→        if ((unit.side === "iran" && unit.position >= 95) || (unit.side === "enemy" && unit.position <= 5)) {
+   547→          unit.state = "impact";
+   548→          // Apply card effects to opposing side
+   549→          if (unit.impactEffects) {
+   550→            appliedEffects[unit.impactEffects.target].push(unit.impactEffects.effects);
+   551→          }
+   552→          destroyedIds.push(unit.id);
+   553→        }
+   554→      }
+   555→    }
+   556→
+   557→    // Remove destroyed units (but only the impact ones are removed, fighting-destroyed stay visible briefly)
+   558→    units = units.filter(u => !destroyedIds.includes(u.id) || u.state === "fighting");
+   559→
+   560→    // Apply impact effects to game state
+   561→    let newState = { ...state };
+   562→    for (const eff of appliedEffects.iran) {
+   563→      const applied = applyEffects(newState, eff);
+   564→      newState = { ...newState, ...applied };
+   565→    }
+   566→    for (const eff of appliedEffects.enemy) {
+   567→      const applied = applyEffects(newState, eff);
+   568→      newState = { ...newState, ...applied };
+   569→    }
+   570→
+   571→    // If no impacts, only update arena
+   572→    if (appliedEffects.iran.length === 0 && appliedEffects.enemy.length === 0) {
+   573→      set({ arenaUnits: units, arenaTick: state.arenaTick + 1 });
+   574→    } else {
+   575→      const statChanges = calculateStatChanges(state, newState);
+   576→      set({
+   577→        ...newState,
+   578→        arenaUnits: units,
+   579→        arenaTick: state.arenaTick + 1,
+   580→        lastStatChanges: statChanges || state.lastStatChanges,
+   581→      });
+   582→    }
+   583→  },
+   584→
+   585→  // === PHASE 4.3: HIDDEN MECHANICS ===
+   586→  increaseIranDetection: (amount) => set((s) => ({ iranDetectionLevel: clamp(s.iranDetectionLevel + amount) })),
+   587→  decreaseIranDetection: (amount) => set((s) => ({ iranDetectionLevel: clamp(s.iranDetectionLevel - amount) })),
+   588→
+   589→  startPreparation: (cardId) => {
+   590→    const state = get();
+   591→    if (state.preparingCards[cardId] !== undefined) return;
+   592→    const prepTime = getPrepTime(cardId);
+   593→    if (prepTime === 0) {
+   594→      get().playCard(cardId);
+   595→      return;
+   596→    }
+   597→    set({
+   598→      preparingCards: { ...state.preparingCards, [cardId]: prepTime },
+   599→    });
+   600→  },
+   601→
+   602→  tickPreparation: () => {
+   603→    const state = get();
+   604→    const preparing = { ...state.preparingCards };
+   605→    let changed = false;
+   606→    for (const [cardId, time] of Object.entries(preparing)) {
+   607→      if (time <= 1) {
+   608→        delete preparing[cardId];
+   609→        changed = true;
+   610→        setTimeout(() => get().playCard(cardId), 100);
+   611→      } else {
+   612→        preparing[cardId] = time - 1;
+   613→        changed = true;
+   614→      }
+   615→    }
+   616→    if (changed) {
+   617→      set({ preparingCards: preparing });
+   618→    }
+   619→  },
+   620→
+   621→  cancelPreparation: (cardId) => {
+   622→    const state = get();
+   623→    const preparing = { ...state.preparingCards };
+   624→    delete preparing[cardId];
+   625→    set({ preparingCards: preparing });
+   626→  },
+   627→
+   628→  playCard: (cardId) => {
+   629→    const state = get();
+   630→    if (state.isResolving) return;
+   631→    const iranCard = iranCards.find((c) => c.id === cardId);
+   632→    if (!iranCard) return;
+   633→
+   634→    // === Phase 1.1: Check elixir cost ===
+   635→    const cost = getCardCost(cardId);
+   636→    if (cost > state.iranElixir) return;
+   637→
+   638→    // === Phase 4.1: Check prerequisites ===
+   639→    if (!arePrereqsMet(cardId, state.playedIranCardIds)) return;
+   640→
+   641→    // === Phase 1.1: Deduct elixir ===
+   642→    let iranElixir = state.iranElixir - cost;
+   643→
+   644→    // === Phase 1.3: Spawn arena unit ===
+   645→    const newUnit = spawnArenaUnit(iranCard, "iran");
+   646→
+   647→    const beforeState = { ...state, iranElixir };
+   648→    let newState = { ...state, iranElixir };
+   649→
+   650→    // === Phase 1.4: Apply combo bonuses ===
+   651→    const newPlayedIds = [...state.playedIranCardIds, cardId];
+   652→    const boostedEffects = applyComboBonuses(newState, iranCard.effects, newPlayedIds);
+   653→    const iranEffects = applyEffects(newState, boostedEffects);
+   654→    newState = { ...newState, ...iranEffects };
+   655→
+   656→    // === Phase 4.3: Detection risk ===
+   657→    const enr = getCardEnrichment(cardId);
+   658→    let detectionIncrease = 0;
+   659→    if (enr?.detectionRisk) {
+   660→      detectionIncrease = Math.floor(enr.detectionRisk * 0.15);
+   661→      newState.iranDetectionLevel = clamp(newState.iranDetectionLevel + detectionIncrease);
+   662→    }
+   663→
+   664→    const enemyCards = selectEnemyResponses(newState, iranCard);
+   665→    for (const card of enemyCards) {
+   666→      const effects = applyEffects(newState, card.effects);
+   667→      newState = { ...newState, ...effects };
+   668→    }
+   669→
+   670→    // === Phase 1.4: Track combos ===
+   671→    const newActiveCombos = detectActiveCombos(newPlayedIds);
+   672→    let comboEvent: ComboEvent | null = null;
+   673→    if (newActiveCombos.length > state.activeCombos.length) {
+   674→      const newCombo = newActiveCombos.find(c => !state.activeCombos.find(old => old.type === c.type));
+   675→      if (newCombo) {
+   676→        comboEvent = { combo: newCombo, turn: state.turn, cardIds: newPlayedIds };
+   677→      }
+   678→    }
+   679→
+   680→    // === Phase 4.4: Update indicators ===
+   681→    newState.israelStrikeReadiness = clamp(newState.israelStrikeReadiness + (iranCard.id === "iran_nuclear_breakout" ? 25 : iranCard.id === "iran_npt_withdraw" ? 10 : 0));
+   682→    newState.diplomaticPressure = clamp(newState.diplomaticPressure + (iranCard.category === "diplomatic" ? 5 : -3));
+   683→    newState.domesticTolerance = clamp(newState.domesticTolerance + (iranCard.category === "extreme" ? -10 : 0));
+   684→    newState.regimeCollapseRisk = clamp(newState.regimeCollapseRisk + (newState.economicStability < 20 ? 5 : 0) + (newState.domesticSupport < 25 ? 5 : 0));
+   685→
+   686→    // === Phase 4.2: Resource consumption ===
+   687→    if (iranCard.id === "iran_missile_strike") newState.missileStockpile = Math.max(0, newState.missileStockpile - 80);
+   688→    if (iranCard.id === "iran_drone_swarm") newState.missileStockpile = Math.max(0, newState.missileStockpile - 30);
+   689→    if (iranCard.id === "iran_nuclear_breakout") newState.enrichmentLevel = 90;
+   690→    if (iranCard.id === "iran_npt_withdraw") newState.enrichmentLevel = Math.max(newState.enrichmentLevel, 70);
+   691→    if (iranCard.id === "iran_oil_weapon") newState.oilRevenue = Math.max(0, newState.oilRevenue - 1.2);
+   692→    if (iranCard.id === "iran_hezbollah_full") newState.hezbollahStrength = Math.min(100, newState.hezbollahStrength + 15);
+   693→
+   694→    const statChanges = calculateStatChanges(beforeState, newState);
+   695→    const earlyEnding = checkEarlyEnding(newState, iranCard, enemyCards);
+   696→
+   697→    // Detect counters used
+   698→    const countersUsed = enemyCards
+   699→      .filter(c => doesCardCounter(c.id, cardId))
+   700→      .map(c => c.id);
+   701→
+   702→    set({
+   703→      ...newState,
+   704→      iranElixir,
+   705→      playedIranCard: iranCard,
+   706→      enemyResponses: enemyCards,
+   707→      playedIranCardIds: newPlayedIds,
+   708→      flippedCardId: null,
+   709→      selectedCardId: null,
+   710→      isResolving: true,
+   711→      lastStatChanges: statChanges,
+   712→      earlyEndingTriggered: earlyEnding,
+   713→      arenaUnits: [...state.arenaUnits, newUnit],
+   714→      activeCombos: newActiveCombos,
+   715→      comboHistory: comboEvent ? [...state.comboHistory, comboEvent] : state.comboHistory,
+   716→      moveLog: [...state.moveLog, {
+   717→        turn: state.turn,
+   718→        iranCard,
+   719→        enemyCards,
+   720→        summary: `ایران «${iranCard.name}» را بازی کرد.`,
+   721→        effectsSummary: "",
+   722→        combos: newActiveCombos.length > state.activeCombos.length ? newActiveCombos : undefined,
+   723→        countersUsed: countersUsed.length > 0 ? countersUsed : undefined,
+   724→      }],
+   725→    });
+   726→  },
+   727→
+   728→  nextTurn: () => {
+   729→    const state = get();
+   730→    if (!state.isResolving) return;
+   731→
+   732→    if (state.earlyEndingTriggered) {
+   733→      const ending = endings.find((e) => e.id === state.earlyEndingTriggered);
+   734→      if (ending) {
+   735→        set({ phase: "ending", ending, endingProbability: 1.0, allProbabilities: [{ ending, probability: 1.0 }], isResolving: false, playedIranCard: null, enemyResponses: [], earlyEndingTriggered: null, lastStatChanges: null, arenaUnits: [], enemyPlays: [] });
+   736→        return;
+   737→      }
+   738→    }
+   739→
+   740→    if (state.turn >= state.maxTurns) {
+   741→      const engineState: EngineState = {
+   742→        nuclearProgress: state.nuclearProgress, regionalInfluence: state.regionalInfluence,
+   743→        economicStability: state.economicStability, domesticSupport: state.domesticSupport,
+   744→        militaryCapability: state.militaryCapability, deterrence: state.deterrence,
+   745→        warEscalation: state.warEscalation, nuclearBreakoutMult: state.nuclearBreakoutMult,
+   746→        regimeChangeMult: state.regimeChangeMult, negotiationChanceMult: state.negotiationChanceMult,
+   747→        usWithdrawalMult: state.usWithdrawalMult, israelIsolationMult: state.israelIsolationMult,
+   748→        turn: state.turn, maxTurns: state.maxTurns,
+   749→      };
+   750→      const { ending, probability, allProbabilities } = determineEnding(engineState);
+   751→      set({ phase: "ending", ending, endingProbability: probability, allProbabilities, isResolving: false, playedIranCard: null, enemyResponses: [], lastStatChanges: null, arenaUnits: [], enemyPlays: [] });
+   752→      return;
+   753→    }
+   754→
+   755→    set({
+   756→      turn: state.turn + 1,
+   757→      isResolving: false,
+   758→      playedIranCard: null,
+   759→      enemyResponses: [],
+   760→      lastStatChanges: null,
+   761→      arenaUnits: [],
+   762→      enemyPlays: [],
+   763→    });
+   764→  },
+   765→}));
+   766→

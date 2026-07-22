@@ -141,13 +141,13 @@ const INITIAL_STATE = {
   phase: "splash" as const,
   turn: 1,
   maxTurns: 8,
-  nuclearProgress: 55,
-  regionalInfluence: 50,
-  economicStability: 30,
-  domesticSupport: 65,
-  militaryCapability: 50,
-  deterrence: 40,
-  warEscalation: 55,
+  nuclearProgress: 50,       // متعادل
+  regionalInfluence: 50,     // متعادل
+  economicStability: 40,     // کمی بالاتر (۳۰→۴۰) تا بازی فرصت داشته باشد
+  domesticSupport: 60,       // کمی پایین‌تر (۶۵→۶۰) برای واقع‌گرایی
+  militaryCapability: 55,    // کمی بالاتر
+  deterrence: 45,            // کمی بالاتر (۴۰→۴۵) - بازدارندگی زیرساختی
+  warEscalation: 50,         // متعادل (۵۵→۵۰) - حالت خاکستری
   nuclearBreakoutMult: 1.0,
   regimeChangeMult: 1.0,
   negotiationChanceMult: 1.0,
@@ -411,14 +411,28 @@ function selectEnemyResponses(state: GameState, iranCard: GameCard): GameCard[] 
 }
 
 function checkEarlyEnding(state: GameState, iranCard: GameCard, enemyCards: GameCard[]): string | null {
-  if (iranCard.id === "iran_nuclear_breakout" && state.nuclearProgress >= 85) return "iran_nuclear_deterrence";
+  // 1. بمب اتم موفق - آستانه پایین‌تر (۷۵ به جای ۸۵) تا قابل دسترس باشد
+  if (iranCard.id === "iran_nuclear_breakout" && state.nuclearProgress >= 75) return "iran_nuclear_deterrence";
+
+  // 2. جنگ هسته‌ای - اگر آمریکا/اسرائیل حمله هسته‌ای کنند
   const allCards = [iranCard, ...enemyCards];
   if (allCards.some(c => c.id === "us_nuclear_strike" || c.id === "israel_nuclear_strike")) return "nuclear_war_regional";
-  if (state.militaryCapability <= 15 && state.warEscalation >= 90) return "iran_strategic_defeat";
-  if (state.economicStability <= 10 && state.domesticSupport <= 15) return "regime_change_from_within";
-  if (state.deterrence >= 85 && state.regionalInfluence >= 85 && state.warEscalation < 40) return "us_withdrawal_ambition";
-  if (state.negotiationChanceMult >= 2.5 && state.warEscalation < 30) return "comprehensive_peace";
-  if (state.regionalInfluence >= 90 && state.israelIsolationMult >= 2.0) return "israel_strategic_weakening";
+
+  // 3. شکست استراتژیک - آستانه منطقی‌تر (۲۰ به جای ۱۵)
+  if (state.militaryCapability <= 20 && state.warEscalation >= 85) return "iran_strategic_defeat";
+
+  // 4. تغییر رژیم از داخل - آستانه منطقی‌تر (۲۰ به جای ۱۰)
+  if (state.economicStability <= 20 && state.domesticSupport <= 20) return "regime_change_from_within";
+
+  // 5. خروج آمریکا - رفع تناقض: warEscalation < ۶۰ به جای ۴۰
+  if (state.deterrence >= 75 && state.regionalInfluence >= 75 && state.warEscalation < 60) return "us_withdrawal_ambition";
+
+  // 6. صلح جامع - آستانه منطقی‌تر
+  if (state.negotiationChanceMult >= 2.0 && state.warEscalation < 40) return "comprehensive_peace";
+
+  // 7. انزوای اسرائیل - آستانه پایین‌تر (۸۰ به جای ۹۰)
+  if (state.regionalInfluence >= 80 && state.israelIsolationMult >= 1.8) return "israel_strategic_weakening";
+
   return null;
 }
 
@@ -746,6 +760,18 @@ export const useGameStore = create<GameState & {
         regimeChangeMult: state.regimeChangeMult, negotiationChanceMult: state.negotiationChanceMult,
         usWithdrawalMult: state.usWithdrawalMult, israelIsolationMult: state.israelIsolationMult,
         turn: state.turn, maxTurns: state.maxTurns,
+        // شاخص‌های پنهان Phase 4.4
+        israelStrikeReadiness: state.israelStrikeReadiness,
+        diplomaticPressure: state.diplomaticPressure,
+        domesticTolerance: state.domesticTolerance,
+        regimeCollapseRisk: state.regimeCollapseRisk,
+        iranDetectionLevel: state.iranDetectionLevel,
+        // منابع Phase 4.2
+        oilRevenue: state.oilRevenue,
+        missileStockpile: state.missileStockpile,
+        enrichmentLevel: state.enrichmentLevel,
+        forexReserves: state.forexReserves,
+        hezbollahStrength: state.hezbollahStrength,
       };
       const { ending, probability, allProbabilities } = determineEnding(engineState);
       set({ phase: "ending", ending, endingProbability: probability, allProbabilities, isResolving: false, playedIranCard: null, enemyResponses: [], lastStatChanges: null, arenaUnits: [], enemyPlays: [] });

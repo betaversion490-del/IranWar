@@ -2,7 +2,6 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { activeCards } from "@/lib/game/cardsData";
 
 // ============================================================
 // PHASE 3.4: BATTLE EFFECTS OVERLAY
@@ -163,36 +162,8 @@ function BattleEffectItem({ effect }: { effect: BattleEffect }) {
 }
 
 // ============================================================
-// PHASE 3.3: NEWS TICKER (bottom)
+// PHASE 3.3: NEWS TICKER - حذف شد (اخبار فرضی حذف شدند)
 // ============================================================
-export function NewsTicker() {
-  // Combine active cards into news items
-  const newsItems = activeCards.map(c => ({
-    text: `${c.actor} ${c.name}: ${c.description}`,
-    color: c.status === "active" ? "#dc2626" : c.status === "preparing" ? "#fbbf24" : "#0ea5e9",
-  }));
-
-  // Duplicate items for seamless scroll
-  const allItems = [...newsItems, ...newsItems];
-
-  return (
-    <div className="shrink-0 px-2 py-0.5 glass-strong border-t border-border/50 overflow-hidden flex items-center gap-2">
-      <span className="text-[8px] font-bold text-rose-400 shrink-0 flex items-center gap-0.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
-        اخبار زنده
-      </span>
-      <div className="flex-1 overflow-hidden">
-        <div className="news-ticker-content">
-          {allItems.map((item, i) => (
-            <span key={i} className="inline-block px-3 text-[8px]" style={{ color: item.color }}>
-              ● {item.text}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ============================================================
 // PHASE 3.2: WORLD MAP HOTSPOTS (compact)

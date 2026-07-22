@@ -430,6 +430,18 @@ export type GameState = {
   israelIsolationMult: number;
   turn: number;
   maxTurns: number;
+  // شاخص‌های پنهان Phase 4.4 - اکنون در محاسبه پایان استفاده می‌شوند
+  israelStrikeReadiness?: number;
+  diplomaticPressure?: number;
+  domesticTolerance?: number;
+  regimeCollapseRisk?: number;
+  iranDetectionLevel?: number;
+  // منابع Phase 4.2
+  oilRevenue?: number;
+  missileStockpile?: number;
+  enrichmentLevel?: number;
+  forexReserves?: number;
+  hezbollahStrength?: number;
 };
 
 export function calculateEndingsProbability(state: GameState): Array<{ ending: Ending; probability: number }> {
@@ -485,8 +497,45 @@ export function calculateEndingsProbability(state: GameState): Array<{ ending: E
     }
     if (ending.category === "status_quo") {
       // Gray zone war is most likely when nothing extreme happens
-      multiplier *= 1.2; // boost base
+      // Note: حذف boost 1.2x غیرضروری - باعث غالب شدن این پایان می‌شد
       multiplier *= 1 - Math.abs(state.warEscalation - 50) / 100;
+    }
+
+    // === اتصال شاخص‌های پنهان Phase 4.4 به منطق پایان ===
+    // اگر آمادگی حمله اسرائیل بالا باشد، احتمال جنگ و شکست بیشتر
+    if (state.israelStrikeReadiness !== undefined) {
+      if (ending.category === "war") {
+        multiplier *= 1 + (state.israelStrikeReadiness - 50) / 150;
+      }
+      if (ending.id === "iran_strategic_defeat") {
+        multiplier *= 1 + (state.israelStrikeReadiness - 50) / 100;
+      }
+    }
+    // اگر تحمل داخلی پایین باشد، احتمال تغییر رژیم بیشتر
+    if (state.domesticTolerance !== undefined && ending.category === "regime_change") {
+      multiplier *= 1 + (50 - state.domesticTolerance) / 100;
+    }
+    // اگر ریسک فروپاشی رژیم بالا باشد
+    if (state.regimeCollapseRisk !== undefined && ending.category === "regime_change") {
+      multiplier *= 1 + (state.regimeCollapseRisk - 15) / 100;
+    }
+    // اگر فشار دیپلماتیک بالا باشد، احتمال صلح بیشتر
+    if (state.diplomaticPressure !== undefined && ending.category === "peace") {
+      multiplier *= 1 + (state.diplomaticPressure - 50) / 200;
+    }
+
+    // === اتصال منابع Phase 4.2 به منطق پایان ===
+    // اگر ذخایر ارزی پایین باشد، احتمال تغییر رژیم بیشتر
+    if (state.forexReserves !== undefined && state.forexReserves < 80 && ending.category === "regime_change") {
+      multiplier *= 1.15;
+    }
+    // اگر قدرت حزب‌الله بالا باشد، احتمال انزوای اسرائیل بیشتر
+    if (state.hezbollahStrength !== undefined && state.hezbollahStrength > 60 && ending.id === "israel_strategic_weakening") {
+      multiplier *= 1.2;
+    }
+    // اگر غنی‌سازی بالا باشد، احتمال پایان هسته‌ای بیشتر
+    if (state.enrichmentLevel !== undefined && state.enrichmentLevel >= 90 && ending.category === "nuclear") {
+      multiplier *= 1.3;
     }
 
     probability *= multiplier;

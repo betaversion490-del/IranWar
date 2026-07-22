@@ -2032,6 +2032,8 @@ export type HistoryCard = {
   icon: string;
   result: "yes" | "no" | "partial";
   effect: string;
+  fictional?: boolean; // true = سناریوی فرضی، false یا حذف = واقعی
+  source?: string;     // منبع تأیید رویداد
 };
 
 export const historyCards: HistoryCard[] = [
@@ -2042,7 +2044,7 @@ export const historyCards: HistoryCard[] = [
   { id: "h05", date: "۱۳۵۹/۶/۳۱", actor: "🇮🇶", title: "هجوم صدام به ایران", icon: "⚔️", result: "partial", effect: "فعال" },
   { id: "h06", date: "۱۳۶۷/۴/۱۲", actor: "🇺🇸", title: "سرنگونی پرواز ۶۵۵", icon: "✈️", result: "yes", effect: "فعال روانی" },
   { id: "h07", date: "۱۳۸۱/۵/۲۳", actor: "🇺🇸", title: "افشای غیرقانونی نطنز", icon: "☢️", result: "yes", effect: "بسیارفعال" },
-  { id: "h08", date: "۱۳۸۹/۴/۱", actor: "🇺🇸🇮🇱", title: "سایبرتروریسم استاکس‌نت", icon: "💻", result: "partial", effect: "سابقه" },
+  { id: "h08", date: "۱۳۸۹/۴", actor: "🇺🇸🇮🇱", title: "سایبرتروریسم استاکس‌نت", icon: "💻", result: "partial", effect: "سابقه" },
   { id: "h09", date: "۱۳۹۴/۴/۲۳", actor: "🇮🇷🇺🇸", title: "برجام (JCPOA)", icon: "✍️", result: "partial", effect: "مرده" },
   { id: "h10", date: "۱۳۹۷/۲/۱۸", actor: "🇺🇸", title: "خروج یک‌جانبه آمریکا از برجام", icon: "🚪", result: "yes", effect: "بسیارفعال" },
   { id: "h11", date: "۱۳۹۸/۱۰/۱۳", actor: "🇺🇸", title: "شهادت سردار سلطیمانی", icon: "🎯", result: "yes", effect: "فعال نمادین" },
@@ -2051,40 +2053,10 @@ export const historyCards: HistoryCard[] = [
   { id: "h14", date: "۱۴۰۳/۱/۲۴", actor: "🇮🇷", title: "عملیات وعده صادق ۱", icon: "🚀", result: "partial", effect: "سابقه" },
   { id: "h15", date: "۱۴۰۳/۵/۱۰", actor: "🇮🇱", title: "ترور شهید هنیه در تهران", icon: "🎯", result: "yes", effect: "فعال نمادین" },
   { id: "h16", date: "۱۴۰۳/۷/۶", actor: "🇮🇱", title: "ترور شهید نصرالله", icon: "🎯", result: "yes", effect: "بسیارفعال" },
-  { id: "h17", date: "۱۴۰۳/۹/۱۸", actor: "🇸🇾🇺🇸", title: "سقوط دولت بشار اسد", icon: "📉", result: "yes", effect: "بسیارفعال" },
-  { id: "h18", date: "۱۴۰۴/۳/۲۳", actor: "🇮🇱🇺🇸", title: "جنگ ۱۲ روزه (تجاوز به ایران)", icon: "🔥", result: "partial", effect: "بسیارفعال" },
-  { id: "h19", date: "۱۴۰۴/۱۲/۹", actor: "🇺🇸🇮🇱", title: "ترور رهبر انقلاب", icon: "💔", result: "yes", effect: "تحول‌ساز" },
-  { id: "h20", date: "۱۴۰۵/۳", actor: "🇮🇷", title: "جانشینی مجتبی خامنه‌ای", icon: "🔄", result: "yes", effect: "فعال" },
-  { id: "h21", date: "۱۴۰۵/۴", actor: "🇮🇷🇺🇸", title: "مذاکرات اسلام‌آباد (شکست)", icon: "🕊️", result: "no", effect: "سابقه" },
-  { id: "h22", date: "۱۴۰۵/۵", actor: "🇮🇷🇺🇸", title: "تفاهم موقت (فروپاشیده)", icon: "📝", result: "partial", effect: "مرده" },
+  { id: "h17", date: "۱۴۰۳/۹/۱۸", actor: "🇸🇾", title: "سقوط دولت بشار اسد", icon: "📉", result: "yes", effect: "بسیارفعال" },
 ];
 
 // ============================================================
-// CURRENTLY ACTIVE CARDS (در حال اجرا - اخبار روزانه)
+// CURRENTLY ACTIVE CARDS (حذف شد - اخبار روزانه فرضی بودند)
+// بازی فقط بر اساس رویدادهای تاریخی تأییدشده تا ۱۴۰۳/۹/۱۸ کار می‌کند
 // ============================================================
-export type ActiveCard = {
-  id: string;
-  name: string;
-  icon: string;
-  actor: string;
-  status: "active" | "preparing" | "recent";
-  description: string;
-  source: string;
-};
-
-export const activeCards: ActiveCard[] = [
-  // Active operations
-  { id: "a01", name: "حملات هوایی شبانه آمریکا", icon: "✈️", actor: "🇺🇸", status: "active", description: "ده شب متوالی بمباران اهداف نظامی ایران", source: "Reuters/CENTCOM" },
-  { id: "a02", name: "محاصره دریایی هرمز", icon: "⚓", actor: "🇺🇸", status: "active", description: "ترامپ بازگرداندن محاصره را اعلام کرد", source: "AP/NPR" },
-  { id: "a03", name: "حملات ایران به نفت‌کش‌ها", icon: "🛢️", actor: "🇮🇷", status: "active", description: "۳ نفت‌کش تجاری هدف قرار گرفت", source: "CNN/Reuters" },
-  { id: "a04", name: "حملات سپاه به پایگاه‌های آمریکا", icon: "🎯", actor: "🇮🇷", status: "active", description: "حمله به بحرین، کویت، التنف. ۳ کشته آمریکا", source: "Reuters/CBS" },
-  { id: "a05", name: "حملات سایبری به زیرساخت آمریکا", icon: "💻", actor: "🇮🇷", status: "active", description: "APTهای ایرانی به PLC و OT نفوذ کرده‌اند", source: "CISA/CSIS" },
-  { id: "a06", name: "تحریم نفت ایران (بازگشته)", icon: "💸", actor: "🇺🇸", status: "active", description: "لایسنس GL X لغو شد. تحریم کامل نفت", source: "OFAC/CNN" },
-  { id: "a07", name: "حوثی‌ها: حمله به دریای سرخ", icon: "🚢", actor: "🇾🇪", status: "active", description: "دو کشتی تجاری غرق شدند", source: "ISW" },
-  { id: "a08", name: "بازسازی حزب‌الله (~۱ میلیارد دلار)", icon: "🇱🇧", actor: "🇮🇷", status: "active", description: "ایران در حال انتقال بودجه برای بازسازی", source: "Terrorism-info" },
-  // Preparing
-  { id: "a09", name: "بازسازی سایت‌های هسته‌ای", icon: "☢️", actor: "🇮🇷", status: "preparing", description: "فعالیت در فردو، کوه تبر، تالاگانو", source: "ISIS/FDD" },
-  { id: "a10", name: "پیشنهاد آتش‌بس ۱۰ روزه", icon: "🕊️", actor: "🇵🇰🇶🇦", status: "preparing", description: "میانجی‌گران پیشنهاد آتش‌بس داده‌اند", source: "Axios/ToI" },
-  { id: "a11", name: "گزینه جنگ همه‌جانبه ترامپ", icon: "⚠️", actor: "🇺🇸", status: "preparing", description: "ترامپ در حال بررسی گزینه شدیدتر", source: "Axios" },
-  { id: "a12", name: "تعلیق همکاری IAEA", icon: "📜", actor: "🇮🇷", status: "preparing", description: "پارلمان قانون تعلیق گذرانده", source: "Reuters/BBC" },
-];
