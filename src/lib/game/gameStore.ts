@@ -125,6 +125,16 @@ export type GameState = {
   diplomaticPressure: number;    // 0-100
   domesticTolerance: number;     // 0-100, if 0 -> uprising
   regimeCollapseRisk: number;    // 0-100, hidden calc
+  // === Notification system ===
+  notifications: GameNotification[];
+};
+
+export type GameNotification = {
+  id: string;
+  type: "enemy_attack" | "info" | "warning" | "success";
+  title: string;
+  message: string;
+  timestamp: number;
 };
 
 export type MoveEntry = {
@@ -191,10 +201,38 @@ const INITIAL_STATE = {
   diplomaticPressure: 55,
   domesticTolerance: 60,
   regimeCollapseRisk: 15,
+  notifications: [] as GameNotification[],
 };
 
 function clamp(value: number, min = 0, max = 100): number {
   return Math.max(min, Math.min(max, value));
+}
+
+// Helper: ایجاد notification
+function makeNotification(type: GameNotification["type"], title: string, message: string): GameNotification {
+  return {
+    id: `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    type,
+    title,
+    message,
+    timestamp: Date.now(),
+  };
+}
+
+// Helper: خلاصه اثرات کارت برای نمایش
+function summarizeEffects(effects: CardEffects): string {
+  const parts: string[] = [];
+  if (effects.nuclearProgress) parts.push(`هسته‌ای ${effects.nuclearProgress > 0 ? "+" : ""}${effects.nuclearProgress}`);
+  if (effects.deterrence) parts.push(`بازدارندگی ${effects.deterrence > 0 ? "+" : ""}${effects.deterrence}`);
+  if (effects.militaryCapability) parts.push(`نظامی ${effects.militaryCapability > 0 ? "+" : ""}${effects.militaryCapability}`);
+  if (effects.economicStability) parts.push(`اقتصاد ${effects.economicStability > 0 ? "+" : ""}${effects.economicStability}`);
+  if (effects.domesticSupport) parts.push(`حمایت ${effects.domesticSupport > 0 ? "+" : ""}${effects.domesticSupport}`);
+  if (effects.regionalInfluence) parts.push(`نفوذ ${effects.regionalInfluence > 0 ? "+" : ""}${effects.regionalInfluence}`);
+  if (effects.warEscalation) {
+    const delta = (effects.warEscalation - 1) * 25;
+    parts.push(`جنگ ${delta > 0 ? "+" : ""}${delta.toFixed(0)}`);
+  }
+  return parts.join("، ");
 }
 
 function applyEffects(state: GameState, effects: CardEffects): Partial<GameState> {
@@ -476,6 +514,7 @@ export const useGameStore = create<GameState & {
   startPreparation: (cardId: string) => void;
   tickPreparation: () => void;
   cancelPreparation: (cardId: string) => void;
+  clearNotification: (id: string) => void;
   // === NEW Phase 1.1: Elixir ===
   tickElixir: () => void;
   // === NEW Phase 1.2: Enemy AI tick ===
@@ -529,22 +568,40 @@ export const useGameStore = create<GameState & {
     const cost = getCardCost(card.id);
     if (cost > state.enemyElixir) return;
 
-    // Spawn arena unit
+    // Spawn arena unit (نمایشی فقط)
     const unit = spawnArenaUnit(card, "enemy");
+    unit.impactEffects = undefined; // اثر فوری اعمال می‌شود، arena فقط نمایشی است
+
+    // اثر کارت دشمن را فوری اعمال کن (مثل کارت ایران)
+    const beforeState = { ...state };
+    let newState = { ...state, enemyElixir: state.enemyElixir - cost };
+    const enemyEffects = applyEffects(newState, card.effects);
+    newState = { ...newState, ...enemyEffects };
+
+    const statChanges = calculateStatChanges(beforeState, newState);
+
+    // notification برای حمله دشمن
+    const notif = makeNotification(
+      "enemy_attack",
+      `${card.actorLabel} حمله کرد`,
+      `${card.name}: ${summarizeEffects(card.effects)}`
+    );
+
     set({
-      enemyElixir: state.enemyElixir - cost,
+      ...newState,
       enemyPlays: [...state.enemyPlays, { card, playedAt: Date.now() }],
       arenaUnits: [...state.arenaUnits, unit],
+      lastStatChanges: statChanges || state.lastStatChanges,
+      notifications: [...state.notifications, notif].slice(-5), // فقط ۵ notification اخیر
     });
   },
 
-  // === PHASE 1.3: ARENA TICK ===
+  // === PHASE 1.3: ARENA TICK (فقط انیمیشن - اثرات فوری اعمال می‌شوند) ===
   tickArena: () => {
     const state = get();
     if (state.arenaUnits.length === 0) return;
 
     let units = state.arenaUnits.map(u => ({ ...u }));
-    const appliedEffects: { iran: Partial<CardEffects>[]; enemy: Partial<CardEffects>[] } = { iran: [], enemy: [] };
     const destroyedIds: string[] = [];
 
     // Advance / fight
@@ -573,44 +630,18 @@ export const useGameStore = create<GameState & {
         const direction = unit.side === "iran" ? 1 : -1;
         unit.position += unit.speed * direction;
 
-        // Check if reached opposing end
+        // Check if reached opposing end (فقط برای انیمیشن impact، بدون اعمال اثر)
         if ((unit.side === "iran" && unit.position >= 95) || (unit.side === "enemy" && unit.position <= 5)) {
           unit.state = "impact";
-          // Apply card effects to opposing side
-          if (unit.impactEffects) {
-            appliedEffects[unit.impactEffects.target].push(unit.impactEffects.effects);
-          }
           destroyedIds.push(unit.id);
         }
       }
     }
 
-    // Remove destroyed units (but only the impact ones are removed, fighting-destroyed stay visible briefly)
+    // Remove destroyed/impacted units
     units = units.filter(u => !destroyedIds.includes(u.id) || u.state === "fighting");
 
-    // Apply impact effects to game state
-    let newState = { ...state };
-    for (const eff of appliedEffects.iran) {
-      const applied = applyEffects(newState, eff);
-      newState = { ...newState, ...applied };
-    }
-    for (const eff of appliedEffects.enemy) {
-      const applied = applyEffects(newState, eff);
-      newState = { ...newState, ...applied };
-    }
-
-    // If no impacts, only update arena
-    if (appliedEffects.iran.length === 0 && appliedEffects.enemy.length === 0) {
-      set({ arenaUnits: units, arenaTick: state.arenaTick + 1 });
-    } else {
-      const statChanges = calculateStatChanges(state, newState);
-      set({
-        ...newState,
-        arenaUnits: units,
-        arenaTick: state.arenaTick + 1,
-        lastStatChanges: statChanges || state.lastStatChanges,
-      });
-    }
+    set({ arenaUnits: units, arenaTick: state.arenaTick + 1 });
   },
 
   // === PHASE 4.3: HIDDEN MECHANICS ===
@@ -619,14 +650,28 @@ export const useGameStore = create<GameState & {
 
   startPreparation: (cardId) => {
     const state = get();
+    // باگ ۸: فقط یک prep همزمان مجاز است
+    const activePreps = Object.keys(state.preparingCards);
+    if (activePreps.length > 0) return; // قبلاً یک prep در حال انجام است
     if (state.preparingCards[cardId] !== undefined) return;
+
+    // باگ ۲: اگر در حال resolve است، prep را شروع نکن
+    if (state.isResolving) return;
+
     const prepTime = getPrepTime(cardId);
     if (prepTime === 0) {
       get().playCard(cardId);
       return;
     }
+
+    // باگ ۳: الیکسیر را همون لحظه کسر کن (رزرو)
+    const cost = getCardCost(cardId);
+    if (cost > state.iranElixir) return; // الیکسیر کافی نیست
+    const newElixir = state.iranElixir - cost;
+
     set({
       preparingCards: { ...state.preparingCards, [cardId]: prepTime },
+      iranElixir: newElixir,
     });
   },
 
@@ -638,7 +683,25 @@ export const useGameStore = create<GameState & {
       if (time <= 1) {
         delete preparing[cardId];
         changed = true;
-        setTimeout(() => get().playCard(cardId), 100);
+        // باگ ۲: قبل از playCard چک کن که isResolving نباشد
+        // (اگر isResolving است، prep هدر رفت - ولی الیکسیر قبلاً کسر شده)
+        const currentState = get();
+        if (!currentState.isResolving) {
+          // playCard را با پرچم skipCost صدا بزن چون الیکسیر قبلاً کسر شده
+          setTimeout(() => {
+            const s = get();
+            if (!s.isResolving) {
+              // الیکسیر را موقتاً برگردان تا playCard چک نکند
+              const card = iranCards.find(c => c.id === cardId);
+              if (card) {
+                const cost = getCardCost(cardId);
+                // موقتاً الیکسیر را اضافه کن تا playCard قبول کند
+                set({ iranElixir: s.iranElixir + cost });
+                get().playCard(cardId);
+              }
+            }
+          }, 100);
+        }
       } else {
         preparing[cardId] = time - 1;
         changed = true;
@@ -653,7 +716,17 @@ export const useGameStore = create<GameState & {
     const state = get();
     const preparing = { ...state.preparingCards };
     delete preparing[cardId];
-    set({ preparingCards: preparing });
+    // باگ ۳: الیکسیر رزرو شده را برگردان
+    const cost = getCardCost(cardId);
+    set({
+      preparingCards: preparing,
+      iranElixir: Math.min(10, state.iranElixir + cost),
+    });
+  },
+
+  clearNotification: (id) => {
+    const state = get();
+    set({ notifications: state.notifications.filter(n => n.id !== id) });
   },
 
   playCard: (cardId) => {
@@ -672,13 +745,15 @@ export const useGameStore = create<GameState & {
     // === Phase 1.1: Deduct elixir ===
     let iranElixir = state.iranElixir - cost;
 
-    // === Phase 1.3: Spawn arena unit ===
+    // === Phase 1.3: Spawn arena unit (نمایشی فقط - اثر قبلاً اعمال شده) ===
     const newUnit = spawnArenaUnit(iranCard, "iran");
+    // unit فقط برای نمایش است - impactEffects را خالی می‌گذاریم تا اثر دو بار اعمال نشود
+    newUnit.impactEffects = undefined;
 
     const beforeState = { ...state, iranElixir };
     let newState = { ...state, iranElixir };
 
-    // === Phase 1.4: Apply combo bonuses ===
+    // === Phase 1.4: Apply combo bonuses + اثر کارت (یک بار) ===
     const newPlayedIds = [...state.playedIranCardIds, cardId];
     const boostedEffects = applyComboBonuses(newState, iranCard.effects, newPlayedIds);
     const iranEffects = applyEffects(newState, boostedEffects);
@@ -730,6 +805,29 @@ export const useGameStore = create<GameState & {
       .filter(c => doesCardCounter(c.id, cardId))
       .map(c => c.id);
 
+    // Notifications: کارت ایران + پاسخ دشمن + counters
+    const newNotifs: GameNotification[] = [];
+    newNotifs.push(makeNotification(
+      "success",
+      `🇮🇷 ایران: ${iranCard.name}`,
+      summarizeEffects(iranCard.effects)
+    ));
+    for (const ec of enemyCards) {
+      const isCounter = countersUsed.includes(ec.id);
+      newNotifs.push(makeNotification(
+        "enemy_attack",
+        `${ec.actorLabel} پاسخ داد: ${ec.name}${isCounter ? " (پادکارت!)" : ""}`,
+        summarizeEffects(ec.effects)
+      ));
+    }
+    if (earlyEnding) {
+      newNotifs.push(makeNotification(
+        "warning",
+        "⚠️ شرایط بحرانی!",
+        `بازی به پایان زودهنگام می‌رسد: ${earlyEnding}`
+      ));
+    }
+
     set({
       ...newState,
       iranElixir,
@@ -744,6 +842,7 @@ export const useGameStore = create<GameState & {
       arenaUnits: [...state.arenaUnits, newUnit],
       activeCombos: newActiveCombos,
       comboHistory: comboEvent ? [...state.comboHistory, comboEvent] : state.comboHistory,
+      notifications: [...state.notifications, ...newNotifs].slice(-8),
       moveLog: [...state.moveLog, {
         turn: state.turn,
         iranCard,

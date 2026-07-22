@@ -15,6 +15,61 @@ import {
 } from "@/lib/game/cardEnrichments";
 import { TechTreePanel } from "./TechTreePanel";
 import { WarModeOverlay, AchievementSystem, ComboFlashOverlay, CardPlayGlow, ParticleBurst } from "./GameEffects";
+import type { GameNotification } from "@/lib/game/gameStore";
+
+// ============================================================
+// NOTIFICATION DISPLAY - نمایش رویدادهای بازی
+// ============================================================
+function NotificationDisplay() {
+  const notifications = useGameStore((s) => s.notifications);
+  const clearNotification = useGameStore((s) => s.clearNotification);
+
+  return (
+    <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 flex flex-col gap-1 items-center pointer-events-none w-[90%] max-w-sm">
+      <AnimatePresence>
+        {notifications.slice(-3).map((notif) => (
+          <NotificationItem key={notif.id} notif={notif} onClose={() => clearNotification(notif.id)} />
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function NotificationItem({ notif, onClose }: { notif: GameNotification; onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 4000);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  const colors = {
+    enemy_attack: { bg: "rgba(220,38,38,0.9)", border: "#dc2626", icon: "💥" },
+    info: { bg: "rgba(59,130,246,0.9)", border: "#3b82f6", icon: "ℹ️" },
+    warning: { bg: "rgba(245,158,11,0.9)", border: "#f59e0b", icon: "⚠️" },
+    success: { bg: "rgba(34,197,94,0.9)", border: "#22c55e", icon: "✅" },
+  };
+  const c = colors[notif.type];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -10, scale: 0.9 }}
+      onClick={onClose}
+      className="pointer-events-auto cursor-pointer w-full px-2.5 py-1.5 rounded-lg flex items-center gap-2 backdrop-blur-sm"
+      style={{
+        background: c.bg,
+        border: `1px solid ${c.border}`,
+        boxShadow: `0 4px 12px ${c.border}40`,
+      }}
+    >
+      <span className="text-sm shrink-0">{c.icon}</span>
+      <div className="flex-1 min-w-0">
+        <div className="text-[10px] font-bold text-white truncate">{notif.title}</div>
+        <div className="text-[8px] text-white/90 truncate">{notif.message}</div>
+      </div>
+    </motion.div>
+  );
+}
 
 // ============================================================
 // ELIXIR BAR (Phase 1.1)
@@ -138,7 +193,7 @@ function MiniCard({
 
       {/* Preview tooltip */}
       <AnimatePresence>
-        {showTooltip && !disabled && (
+        {showTooltip && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
@@ -551,19 +606,58 @@ function CardDetailModal({ card, onClose }: { card: GameCard | null; onClose: ()
           </div>
         )}
 
-        {card.actor === "iran" && activeTab === "detail" && (
-          <button
-            onClick={() => {
-              const store = useGameStore.getState();
-              if (prepTime === 0) store.playCard(card.id);
-              else store.startPreparation(card.id);
-              onClose();
-            }}
-            className="w-full py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all mt-2"
-          >
-            {prepTime === 0 ? '▶ بازی کردن' : `⏱ شروع آماده‌سازی (${prepTime}s)`}
-          </button>
-        )}
+        {card.actor === "iran" && activeTab === "detail" && (() => {
+          const store = useGameStore.getState();
+          const hasEnoughElixir = store.iranElixir >= cost;
+          const hasActivePrep = Object.keys(store.preparingCards).length > 0;
+          const isResolving = store.isResolving;
+          const isThisPreparing = store.preparingCards[card.id] !== undefined;
+          const canPlay = hasEnoughElixir && !hasActivePrep && !isResolving;
+
+          if (isThisPreparing) {
+            return (
+              <div className="w-full py-2.5 bg-amber-500/20 text-amber-300 rounded-xl font-bold text-xs text-center mt-2 border border-amber-500/40">
+                ⏳ در حال آماده‌سازی... ({store.preparingCards[card.id]}s)
+              </div>
+            );
+          }
+
+          return (
+            <div className="space-y-1.5 mt-2">
+              {isResolving && (
+                <div className="text-[9px] text-rose-300 text-center bg-rose-500/10 rounded p-1.5">
+                  ⏸ ابتدا نوبت فعلی را کامل کنید (دکمه «ادامه»)
+                </div>
+              )}
+              {hasActivePrep && !isResolving && (
+                <div className="text-[9px] text-amber-300 text-center bg-amber-500/10 rounded p-1.5">
+                  ⏳ یک آماده‌سازی در حال انجام است. صبر کنید یا آن را لغو کنید.
+                </div>
+              )}
+              {!hasEnoughElixir && !isResolving && !hasActivePrep && (
+                <div className="text-[9px] text-rose-300 text-center bg-rose-500/10 rounded p-1.5">
+                  💎 الیکسیر کافی نیست ({cost} نیاز، {store.iranElixir} موجود)
+                </div>
+              )}
+              <button
+                onClick={() => {
+                  if (!canPlay) return;
+                  if (prepTime === 0) store.playCard(card.id);
+                  else store.startPreparation(card.id);
+                  onClose();
+                }}
+                disabled={!canPlay}
+                className={`w-full py-2.5 rounded-xl font-bold text-xs transition-all ${
+                  canPlay
+                    ? "bg-primary text-primary-foreground hover:scale-[1.02] active:scale-95"
+                    : "bg-muted/40 text-muted-foreground cursor-not-allowed"
+                }`}
+              >
+                {prepTime === 0 ? '▶ بازی کردن' : `⏱ شروع آماده‌سازی (${prepTime}s)`}
+              </button>
+            </div>
+          );
+        })()}
       </motion.div>
     </motion.div>
   );
@@ -800,9 +894,15 @@ export function GameScreen() {
               </div>
             ))}
             {moveLog.map((m, i) => (
-              <div key={`p${i}`} className="shrink-0 flex flex-col items-center">
+              <div key={`p${i}`} className="shrink-0 flex flex-col items-center relative" title={m.countersUsed?.length ? `${m.countersUsed.length} پادکارت استفاده شد` : ""}>
                 <div className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px]" style={{ background: actorInfo[m.iranCard.actor].gradient, border: `1px solid ${actorInfo[m.iranCard.actor].color}` }}>{m.iranCard.icon}</div>
                 <span className="text-[5px] text-emerald-400 mt-0.5">نوبت{m.turn}</span>
+                {m.countersUsed && m.countersUsed.length > 0 && (
+                  <span className="absolute -top-1 -left-1 text-[7px] bg-rose-500 text-white rounded-full w-3 h-3 flex items-center justify-center font-bold">⚠</span>
+                )}
+                {m.combos && m.combos.length > 0 && (
+                  <span className="absolute -top-1 -right-1 text-[7px] bg-fuchsia-500 text-white rounded-full w-3 h-3 flex items-center justify-center font-bold">⚡</span>
+                )}
               </div>
             ))}
           </div>
@@ -818,7 +918,19 @@ export function GameScreen() {
               {enemyResponses.map((card, idx) => (<div key={idx} className="flex flex-col items-center gap-1"><span className="text-[8px] font-bold" style={{ color: actorInfo[card.actor].color }}>{card.actorLabel}</span><MiniCard card={card} disabled size={48} /></div>))}
             </div>
             {earlyEndingTriggered ? (
-              <div className="mt-2 text-center"><div className="text-[10px] text-rose-400 font-bold animate-pulse mb-2">⚠️ شرایط بحرانی!</div><button onClick={() => nextTurn()} className="px-6 py-2.5 bg-rose-600 text-white rounded-xl font-bold text-xs hover:scale-105 active:scale-95 transition-all">🏁 مشاهده پایان</button></div>
+              <div className="mt-2 text-center">
+                <div className="text-[10px] text-rose-400 font-bold animate-pulse mb-1">⚠️ شرایط بحرانی!</div>
+                <div className="text-[9px] text-amber-300 mb-2 px-2">
+                  {earlyEndingTriggered === "iran_nuclear_deterrence" && "🥇 ایران به بمب اتم دست یافت! بازدارندگی هسته‌ای تأسیس شد."}
+                  {earlyEndingTriggered === "nuclear_war_regional" && "💀 جنگ هسته‌ای منطقه‌ای آغاز شد!"}
+                  {earlyEndingTriggered === "iran_strategic_defeat" && "🎯 شکست استراتژیک: توان نظامی فروپاشید و جنگ از کنترل خارج شد."}
+                  {earlyEndingTriggered === "regime_change_from_within" && "🔄 تغییر رژیم: اقتصاد و حمایت داخلی هر دو سقوط کرد."}
+                  {earlyEndingTriggered === "us_withdrawal_ambition" && "🚪 خروج آمریکا: بازدارندگی و نفوذ ایران آن‌قدر بالا رفت که آمریکا عقب‌نشینی کرد."}
+                  {earlyEndingTriggered === "comprehensive_peace" && "🕊️ صلح جامع: دیپلماسی موفق بود!"}
+                  {earlyEndingTriggered === "israel_strategic_weakening" && "📉 انزوای اسرائیل: محور مقاومت اسرائیل را منزو کرد."}
+                </div>
+                <button onClick={() => nextTurn()} className="px-6 py-2.5 bg-rose-600 text-white rounded-xl font-bold text-xs hover:scale-105 active:scale-95 transition-all">🏁 مشاهده پایان</button>
+              </div>
             ) : (<button onClick={() => nextTurn()} className="mt-2 w-full py-2 bg-primary text-primary-foreground rounded-xl font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all">{turn >= maxTurns ? '🏁 نتیجه نهایی' : '← ادامه'}</button>)}
           </motion.div>
         )}
@@ -900,6 +1012,7 @@ export function GameScreen() {
 
       {/* === Visual Effects === */}
       <WarModeOverlay />
+      <NotificationDisplay />
       <ComboAlert />
       <ComboFlashOverlay comboName={comboFlashName} trigger={comboFlashTrigger} />
       <CardPlayGlow trigger={cardPlayTrigger} />
