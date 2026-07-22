@@ -240,100 +240,143 @@ function MiniCard({
 }
 
 // ============================================================
-// PHASE 1.3: BATTLE ARENA
+// BATTLEFIELD - کارت‌های بازی‌شده در دو ردیف (ایران / دشمن)
 // ============================================================
-function BattleArena() {
-  const arenaUnits = useGameStore((s) => s.arenaUnits);
+function Battlefield() {
+  const moveLog = useGameStore((s) => s.moveLog);
+  const enemyPlays = useGameStore((s) => s.enemyPlays);
+  const isResolving = useGameStore((s) => s.isResolving);
+  const playedIranCard = useGameStore((s) => s.playedIranCard);
+  const enemyResponses = useGameStore((s) => s.enemyResponses);
+
+  // کارت‌های بازی‌شده: ایران در بالا، دشمن در پایین
+  // هر نوبت یک ستون: کارت ایران بالا، کارت‌های دشمن پایین
 
   return (
-    <div className="relative flex-1 mx-1 my-0.5 rounded-xl overflow-hidden"
+    <div className="relative flex-1 mx-1 my-0.5 rounded-xl overflow-hidden flex flex-col"
       style={{
-        background: "linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(30,41,59,0.4) 50%, rgba(15,23,42,0.6) 100%)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        minHeight: "110px",
+        background: "linear-gradient(180deg, rgba(16,185,129,0.08) 0%, rgba(15,23,42,0.5) 50%, rgba(220,38,38,0.08) 100%)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        minHeight: "140px",
       }}
     >
-      {/* Arena ground line */}
-      <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      {/* Header */}
+      <div className="flex items-center justify-between px-2 py-0.5 shrink-0 border-b border-white/5">
+        <span className="text-[8px] font-bold text-emerald-400">🇮🇷 کارت‌های ایران</span>
+        <span className="text-[7px] text-muted-foreground">میدان نبرد</span>
+        <span className="text-[8px] font-bold text-rose-400">کارت‌های دشمن 🇺🇸🇮🇱</span>
+      </div>
 
-      {/* Iran side label */}
-      <div className="absolute bottom-0.5 right-1 text-[7px] font-bold text-emerald-400">🇮🇷 ایران</div>
-      <div className="absolute bottom-0.5 left-1 text-[7px] font-bold text-rose-400">🇺🇸🇮🇱 دشمن</div>
+      {/* Iran row (top) */}
+      <div className="flex-1 flex items-center px-1 overflow-x-auto no-scrollbar" style={{ direction: "ltr" }}>
+        <div className="flex gap-1 items-center min-h-[42px]">
+          {moveLog.length === 0 && !isResolving && (
+            <div className="text-[8px] text-muted-foreground/50 px-2">کارت‌های بازی‌شده ایران اینجا نمایش داده می‌شوند ←</div>
+          )}
+          {moveLog.map((m, i) => (
+            <BattlefieldCard key={`ir-${i}`} card={m.iranCard} side="iran" turn={m.turn} combo={m.combos?.length ?? 0} countered={m.countersUsed?.length ?? 0} />
+          ))}
+          {/* Current resolving card */}
+          {isResolving && playedIranCard && (
+            <BattlefieldCard card={playedIranCard} side="iran" turn={moveLog.length + 1} current />
+          )}
+        </div>
+      </div>
 
-      {/* Iran spawn zone */}
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-emerald-500/10 to-transparent" />
-      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-rose-500/10 to-transparent" />
+      {/* Divider line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent shrink-0" />
 
-      {/* Units */}
-      <AnimatePresence>
-        {arenaUnits.map((unit) => {
-          const actor = actorInfo[unit.card.actor];
-          const isIran = unit.side === "iran";
-          return (
-            <motion.div
-              key={unit.id}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{
-                opacity: 1, scale: 1,
-                right: isIran ? `${100 - unit.position}%` : undefined,
-                left: !isIran ? `${unit.position}%` : undefined,
-              }}
-              exit={{ opacity: 0, scale: 0 }}
-              transition={{ duration: 0.3 }}
-              className="absolute top-1/2 -translate-y-1/2"
-              style={{ zIndex: 10 }}
-            >
-              <div className="relative flex flex-col items-center">
-                <motion.div
-                  animate={unit.state === "fighting" ? { x: [0, -2, 2, 0] } : {}}
-                  transition={{ duration: 0.2, repeat: 2 }}
-                  className="rounded-md flex items-center justify-center"
-                  style={{
-                    width: 30, height: 30,
-                    background: actor.gradient,
-                    border: `2px solid ${unit.state === "fighting" ? "#fbbf24" : actor.color}`,
-                    boxShadow: unit.state === "impact" ? "0 0 20px #dc2626" : `0 0 8px ${actor.color}80`,
-                  }}
-                >
-                  <span className="text-sm">{unit.card.icon}</span>
-                </motion.div>
-                {/* HP bar */}
-                <div className="w-7 h-0.5 bg-black/50 rounded-full mt-0.5 overflow-hidden">
-                  <div className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${Math.max(0, unit.hp)}%`,
-                      background: unit.hp > 50 ? "#22c55e" : unit.hp > 25 ? "#fbbf24" : "#ef4444",
-                    }}
-                  />
-                </div>
-                {/* Impact effect */}
-                {unit.state === "impact" && (
-                  <motion.div
-                    initial={{ scale: 0, opacity: 1 }}
-                    animate={{ scale: 2.5, opacity: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl pointer-events-none"
-                  >
-                    💥
-                  </motion.div>
-                )}
-              </div>
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+      {/* Enemy row (bottom) */}
+      <div className="flex-1 flex items-center px-1 overflow-x-auto no-scrollbar" style={{ direction: "ltr" }}>
+        <div className="flex gap-1 items-center min-h-[42px]">
+          {moveLog.length === 0 && enemyPlays.length === 0 && !isResolving && (
+            <div className="text-[8px] text-muted-foreground/50 px-2">→ کارت‌های بازی‌شده دشمن اینجا نمایش داده می‌شوند</div>
+          )}
+          {/* Ambient enemy plays (real-time) */}
+          {enemyPlays.map((p, i) => (
+            <BattlefieldCard key={`amb-${i}`} card={p.card} side="enemy" turn={0} ambient />
+          ))}
+          {/* Response enemy cards from moveLog */}
+          {moveLog.map((m, i) => (
+            <div key={`en-${i}`} className="flex gap-0.5 items-center">
+              {m.enemyCards.map((ec, j) => (
+                <BattlefieldCard key={`en-${i}-${j}`} card={ec} side="enemy" turn={m.turn} />
+              ))}
+            </div>
+          ))}
+          {/* Current resolving enemy responses */}
+          {isResolving && enemyResponses.map((ec, j) => (
+            <BattlefieldCard key={`cur-en-${j}`} card={ec} side="enemy" turn={moveLog.length + 1} current />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      {/* Empty state */}
-      {arenaUnits.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-[9px] text-muted-foreground/40 text-center">
-            <div className="text-lg mb-1">⚔️</div>
-            <div>حلقه نبرد</div>
-            <div className="text-[7px] mt-0.5">کارت‌ها اینجا رودررو می‌شوند</div>
-          </div>
+// کارت در battlefield - کوچک، با شماره نوبت و نشان طرف
+function BattlefieldCard({ card, side, turn, current, ambient, combo, countered }: {
+  card: GameCard;
+  side: "iran" | "enemy";
+  turn: number;
+  current?: boolean;
+  ambient?: boolean;
+  combo?: number;
+  countered?: number;
+}) {
+  const actor = actorInfo[card.actor];
+  const rar = rarityInfo[card.rarity];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5, y: side === "iran" ? -10 : 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="relative shrink-0 rounded-md overflow-hidden"
+      style={{
+        width: 30, height: 40,
+        background: actor.gradient,
+        border: `1.5px solid ${current ? "#fbbf24" : rar.color + "60"}`,
+        boxShadow: current ? `0 0 10px ${rar.color}` : "none",
+        opacity: current ? 1 : 0.85,
+      }}
+      title={`${card.name} - ${card.actorLabel}`}
+    >
+      {/* Side indicator bar */}
+      <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: side === "iran" ? "#10b981" : "#dc2626" }} />
+
+      {/* Icon */}
+      <div className="flex items-center justify-center pt-1" style={{ fontSize: 12 }}>{card.icon}</div>
+
+      {/* Turn number */}
+      {turn > 0 && (
+        <div className="absolute -top-1 -right-1 text-[6px] bg-black/80 text-white rounded-full w-3 h-3 flex items-center justify-center font-bold border border-white/20">
+          {turn}
         </div>
       )}
-    </div>
+      {ambient && (
+        <div className="absolute -top-1 -right-1 text-[6px] bg-rose-600 text-white rounded-full w-3 h-3 flex items-center justify-center font-bold">
+          ⚡
+        </div>
+      )}
+
+      {/* Combo/Counter indicators */}
+      {combo && combo > 0 && (
+        <div className="absolute -bottom-1 -left-1 text-[6px] bg-fuchsia-600 text-white rounded-full w-3 h-3 flex items-center justify-center font-bold">⚡</div>
+      )}
+      {countered && countered > 0 && (
+        <div className="absolute -bottom-1 -left-1 text-[6px] bg-rose-600 text-white rounded-full w-3 h-3 flex items-center justify-center font-bold">⚠</div>
+      )}
+
+      {/* Current card pulse */}
+      {current && (
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1, repeat: Infinity }}
+          className="absolute inset-0 border-2 border-amber-400 rounded-md pointer-events-none"
+        />
+      )}
+    </motion.div>
   );
 }
 
@@ -879,32 +922,75 @@ export function GameScreen() {
         </div>
       </div>
 
-      {/* === BATTLE ARENA (Phase 1.3) === */}
-      <BattleArena />
+      {/* === BATTLEFIELD - کارت‌های بازی‌شده === */}
+      <Battlefield />
 
-      {/* === TIMELINE === */}
-      <div className="shrink-0 px-2 py-1 space-y-1">
+      {/* === TIMELINE یکپارچه: تاریخ گذشته + بازی فعلی === */}
+      <div className="shrink-0 px-2 py-1 border-t border-white/5">
         <div className="flex items-center gap-1">
-          <span className="text-[8px] font-bold text-amber-400 shrink-0">📜</span>
-          <div className="flex-1 flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', direction: 'ltr' }}>
+          <span className="text-[7px] font-bold text-amber-400 shrink-0">📜 تاریخچه</span>
+          <div className="flex-1 flex gap-0.5 overflow-x-auto pb-1 no-scrollbar" style={{ direction: 'ltr' }}>
+            {/* تاریخ گذشته */}
             {historyCards.map((h, i) => (
-              <div key={h.id} className="shrink-0 flex flex-col items-center" style={{ opacity: Math.max(0.3, 1 - i * 0.04) }}>
-                <div className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px]" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${h.result === 'yes' ? '#16a34a' : h.result === 'no' ? '#dc2626' : '#d97706'}40` }}>{h.icon}</div>
-                <span className="text-[5px] text-muted-foreground mt-0.5 text-center leading-none whitespace-nowrap">{h.date}</span>
+              <div key={h.id} className="shrink-0 flex flex-col items-center" style={{ opacity: Math.max(0.35, 1 - i * 0.03) }}>
+                <div className="w-5 h-5 rounded flex items-center justify-center text-[8px]"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${h.result === 'yes' ? '#16a34a' : h.result === 'no' ? '#dc2626' : '#d97706'}50`
+                  }}
+                  title={`${h.date} - ${h.title}`}
+                >
+                  {h.icon}
+                </div>
+                <span className="text-[4px] text-muted-foreground mt-0.5 text-center leading-none whitespace-nowrap">{h.date.split('/')[0]}/{h.date.split('/')[1] ?? ''}</span>
               </div>
             ))}
+
+            {/* نشانگر "حال" - جداکننده تاریخ گذشته و بازی */}
+            <div className="shrink-0 flex flex-col items-center justify-center px-0.5">
+              <div className="w-px h-5 bg-amber-400/60"></div>
+              <span className="text-[5px] font-bold text-amber-400 mt-0.5 whitespace-nowrap">شروع بازی</span>
+            </div>
+
+            {/* کارت‌های بازی‌شده در بازی فعلی */}
             {moveLog.map((m, i) => (
-              <div key={`p${i}`} className="shrink-0 flex flex-col items-center relative" title={m.countersUsed?.length ? `${m.countersUsed.length} پادکارت استفاده شد` : ""}>
-                <div className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px]" style={{ background: actorInfo[m.iranCard.actor].gradient, border: `1px solid ${actorInfo[m.iranCard.actor].color}` }}>{m.iranCard.icon}</div>
-                <span className="text-[5px] text-emerald-400 mt-0.5">نوبت{m.turn}</span>
+              <div key={`p${i}`} className="shrink-0 flex flex-col items-center relative" title={`${m.iranCard.name} - نوبت ${m.turn}${m.countersUsed?.length ? ` (${m.countersUsed.length} پادکارت)` : ''}`}>
+                <div className="w-5 h-5 rounded flex items-center justify-center text-[8px]"
+                  style={{
+                    background: actorInfo[m.iranCard.actor].gradient,
+                    border: `1px solid ${actorInfo[m.iranCard.actor].color}`,
+                  }}
+                >
+                  {m.iranCard.icon}
+                </div>
+                <span className="text-[4px] text-emerald-400 mt-0.5 font-bold">ن{m.turn}</span>
                 {m.countersUsed && m.countersUsed.length > 0 && (
-                  <span className="absolute -top-1 -left-1 text-[7px] bg-rose-500 text-white rounded-full w-3 h-3 flex items-center justify-center font-bold">⚠</span>
+                  <span className="absolute -top-1 -left-1 text-[6px] bg-rose-500 text-white rounded-full w-2.5 h-2.5 flex items-center justify-center font-bold">⚠</span>
                 )}
                 {m.combos && m.combos.length > 0 && (
-                  <span className="absolute -top-1 -right-1 text-[7px] bg-fuchsia-500 text-white rounded-full w-3 h-3 flex items-center justify-center font-bold">⚡</span>
+                  <span className="absolute -top-1 -right-1 text-[6px] bg-fuchsia-500 text-white rounded-full w-2.5 h-2.5 flex items-center justify-center font-bold">⚡</span>
                 )}
               </div>
             ))}
+
+            {/* کارت فعلی در حال resolve */}
+            {isResolving && playedIranCard && (
+              <div className="shrink-0 flex flex-col items-center relative">
+                <motion.div
+                  animate={{ scale: [1, 1.15, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="w-5 h-5 rounded flex items-center justify-center text-[8px]"
+                  style={{
+                    background: actorInfo[playedIranCard.actor].gradient,
+                    border: '2px solid #fbbf24',
+                    boxShadow: '0 0 8px #fbbf24',
+                  }}
+                >
+                  {playedIranCard.icon}
+                </motion.div>
+                <span className="text-[4px] text-amber-400 mt-0.5 font-bold">ن{moveLog.length + 1}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
