@@ -2050,7 +2050,7 @@ export const historyCards: HistoryCard[] = [
   { id: "h11", date: "۱۳۹۸/۱۰/۱۳", actor: "🇺🇸", title: "شهادت سردار سلطیمانی", icon: "🎯", result: "yes", effect: "فعال نمادین" },
   { id: "h12", date: "۱۳۹۹/۹/۷", actor: "🇮🇱", title: "ترور شهید فخری‌زاده", icon: "🔬", result: "yes", effect: "فعال نمادین" },
   { id: "h13", date: "۱۴۰۲/۷/۱۵", actor: "🇵🇸", title: "طوفان الاقصی", icon: "🌪️", result: "yes", effect: "بسیارفعال" },
-  { id: "h14", date: "۱۴۰۳/۱/۲۴", actor: "🇮🇷", title: "عملیات وعده صادق ۱", icon: "🚀", result: "partial", effect: "سابقه" },
+  { id: "h14", date: "۱۴۰۳/۱/۲۶", actor: "🇮🇷", title: "عملیات وعده صادق ۱", icon: "🚀", result: "partial", effect: "سابقه", source: "ویکی‌پدیا: حملات فروردین ۱۴۰۳ ایران به اسرائیل" },
   { id: "h15", date: "۱۴۰۳/۵/۱۰", actor: "🇮🇱", title: "ترور شهید هنیه در تهران", icon: "🎯", result: "yes", effect: "فعال نمادین" },
   { id: "h16", date: "۱۴۰۳/۷/۶", actor: "🇮🇱", title: "ترور شهید نصرالله", icon: "🎯", result: "yes", effect: "بسیارفعال" },
   { id: "h17", date: "۱۴۰۳/۹/۱۸", actor: "🇸🇾", title: "سقوط دولت بشار اسد", icon: "📉", result: "yes", effect: "بسیارفعال" },

@@ -214,6 +214,23 @@ function applyEffects(state: GameState, effects: CardEffects): Partial<GameState
   if (effects.negotiationChance) next.negotiationChanceMult = state.negotiationChanceMult * effects.negotiationChance;
   if (effects.usWithdrawal) next.usWithdrawalMult = state.usWithdrawalMult * effects.usWithdrawal;
   if (effects.israelIsolation) next.israelIsolationMult = state.israelIsolationMult * effects.israelIsolation;
+
+  // === اثرات ثانویه واقع‌گرایانه ===
+  // اقتصاد پایین → کاهش حمایت داخلی (مردم از اقتصاد ناراضی)
+  const newEcon = next.economicStability ?? state.economicStability;
+  if (newEcon < 30) {
+    const drop = Math.floor((30 - newEcon) / 6); // 1-5 افت
+    const newDom = next.domesticSupport ?? state.domesticSupport;
+    next.domesticSupport = clamp(newDom - drop);
+  }
+  // جنگ بالا → کاهش حمایت داخلی (خستگی از جنگ)
+  const newWar = next.warEscalation ?? state.warEscalation;
+  if (newWar > 80) {
+    const drop = Math.floor((newWar - 80) / 8);
+    const newDom = next.domesticSupport ?? state.domesticSupport;
+    next.domesticSupport = clamp(newDom - drop);
+  }
+
   return next;
 }
 
@@ -411,27 +428,27 @@ function selectEnemyResponses(state: GameState, iranCard: GameCard): GameCard[] 
 }
 
 function checkEarlyEnding(state: GameState, iranCard: GameCard, enemyCards: GameCard[]): string | null {
-  // 1. بمب اتم موفق - آستانه پایین‌تر (۷۵ به جای ۸۵) تا قابل دسترس باشد
-  if (iranCard.id === "iran_nuclear_breakout" && state.nuclearProgress >= 75) return "iran_nuclear_deterrence";
-
-  // 2. جنگ هسته‌ای - اگر آمریکا/اسرائیل حمله هسته‌ای کنند
+  // 0. اولویت اول: جنگ هسته‌ای (بحرانی‌ترین)
   const allCards = [iranCard, ...enemyCards];
   if (allCards.some(c => c.id === "us_nuclear_strike" || c.id === "israel_nuclear_strike")) return "nuclear_war_regional";
 
-  // 3. شکست استراتژیک - آستانه منطقی‌تر (۲۰ به جای ۱۵)
-  if (state.militaryCapability <= 20 && state.warEscalation >= 85) return "iran_strategic_defeat";
+  // 1. بمب اتم موفق - فقط با کارت بمب و غنی‌سازی کافی
+  if (iranCard.id === "iran_nuclear_breakout" && state.nuclearProgress >= 75) return "iran_nuclear_deterrence";
 
-  // 4. تغییر رژیم از داخل - آستانه منطقی‌تر (۲۰ به جای ۱۰)
-  if (state.economicStability <= 20 && state.domesticSupport <= 20) return "regime_change_from_within";
+  // 2. تغییر رژیم از داخل - اقتصاد و حمایت هر دو بحرانی
+  if (state.economicStability <= 20 && state.domesticSupport <= 25) return "regime_change_from_within";
 
-  // 5. خروج آمریکا - رفع تناقض: warEscalation < ۶۰ به جای ۴۰
-  if (state.deterrence >= 75 && state.regionalInfluence >= 75 && state.warEscalation < 60) return "us_withdrawal_ambition";
+  // 3. شکست استراتژیک - نظامی ضعیف و جنگ بالا (بدون نیاز به jنگ بسیار بالا)
+  if (state.militaryCapability <= 25 && state.warEscalation >= 80) return "iran_strategic_defeat";
 
-  // 6. صلح جامع - آستانه منطقی‌تر
-  if (state.negotiationChanceMult >= 2.0 && state.warEscalation < 40) return "comprehensive_peace";
+  // 4. صلح جامع - دیپلماسی بالا و جنگ پایین (آستانه بالاتر تا مسیرهای دیگر قابل بازی باشند)
+  if (state.negotiationChanceMult >= 2.5 && state.warEscalation < 35) return "comprehensive_peace";
 
-  // 7. انزوای اسرائیل - آستانه پایین‌تر (۸۰ به جای ۹۰)
-  if (state.regionalInfluence >= 80 && state.israelIsolationMult >= 1.8) return "israel_strategic_weakening";
+  // 5. خروج آمریکا - بازدارندگی بالا + نفوذ بالا + جنگ کنترل‌شده
+  if (state.deterrence >= 70 && state.regionalInfluence >= 65 && state.warEscalation < 65) return "us_withdrawal_ambition";
+
+  // 6. انزوای اسرائیل - نفوذ بسیار بالا + انزوای اسرائیل بالا + جنگ کنترل‌شده
+  if (state.regionalInfluence >= 80 && state.israelIsolationMult >= 1.7 && state.warEscalation < 85) return "israel_strategic_weakening";
 
   return null;
 }

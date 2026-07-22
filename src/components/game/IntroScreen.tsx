@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { useGameStore } from "@/lib/game/gameStore";
+import { EndingsGallery } from "./EndingsGallery";
 
 type TutorialStep = "intro" | "role" | "stats" | "elixir" | "cards" | "combos" | "ending" | "ready";
 
@@ -12,6 +13,7 @@ export function IntroScreen() {
   const setPhase = useGameStore((s) => s.setPhase);
   const startGame = useGameStore((s) => s.startGame);
   const [step, setStep] = useState<TutorialStep>("intro");
+  const [showEndingsGallery, setShowEndingsGallery] = useState(false);
 
   const currentIndex = STEPS.indexOf(step);
   const goNext = () => {
@@ -303,20 +305,31 @@ export function IntroScreen() {
         ) : (
           <>
             <button
-              onClick={() => setPhase("history")}
-              className="flex-1 px-4 sm:px-6 py-3 sm:py-4 glass rounded-xl font-bold text-sm sm:text-base hover:scale-[1.02] active:scale-95 transition-all"
+              onClick={() => setShowEndingsGallery(true)}
+              className="flex-1 px-3 sm:px-4 py-3 sm:py-4 glass rounded-xl font-bold text-xs sm:text-sm hover:scale-[1.02] active:scale-95 transition-all border-fuchsia-500/30"
             >
-              📜 مرور تاریخچه
+              🏁 راهنمای برد
+            </button>
+            <button
+              onClick={() => setPhase("history")}
+              className="flex-1 px-3 sm:px-4 py-3 sm:py-4 glass rounded-xl font-bold text-xs sm:text-sm hover:scale-[1.02] active:scale-95 transition-all"
+            >
+              📜 تاریخچه
             </button>
             <button
               onClick={() => startGame()}
-              className="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-primary text-primary-foreground rounded-xl font-bold text-sm sm:text-base md:text-lg hover:bg-primary/90 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/30"
+              className="flex-1 px-3 sm:px-4 py-3 sm:py-4 bg-primary text-primary-foreground rounded-xl font-bold text-xs sm:text-sm md:text-base hover:bg-primary/90 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/30"
             >
-              ⚔️ شروع شبیه‌سازی
+              ⚔️ شروع
             </button>
           </>
         )}
       </div>
+
+      {/* گالری پایان‌ها */}
+      <AnimatePresence>
+        {showEndingsGallery && <EndingsGallery onClose={() => setShowEndingsGallery(false)} />}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -649,6 +649,14 @@ export function GameScreen() {
 
   const [showInfra, setShowInfra] = useState(false);
   const [showComboList, setShowComboList] = useState(false);
+
+  // Expose store for testing/screenshot automation (dev only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.__gameStore = store;
+      window.__iranCards = iranCards;
+    }
+  }, [store]);
   const [showTechTree, setShowTechTree] = useState(false);
   const [comboFlashTrigger, setComboFlashTrigger] = useState(0);
   const [comboFlashName, setComboFlashName] = useState<string | null>(null);
