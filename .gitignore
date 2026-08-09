@@ -52,3 +52,27 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# Build artifacts
+*.pdf
+download/
+upload/
+db/
+prisma/
+
+# Examples and mini-services
+examples/
+mini-services/
+
+# Scripts (test/build scripts)
+scripts/test-*.js
+scripts/capture-endings.js
+scripts/run-capture.sh
+scripts/test_play_v3.sh
+
+# Z-AI config
+.z-ai-config
+.zscripts/
+
+# PID files
+*.pid

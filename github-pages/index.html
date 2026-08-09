@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بازی بزرگ خاورمیانه | ایران در برابر آمریکا و اسرائیل</title>
+  <meta name="description" content="یک بازی استراتژیک تعاملی بر اساس تاریخچه مناسبات و درگیری‌های ایران، آمریکا و اسرائیل. شما نقش ایران را بازی می‌کنید و آینده منطقه را رقم می‌زنید.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-dark: #0a0e1a;
+      --bg-card: #131826;
+      --bg-card-hover: #1a2138;
+      --border: rgba(255,255,255,0.08);
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --accent: #fbbf24;
+      --danger: #dc2626;
+      --info: #3b82f6;
+    }
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, rgba(16,185,129,0.1) 0%, transparent 50%),
+                  radial-gradient(ellipse at top left, rgba(220,38,38,0.08) 0%, transparent 40%),
+                  radial-gradient(ellipse at bottom right, rgba(251,191,36,0.06) 0%, transparent 40%);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L0 30h60L30 0z' fill='%23ffffff' fill-opacity='0.02'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-content { text-align: center; z-index: 1; padding: 2rem; }
+    .hero-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 999px;
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #10b981 0%, #fbbf24 50%, #dc2626 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero h1 .sub { display: block; font-size: 0.4em; font-weight: 700; color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); margin-top: 0.5rem; }
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      border-radius: 0.75rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(16,185,129,0.3); }
+    .btn-secondary { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--bg-card-hover); transform: translateY(-2px); }
+    .flags { display: flex; justify-content: center; gap: 1rem; margin-top: 3rem; font-size: 2.5rem; opacity: 0.7; }
+
+    /* Sections */
+    section { padding: 5rem 0; }
+    .section-header { text-align: center; margin-bottom: 3rem; }
+    .section-header h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 1rem; }
+    .section-header p { color: var(--text-muted); max-width: 600px; margin: 0 auto; font-size: 1.05rem; }
+    .section-divider { width: 60px; height: 4px; background: linear-gradient(90deg, var(--primary), var(--accent)); margin: 0 auto 2rem; border-radius: 2px; }
+
+    /* Features */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: all 0.3s;
+    }
+    .feature-card:hover { background: var(--bg-card-hover); transform: translateY(-4px); border-color: rgba(16,185,129,0.3); }
+    .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .feature-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .feature-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+    /* Endings */
+    .endings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+    .ending-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .ending-card:hover { transform: translateY(-2px); }
+    .ending-card.win { border-color: rgba(16,185,129,0.3); }
+    .ending-card.lose { border-color: rgba(220,38,38,0.3); }
+    .ending-card.neutral { border-color: rgba(251,191,36,0.3); }
+    .ending-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .ending-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .ending-prob { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin-bottom: 0.5rem; }
+    .ending-card p { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* How to win */
+    .paths-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .path-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .path-card::before { content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; }
+    .path-card.win::before { background: linear-gradient(180deg, #10b981, #fbbf24); }
+    .path-card.lose::before { background: linear-gradient(180deg, #dc2626, #7c2d12); }
+    .path-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; }
+    .path-card.win .path-badge { background: rgba(16,185,129,0.15); color: var(--primary); }
+    .path-card.lose .path-badge { background: rgba(220,38,38,0.15); color: var(--danger); }
+    .path-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .path-card .strategy { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .path-card .sequence { font-size: 0.8rem; color: var(--accent); background: rgba(251,191,36,0.08); padding: 0.5rem 0.75rem; border-radius: 0.5rem; direction: ltr; text-align: left; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1.5rem; text-align: center; }
+    .stat-item { padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; }
+    .stat-num { font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; }
+
+    /* Timeline */
+    .timeline { position: relative; padding: 2rem 0; }
+    .timeline::before { content: ''; position: absolute; top: 0; bottom: 0; right: 50%; width: 2px; background: linear-gradient(180deg, var(--primary), var(--accent), var(--danger)); }
+    .timeline-item { padding: 1rem 0; position: relative; width: 50%; }
+    .timeline-item:nth-child(odd) { margin-right: 50%; padding-left: 2rem; text-align: left; }
+    .timeline-item:nth-child(even) { margin-left: 50%; padding-right: 2rem; text-align: right; }
+    .timeline-item::after { content: ''; position: absolute; top: 1.5rem; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--bg-dark); }
+    .timeline-item:nth-child(odd)::after { left: -6px; }
+    .timeline-item:nth-child(even)::after { right: -6px; }
+    .timeline-date { color: var(--accent); font-size: 0.85rem; font-weight: 600; }
+    .timeline-title { font-weight: 700; margin: 0.25rem 0; }
+    .timeline-desc { color: var(--text-muted); font-size: 0.85rem; }
+
+    /* Footer */
+    footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 3rem 0; text-align: center; }
+    footer .container { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+    footer .social { display: flex; gap: 1rem; }
+    footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: var(--primary); }
+    footer .copyright { color: var(--text-muted); font-size: 0.85rem; }
+    footer .disclaimer { color: var(--text-muted); font-size: 0.8rem; max-width: 700px; line-height: 1.5; padding: 1rem; background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.2); border-radius: 0.5rem; }
+
+    /* Navbar */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(10,14,26,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    nav .container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; }
+    .nav-logo { font-weight: 800; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { background: var(--primary); color: #fff; padding: 0.5rem 1.25rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.85rem; font-weight: 700; }
+    @media (max-width: 640px) { .nav-links { display: none; } }
+
+    /* CTA section */
+    .cta { background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(251,191,36,0.1)); border-radius: 1.5rem; padding: 3rem 2rem; text-align: center; }
+    .cta h2 { font-size: 2rem; margin-bottom: 1rem; }
+    .cta p { color: var(--text-muted); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    .tag { display: inline-block; padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 0.3rem; font-size: 0.75rem; color: var(--text-muted); margin: 0.2rem; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="container">
+      <a href="#top" class="nav-logo">🎮 بازی خاورمیانه</a>
+      <ul class="nav-links">
+        <li><a href="#about">درباره بازی</a></li>
+        <li><a href="#features">ویژگی‌ها</a></li>
+        <li><a href="#endings">پایان‌ها</a></li>
+        <li><a href="#paths">راه‌های برد</a></li>
+        <li><a href="#source">سورس کد</a></li>
+      </ul>
+      <a href="https://preview-z.ai/" class="nav-cta" target="_blank" rel="noopener">▶ بازی کن</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero" id="top">
+    <div class="hero-content">
+      <span class="hero-badge">⚡ بازی استراتژیک بر اساس رویدادهای واقعی</span>
+      <h1>
+        بازی بزرگ خاورمیانه
+        <span class="sub">ایران در برابر آمریکا و اسرائیل</span>
+      </h1>
+      <p>
+        یک شبیه‌سازی استراتژیک تعاملی بر اساس تاریخچه واقعی مناسبات و درگیری‌های ایران، آمریکا و اسرائیل از ۱۹۵۳ تا امروز. شما نقش ایران را بازی می‌کنید و با هر تصمیم، آینده منطقه را رقم می‌زنید.
+      </p>
+      <div class="hero-buttons">
+        <a href="https://preview-z.ai/" class="btn btn-primary" target="_blank" rel="noopener">
+          ⚔️ شروع بازی
+        </a>
+        <a href="#about" class="btn btn-secondary">📖 بیشتر بدانید</a>
+      </div>
+      <div class="flags">
+        🇮🇷 ⚔️ 🇺🇸🇮🇱
+      </div>
+    </div>
+  </header>
+
+  <!-- About -->
+  <section id="about">
+    <div class="container">
+      <div class="section-header">
+        <h2>درباره بازی</h2>
+        <div class="section-divider"></div>
+        <p>این بازی یک شبیه‌سازی استراتژیک است که بر اساس رویدادهای تاریخی واقعی و تحلیل‌های معتبر ساخته شده است.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📜</div>
+          <h3>مبتنی بر تاریخ واقعی</h3>
+          <p>۱۷ رویداد تاریخی از کودتای ۲۸ مرداد ۱۳۳۲ تا سقوط دولت بشار اسد در ۱۸ آذر ۱۴۰۳، تماماً با تاریخ دقیق شمسی.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <h3>منابع معتبر ایرانی</h3>
+          <p>تحلیل‌ها بر اساس منابع رسمی ایرانی: تسنیم، فارس، ایسنا، IRNA، مرکز پژوهش‌های مجلس، اندیشکده روابط بین‌الملل، SID.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎴</div>
+          <h3>۶۰+ کارت استراتژیک</h3>
+          <p>۲۰ کارت ایران، ۱۵ کارت آمریکا، ۱۵ کارت اسرائیل، ۸ کارت عربی، ۵ کارت ناتو، ۵ کارت متحدان شرقی - همه با داده واقعی.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏁</div>
+          <h3>۱۰ پایان محتمل</h3>
+          <p>از «بازدارندگی هسته‌ای» تا «جنگ تمام‌عیار»، از «صلح جامع» تا «تغییر رژیم» - هر کدام با احتمال واقعی و مبنای تاریخی.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>هوش مصنوعی دشمن</h3>
+          <p>دشمنان (آمریکا و اسرائیل) با AI واکنش‌گرا بازی می‌کنند - پاسخ آن‌ها بر اساس موقعیت فعلی و کارت شما تغییر می‌کند.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>سیستم کمبو و پادکارت</h3>
+          <p>۴ کمبو استراتژیک (محور مقاومت، بازدارندگی هسته‌ای، غیرمتقارن کامل، محور شرق) و سیستم پادکارت برای هر کارت.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section style="padding: 3rem 0; background: var(--bg-card);">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-num">۱۷</div>
+          <div class="stat-label">رویداد تاریخی</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">۶۸+</div>
+          <div class="stat-label">کارت استراتژیک</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">۱۰</div>
+          <div class="stat-label">پایان محتمل</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">۶</div>
+          <div class="stat-label">شاخص حیاتی</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">۴</div>
+          <div class="stat-label">کمبو استراتژیک</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">۸</div>
+          <div class="stat-label">نوبت بازی</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Endings -->
+  <section id="endings">
+    <div class="container">
+      <div class="section-header">
+        <h2>پایان‌های محتمل</h2>
+        <div class="section-divider"></div>
+        <p>بازی ۱۰ پایان مختلف دارد. ۴ پایان «برد» و ۶ پایان «باخت/وضع موجود». هر پایان با احتمال واقعی و مبنای تاریخی.</p>
+      </div>
+      <div class="endings-grid">
+        <div class="ending-card win">
+          <div class="ending-icon">☢️</div>
+          <h4>بازدارندگی هسته‌ای</h4>
+          <div class="ending-prob">۲۰-۲۵٪</div>
+          <p>ایران به بمب اتم می‌رسد - مثل کره شمالی</p>
+        </div>
+        <div class="ending-card win">
+          <div class="ending-icon">🕊️</div>
+          <h4>صلح جامع</h4>
+          <div class="ending-prob">۱۵-۲۰٪</div>
+          <p>توافق «Less for Less» با تضمین کنگره</p>
+        </div>
+        <div class="ending-card win">
+          <div class="ending-icon">🚪</div>
+          <h4>خروج آمریکا</h4>
+          <div class="ending-prob">۱۰-۱۵٪</div>
+          <p>بازدارندگی ایران آن‌قدر بالا می‌رود که آمریکا عقب‌نشینی می‌کند</p>
+        </div>
+        <div class="ending-card win">
+          <div class="ending-icon">📉</div>
+          <h4>انزوای اسرائیل</h4>
+          <div class="ending-prob">۸-۱۲٪</div>
+          <p>محور مقاومت اسرائیل را منزو می‌کند</p>
+        </div>
+        <div class="ending-card neutral">
+          <div class="ending-icon">🌫️</div>
+          <h4>جنگ ترکیبی کنترل‌شده</h4>
+          <div class="ending-prob">۴۰٪ (محتمل‌ترین)</div>
+          <p>ادامه درگیری سایبری-اقتصادی-نیابتی برای دهه‌ها</p>
+        </div>
+        <div class="ending-card lose">
+          <div class="ending-icon">🎯</div>
+          <h4>شکست استراتژیک</h4>
+          <div class="ending-prob">۱۵-۲۰٪</div>
+          <p>حمله هوایی هماهنگ - برنامه تأخیر می‌خورد</p>
+        </div>
+        <div class="ending-card lose">
+          <div class="ending-icon">🔄</div>
+          <h4>تغییر رژیم</h4>
+          <div class="ending-prob">۳-۵٪</div>
+          <p>اقتصاد و حمایت داخلی هر دو سقوط می‌کنند</p>
+        </div>
+        <div class="ending-card lose">
+          <div class="ending-icon">💥</div>
+          <h4>جنگ هسته‌ای</h4>
+          <div class="ending-prob">۳-۵٪</div>
+          <p>بدترین سناریو - حمله هسته‌ای متقابل</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Paths to win -->
+  <section id="paths" style="background: var(--bg-card);">
+    <div class="container">
+      <div class="section-header">
+        <h2>راه‌های برد</h2>
+        <div class="section-divider"></div>
+        <p>۴ مسیر برد و ۲ مسیر باخت. هر مسیر با استراتژی مشخص و دنباله کارت‌ها.</p>
+      </div>
+      <div class="paths-grid">
+        <div class="path-card win">
+          <span class="path-badge">🥇 برد - نوبت ۷</span>
+          <h3>مسیر بمب اتم</h3>
+          <p class="strategy">خروج از NPT → افزایش غنی‌سازی → ساخت بمب. مسیر خطرناک اما قطعی.</p>
+          <div class="sequence">iran_npt_withdraw → patience → china → russia → nuclear_breakout</div>
+        </div>
+        <div class="path-card win">
+          <span class="path-badge">🥈 برد - نوبت ۳</span>
+          <h3>مسیر صلح جامع</h3>
+          <p class="strategy">دیپلماسی مداوم + صبر استراتژیک. سریع‌ترین مسیر برد.</p>
+          <div class="sequence">diplomacy → patience → diplomacy</div>
+        </div>
+        <div class="path-card win">
+          <span class="path-badge">🥉 برد - نوبت ۴</span>
+          <h3>مسیر خروج آمریکا</h3>
+          <p class="strategy">ائتلاف با روسیه و چین + فعال‌سازی محور مقاومت + کنترل جنگ.</p>
+          <div class="sequence">russia → china → hezbollah → patience</div>
+        </div>
+        <div class="path-card win">
+          <span class="path-badge">🏅 برد - نوبت ۵</span>
+          <h3>مسیر انزوای اسرائیل</h3>
+          <p class="strategy">فعال‌سازی کامل محور مقاومت + حمله موشکی.</p>
+          <div class="sequence">hezbollah → houthi → iraq_militias → missile → patience</div>
+        </div>
+        <div class="path-card lose">
+          <span class="path-badge">💀 باخت - نوبت ۶</span>
+          <h3>تهاجم بی‌رویه</h3>
+          <p class="strategy">اگر فقط کارت‌های تهاجمی بازی کنید، جنگ از کنترل خارج می‌شود.</p>
+          <div class="sequence">hezbollah → hormuz → missile → houthi → ...</div>
+        </div>
+        <div class="path-card lose">
+          <span class="path-badge">🔥 باخت - نوبت ۴</span>
+          <h3>فروپاشی اقتصادی</h3>
+          <p class="strategy">بستن هرمز + سلاح نفت = نابودی اقتصاد و تغییر رژیم.</p>
+          <div class="sequence">hormuz → oil_weapon → hormuz → oil_weapon</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section id="timeline">
+    <div class="container">
+      <div class="section-header">
+        <h2>خط زمانی تاریخ</h2>
+        <div class="section-divider"></div>
+        <p>۱۷ رویداد تاریخی از ۱۳۳۲ تا ۱۴۰۳ که در بازی گنجانده شده.</p>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">۱۳۳۲/۵/۲۸</div>
+          <div class="timeline-title">💥 کودتای ۲۸ مرداد</div>
+          <div class="timeline-desc">سرنگونی دولت مصدق با دخالت آمریکا و انگلیس</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۳۵۷/۱۱/۲۲</div>
+          <div class="timeline-title">🕌 پیروزی انقلاب اسلامی</div>
+          <div class="timeline-desc">سرنگونی رژیم پهلوی و تأسیس جمهوری اسلامی</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۳۵۹/۶/۳۱</div>
+          <div class="timeline-title">⚔️ هجوم صدام به ایران</div>
+          <div class="timeline-desc">آغاز جنگ هشت ساله ایران-عراق</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۳۶۷/۴/۱۲</div>
+          <div class="timeline-title">✈️ سرنگونی پرواز ۶۵۵</div>
+          <div class="timeline-desc">سرنگونی هواپیمای مسافربری ایران توسط ناو آمریکایی</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۳۹۴/۴/۲۳</div>
+          <div class="timeline-title">✍️ برجام (JCPOA)</div>
+          <div class="timeline-desc">توافق هسته‌ای ایران و ۱+۵</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۳۹۷/۲/۱۸</div>
+          <div class="timeline-title">🚪 خروج آمریکا از برجام</div>
+          <div class="timeline-desc">ترامپ به‌طور یک‌جانبه از توافق خارج شد</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۳۹۸/۱۰/۱۳</div>
+          <div class="timeline-title">🎯 شهادت سردار سلطیمانی</div>
+          <div class="timeline-desc">ترور فرمانده سپاه قدس توسط آمریکا</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۴۰۲/۷/۱۵</div>
+          <div class="timeline-title">🌪️ طوفان الاقصی</div>
+          <div class="timeline-desc">عملیات حماس علیه اسرائیل</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۴۰۳/۱/۲۶</div>
+          <div class="timeline-title">🚀 عملیات وعده صادق ۱</div>
+          <div class="timeline-desc">حمله موشکی-پهپادی ایران به اسرائیل</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۴۰۳/۵/۱۰</div>
+          <div class="timeline-title">🎯 ترور شهید هنیه در تهران</div>
+          <div class="timeline-desc">ترور رهبر حماس در پایتخت ایران</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۴۰۳/۷/۶</div>
+          <div class="timeline-title">🎯 ترور شهید نصرالله</div>
+          <div class="timeline-desc">ترور دبیرکل حزب‌الله در بیروت</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">۱۴۰۳/۹/۱۸</div>
+          <div class="timeline-title">📉 سقوط دولت بشار اسد</div>
+          <div class="timeline-desc">سقوط دولت سوریه و فرار اسد</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Source code -->
+  <section id="source">
+    <div class="container">
+      <div class="section-header">
+        <h2>سورس کد بازی</h2>
+        <div class="section-divider"></div>
+        <p>سورس کامل بازی به‌صورت متن‌باز در GitHub موجود است.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚛️</div>
+          <h3>تکنولوژی‌ها</h3>
+          <p>Next.js 16، TypeScript، Tailwind CSS 4، Zustand، Framer Motion</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>ساختار پروژه</h3>
+          <p>App Router، Server Components، Client Components، API Routes</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎮</div>
+          <h3>منطق بازی</h3>
+          <p>cardsData.ts (2000+ lines)، gameStore.ts (800+ lines)، endingsData.ts (560+ lines)</p>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 2rem;">
+        <div style="margin-bottom: 1rem;">
+          <span class="tag">TypeScript</span>
+          <span class="tag">Next.js</span>
+          <span class="tag">React</span>
+          <span class="tag">Tailwind CSS</span>
+          <span class="tag">Zustand</span>
+          <span class="tag">Framer Motion</span>
+        </div>
+        <a href="https://github.com/betaversion490-del/IranWar" class="btn btn-primary" target="_blank" rel="noopener">
+          📦 مشاهده در GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section>
+    <div class="container">
+      <div class="cta">
+        <h2>آماده بازی هستید؟</h2>
+        <p>وارد دنیای استراتژی خاورمیانه شوید. تصمیم‌های شما آینده منطقه را تعیین می‌کند. آیا به بمب اتم می‌رسید، صلح می‌سازید، یا شکست می‌خورید؟</p>
+        <a href="https://preview-z.ai/" class="btn btn-primary" target="_blank" rel="noopener">
+          ⚔️ شروع بازی
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="social">
+        <a href="https://github.com/betaversion490-del/IranWar" target="_blank" rel="noopener">GitHub</a>
+        <a href="#about">درباره</a>
+        <a href="#source">سورس</a>
+      </div>
+      <div class="disclaimer">
+        ⚠️ <strong>سلب مسئولیت:</strong> این بازی یک شبیه‌سازی آموزشی-استراتژیک است و نه یک پیش‌بینی قطعی. تمام داده‌ها بر اساس منابع رسمی ایرانی (تسنیم، فارس، ایسنا، مرکز پژوهش‌های مجلس) و منابع بین‌المللی معتبر تنظیم شده است. هیچ داده فرضی وجود ندارد. این بازی نه حمایت از هیچ‌یک از طرفین است و نه تأیید هیچ سناریوی خاصی.
+      </div>
+      <div class="copyright">
+        © ۲۰۲۵ بازی بزرگ خاورمیانه • ساخته‌شده با ❤️ برای آموزش استراتژی
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
