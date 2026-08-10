@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بازی بزرگ خاورمیانه | ایران در برابر آمریکا و اسرائیل</title>
-  <meta name="description" content="یک بازی استراتژیک تعاملی بر اساس تاریخچه مناسبات و درگیری‌های ایران، آمریکا و اسرائیل. شما نقش ایران را بازی می‌کنید و آینده منطقه را رقم می‌زنید.">
+  <title>تاریخچه مناسبات ایران، آمریکا و اسرائیل | مرجع اطلاعاتی</title>
+  <meta name="description" content="مرجع اطلاعاتی تاریخچه مناسبات و درگیری‌های ایران، آمریکا و اسرائیل از ۱۹۵۳ تا امروز. شامل خط زمانی رویدادها، تحلیل تاریخچه کامل، و گزینه‌های استراتژیک ایران.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -18,7 +18,6 @@
       --text: #e2e8f0;
       --text-muted: #94a3b8;
       --primary: #10b981;
-      --primary-dark: #059669;
       --accent: #fbbf24;
       --danger: #dc2626;
       --info: #3b82f6;
@@ -27,533 +26,521 @@
       font-family: 'Vazirmatn', sans-serif;
       background: var(--bg-dark);
       color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
+      line-height: 1.8;
     }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 
-    /* Hero */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      background: radial-gradient(ellipse at center, rgba(16,185,129,0.1) 0%, transparent 50%),
-                  radial-gradient(ellipse at top left, rgba(220,38,38,0.08) 0%, transparent 40%),
-                  radial-gradient(ellipse at bottom right, rgba(251,191,36,0.06) 0%, transparent 40%);
+    /* Header */
+    header {
+      padding: 4rem 0 3rem;
+      text-align: center;
+      background: radial-gradient(ellipse at center, rgba(16,185,129,0.08) 0%, transparent 60%);
+      border-bottom: 1px solid var(--border);
     }
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L0 30h60L30 0z' fill='%23ffffff' fill-opacity='0.02'/%3E%3C/svg%3E");
-      pointer-events: none;
-    }
-    .hero-content { text-align: center; z-index: 1; padding: 2rem; }
-    .hero-badge {
-      display: inline-block;
-      padding: 0.4rem 1rem;
-      background: rgba(16,185,129,0.15);
-      border: 1px solid rgba(16,185,129,0.3);
-      border-radius: 999px;
-      color: var(--primary);
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-    }
-    .hero h1 {
-      font-size: clamp(2rem, 6vw, 4.5rem);
+    header h1 {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
       font-weight: 900;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg, #10b981 0%, #fbbf24 50%, #dc2626 100%);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #10b981 0%, #fbbf24 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .hero h1 .sub { display: block; font-size: 0.4em; font-weight: 700; color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); margin-top: 0.5rem; }
-    .hero p {
-      font-size: clamp(1rem, 2vw, 1.25rem);
+    header p {
       color: var(--text-muted);
       max-width: 700px;
-      margin: 0 auto 2.5rem;
+      margin: 0 auto;
+      font-size: 1.05rem;
     }
-    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.9rem 2rem;
-      border-radius: 0.75rem;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
+
+    /* Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,14,26,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
     }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(16,185,129,0.3); }
-    .btn-secondary { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: var(--bg-card-hover); transform: translateY(-2px); }
-    .flags { display: flex; justify-content: center; gap: 1rem; margin-top: 3rem; font-size: 2.5rem; opacity: 0.7; }
+    nav .container { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; }
+    .nav-logo { font-weight: 800; font-size: 1rem; color: var(--primary); text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    @media (max-width: 640px) { .nav-links { display: none; } }
 
     /* Sections */
-    section { padding: 5rem 0; }
-    .section-header { text-align: center; margin-bottom: 3rem; }
-    .section-header h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 1rem; }
-    .section-header p { color: var(--text-muted); max-width: 600px; margin: 0 auto; font-size: 1.05rem; }
-    .section-divider { width: 60px; height: 4px; background: linear-gradient(90deg, var(--primary), var(--accent)); margin: 0 auto 2rem; border-radius: 2px; }
+    section { padding: 4rem 0; border-bottom: 1px solid var(--border); }
+    .section-header { margin-bottom: 2.5rem; }
+    .section-header h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; margin-bottom: 0.75rem; }
+    .section-header p { color: var(--text-muted); max-width: 700px; }
+    .section-num {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 999px;
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
 
-    /* Features */
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-    .feature-card {
+    /* Brief timeline */
+    .brief-timeline {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 1rem 0;
+      direction: ltr;
+    }
+    .brief-item {
+      shrink: 0;
+      min-width: 110px;
+      text-align: center;
+      padding: 0.75rem;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 2rem;
-      transition: all 0.3s;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
     }
-    .feature-card:hover { background: var(--bg-card-hover); transform: translateY(-4px); border-color: rgba(16,185,129,0.3); }
-    .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-    .feature-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; }
-    .feature-card p { color: var(--text-muted); font-size: 0.95rem; }
+    .brief-item:hover { background: var(--bg-card-hover); transform: translateY(-2px); }
+    .brief-item .icon { font-size: 1.5rem; }
+    .brief-item .date { color: var(--accent); font-size: 0.75rem; font-weight: 700; margin: 0.25rem 0; }
+    .brief-item .title { font-size: 0.75rem; color: var(--text); line-height: 1.3; }
 
-    /* Endings */
-    .endings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
-    .ending-card {
+    /* Full timeline */
+    .full-timeline { position: relative; }
+    .full-timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 20px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--primary), var(--accent), var(--danger));
+    }
+    .full-event {
+      position: relative;
+      margin-right: 50px;
+      margin-bottom: 2rem;
+      padding: 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      transition: all 0.2s;
+    }
+    .full-event:hover { background: var(--bg-card-hover); }
+    .full-event::before {
+      content: '';
+      position: absolute;
+      right: -34px;
+      top: 1.5rem;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 3px solid var(--bg-dark);
+    }
+    .full-event .date {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    .full-event .title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .full-event .actor {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .full-event .desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    .full-event .source {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    /* Cards grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .card:hover { background: var(--bg-card-hover); transform: translateY(-2px); border-color: rgba(16,185,129,0.3); }
+    .card-header { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .card-icon { font-size: 1.75rem; shrink: 0; }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.1rem; }
+    .card-cat {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 0.3rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .card-desc { color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; }
+    .card-detail {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: none;
+    }
+    .card.open .card-detail { display: block; }
+    .card-toggle {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Category colors */
+    .cat-nuclear { background: rgba(220,38,38,0.15); color: #f87171; }
+    .cat-military { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .cat-proxy { background: rgba(16,185,129,0.15); color: #34d399; }
+    .cat-diplomatic { background: rgba(6,182,212,0.15); color: #22d3ee; }
+    .cat-economic { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .cat-cyber { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .cat-asymmetric { background: rgba(249,115,22,0.15); color: #fb923c; }
+    .cat-alliance { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+    .cat-domestic { background: rgba(236,72,153,0.15); color: #f472b6; }
+    .cat-extreme { background: rgba(220,38,38,0.2); color: #ef4444; }
+
+    /* Sources */
+    .sources-list {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 0.75rem;
       padding: 1.5rem;
-      text-align: center;
-      transition: all 0.3s;
     }
-    .ending-card:hover { transform: translateY(-2px); }
-    .ending-card.win { border-color: rgba(16,185,129,0.3); }
-    .ending-card.lose { border-color: rgba(220,38,38,0.3); }
-    .ending-card.neutral { border-color: rgba(251,191,36,0.3); }
-    .ending-icon { font-size: 3rem; margin-bottom: 0.75rem; }
-    .ending-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .ending-prob { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin-bottom: 0.5rem; }
-    .ending-card p { font-size: 0.8rem; color: var(--text-muted); }
-
-    /* How to win */
-    .paths-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-    .path-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.75rem;
-      position: relative;
-      overflow: hidden;
+    .sources-list h3 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+    .sources-list ul { list-style: none; }
+    .sources-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-muted);
     }
-    .path-card::before { content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; }
-    .path-card.win::before { background: linear-gradient(180deg, #10b981, #fbbf24); }
-    .path-card.lose::before { background: linear-gradient(180deg, #dc2626, #7c2d12); }
-    .path-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; }
-    .path-card.win .path-badge { background: rgba(16,185,129,0.15); color: var(--primary); }
-    .path-card.lose .path-badge { background: rgba(220,38,38,0.15); color: var(--danger); }
-    .path-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .path-card .strategy { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
-    .path-card .sequence { font-size: 0.8rem; color: var(--accent); background: rgba(251,191,36,0.08); padding: 0.5rem 0.75rem; border-radius: 0.5rem; direction: ltr; text-align: left; }
-
-    /* Stats */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1.5rem; text-align: center; }
-    .stat-item { padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; }
-    .stat-num { font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .stat-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; }
-
-    /* Timeline */
-    .timeline { position: relative; padding: 2rem 0; }
-    .timeline::before { content: ''; position: absolute; top: 0; bottom: 0; right: 50%; width: 2px; background: linear-gradient(180deg, var(--primary), var(--accent), var(--danger)); }
-    .timeline-item { padding: 1rem 0; position: relative; width: 50%; }
-    .timeline-item:nth-child(odd) { margin-right: 50%; padding-left: 2rem; text-align: left; }
-    .timeline-item:nth-child(even) { margin-left: 50%; padding-right: 2rem; text-align: right; }
-    .timeline-item::after { content: ''; position: absolute; top: 1.5rem; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--bg-dark); }
-    .timeline-item:nth-child(odd)::after { left: -6px; }
-    .timeline-item:nth-child(even)::after { right: -6px; }
-    .timeline-date { color: var(--accent); font-size: 0.85rem; font-weight: 600; }
-    .timeline-title { font-weight: 700; margin: 0.25rem 0; }
-    .timeline-desc { color: var(--text-muted); font-size: 0.85rem; }
+    .sources-list li:last-child { border-bottom: none; }
 
     /* Footer */
-    footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 3rem 0; text-align: center; }
-    footer .container { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
-    footer .social { display: flex; gap: 1rem; }
-    footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-    footer a:hover { color: var(--primary); }
+    footer {
+      padding: 3rem 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    footer .disclaimer {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.7;
+      padding: 1rem;
+      background: rgba(251,191,36,0.05);
+      border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 0.5rem;
+    }
     footer .copyright { color: var(--text-muted); font-size: 0.85rem; }
-    footer .disclaimer { color: var(--text-muted); font-size: 0.8rem; max-width: 700px; line-height: 1.5; padding: 1rem; background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.2); border-radius: 0.5rem; }
 
-    /* Navbar */
-    nav { position: sticky; top: 0; z-index: 100; background: rgba(10,14,26,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
-    nav .container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; }
-    .nav-logo { font-weight: 800; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
-    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
-    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta { background: var(--primary); color: #fff; padding: 0.5rem 1.25rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.85rem; font-weight: 700; }
-    @media (max-width: 640px) { .nav-links { display: none; } }
-
-    /* CTA section */
-    .cta { background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(251,191,36,0.1)); border-radius: 1.5rem; padding: 3rem 2rem; text-align: center; }
-    .cta h2 { font-size: 2rem; margin-bottom: 1rem; }
-    .cta p { color: var(--text-muted); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
-
-    .tag { display: inline-block; padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 0.3rem; font-size: 0.75rem; color: var(--text-muted); margin: 0.2rem; }
+    /* Intro */
+    .intro {
+      padding: 3rem 0;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+    .intro p { color: var(--text-muted); font-size: 1rem; line-height: 1.8; max-width: 800px; }
+    .intro p + p { margin-top: 1rem; }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
+  <!-- Nav -->
   <nav>
     <div class="container">
-      <a href="#top" class="nav-logo">🎮 بازی خاورمیانه</a>
+      <a href="#top" class="nav-logo">📜 مرجع خاورمیانه</a>
       <ul class="nav-links">
-        <li><a href="#about">درباره بازی</a></li>
-        <li><a href="#features">ویژگی‌ها</a></li>
-        <li><a href="#endings">پایان‌ها</a></li>
-        <li><a href="#paths">راه‌های برد</a></li>
-        <li><a href="#source">سورس کد</a></li>
+        <li><a href="#brief">خلاصه</a></li>
+        <li><a href="#full">تاریخچه کامل</a></li>
+        <li><a href="#cards">گزینه‌های استراتژیک ایران</a></li>
+        <li><a href="#sources">منابع</a></li>
       </ul>
-      <a href="https://preview-z.ai/" class="nav-cta" target="_blank" rel="noopener">▶ بازی کن</a>
     </div>
   </nav>
 
-  <!-- Hero -->
-  <header class="hero" id="top">
-    <div class="hero-content">
-      <span class="hero-badge">⚡ بازی استراتژیک بر اساس رویدادهای واقعی</span>
-      <h1>
-        بازی بزرگ خاورمیانه
-        <span class="sub">ایران در برابر آمریکا و اسرائیل</span>
-      </h1>
-      <p>
-        یک شبیه‌سازی استراتژیک تعاملی بر اساس تاریخچه واقعی مناسبات و درگیری‌های ایران، آمریکا و اسرائیل از ۱۹۵۳ تا امروز. شما نقش ایران را بازی می‌کنید و با هر تصمیم، آینده منطقه را رقم می‌زنید.
-      </p>
-      <div class="hero-buttons">
-        <a href="https://preview-z.ai/" class="btn btn-primary" target="_blank" rel="noopener">
-          ⚔️ شروع بازی
-        </a>
-        <a href="#about" class="btn btn-secondary">📖 بیشتر بدانید</a>
-      </div>
-      <div class="flags">
-        🇮🇷 ⚔️ 🇺🇸🇮🇱
-      </div>
+  <!-- Header -->
+  <header id="top">
+    <div class="container">
+      <h1>تاریخچه مناسبات ایران، آمریکا و اسرائیل</h1>
+      <p>مرجع اطلاعاتی تاریخچه مناسبات و درگیری‌های ایران، آمریکا و اسرائیل از کودتای ۲۸ مرداد ۱۳۳۲ تا سقوط دولت بشار اسد در ۱۸ آذر ۱۴۰۳</p>
     </div>
   </header>
 
-  <!-- About -->
-  <section id="about">
+  <!-- Intro -->
+  <section class="intro">
+    <div class="container">
+      <p>این مرجع اطلاعاتی، تاریخچه مناسبات پیچیده و پر فراز و نشیب ایران با ایالات متحده آمریکا و اسرائیل را از سال ۱۳۳۲ تاکنون بررسی می‌کند. این مناسبات که با کودتای ۲۸ مرداد آغاز شد، طی هفت دهه گذشته شامل رویدادهای مهمی چون انقلاب اسلامی، جنگ ایران و عراق، افشای برنامه هسته‌ای ایران، انعقاد برجام، خروج آمریکا از آن، ترور سردار سلطیمانی، طوفان الاقصی، و عملیات وعده صادق بوده است.</p>
+      <p>در این مرجع، رویدادهای تاریخی با تاریخ دقیق شمسی، طرف‌های درگیر، و توضیحات مختصر ارائه شده‌اند. همچنین گزینه‌های استراتژیک موجود در اختیار ایران — از مسیر هسته‌ای تا دیپلماسی، از محور مقاومت تا اتحاد با قدرت‌های شرقی — بر اساس منابع رسمی ایرانی و بین‌المللی معتبر گردآوری شده است.</p>
+    </div>
+  </section>
+
+  <!-- Brief timeline -->
+  <section id="brief">
     <div class="container">
       <div class="section-header">
-        <h2>درباره بازی</h2>
-        <div class="section-divider"></div>
-        <p>این بازی یک شبیه‌سازی استراتژیک است که بر اساس رویدادهای تاریخی واقعی و تحلیل‌های معتبر ساخته شده است.</p>
+        <span class="section-num">بخش ۱</span>
+        <h2>خلاصه تاریخچه</h2>
+        <p>خط زمانی فشرده ۱۷ رویداد کلیدی از ۱۳۳۲ تا ۱۴۰۳</p>
       </div>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">📜</div>
-          <h3>مبتنی بر تاریخ واقعی</h3>
-          <p>۱۷ رویداد تاریخی از کودتای ۲۸ مرداد ۱۳۳۲ تا سقوط دولت بشار اسد در ۱۸ آذر ۱۴۰۳، تماماً با تاریخ دقیق شمسی.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">📚</div>
-          <h3>منابع معتبر ایرانی</h3>
-          <p>تحلیل‌ها بر اساس منابع رسمی ایرانی: تسنیم، فارس، ایسنا، IRNA، مرکز پژوهش‌های مجلس، اندیشکده روابط بین‌الملل، SID.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🎴</div>
-          <h3>۶۰+ کارت استراتژیک</h3>
-          <p>۲۰ کارت ایران، ۱۵ کارت آمریکا، ۱۵ کارت اسرائیل، ۸ کارت عربی، ۵ کارت ناتو، ۵ کارت متحدان شرقی - همه با داده واقعی.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🏁</div>
-          <h3>۱۰ پایان محتمل</h3>
-          <p>از «بازدارندگی هسته‌ای» تا «جنگ تمام‌عیار»، از «صلح جامع» تا «تغییر رژیم» - هر کدام با احتمال واقعی و مبنای تاریخی.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🤖</div>
-          <h3>هوش مصنوعی دشمن</h3>
-          <p>دشمنان (آمریکا و اسرائیل) با AI واکنش‌گرا بازی می‌کنند - پاسخ آن‌ها بر اساس موقعیت فعلی و کارت شما تغییر می‌کند.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3>سیستم کمبو و پادکارت</h3>
-          <p>۴ کمبو استراتژیک (محور مقاومت، بازدارندگی هسته‌ای، غیرمتقارن کامل، محور شرق) و سیستم پادکارت برای هر کارت.</p>
-        </div>
+      <div class="brief-timeline">
+        <div class="brief-item"><div class="icon">💥</div><div class="date">۱۳۳۲/۵/۲۸</div><div class="title">کودتای ۲۸ مرداد</div></div>
+        <div class="brief-item"><div class="icon">⚖️</div><div class="date">۱۳۴۳/۷/۲۱</div><div class="title">کاپیتولاسیون</div></div>
+        <div class="brief-item"><div class="icon">🕌</div><div class="date">۱۳۵۷/۱۱/۲۲</div><div class="title">پیروزی انقلاب</div></div>
+        <div class="brief-item"><div class="icon">🏛️</div><div class="date">۱۳۵۸/۸/۱۳</div><div class="title">تسخیر لانه جاسوسی</div></div>
+        <div class="brief-item"><div class="icon">⚔️</div><div class="date">۱۳۵۹/۶/۳۱</div><div class="title">هجوم صدام</div></div>
+        <div class="brief-item"><div class="icon">✈️</div><div class="date">۱۳۶۷/۴/۱۲</div><div class="title">پرواز ۶۵۵</div></div>
+        <div class="brief-item"><div class="icon">☢️</div><div class="date">۱۳۸۱/۵/۲۳</div><div class="title">افشای نطنز</div></div>
+        <div class="brief-item"><div class="icon">💻</div><div class="date">۱۳۸۹/۴</div><div class="title">استاکس‌نت</div></div>
+        <div class="brief-item"><div class="icon">✍️</div><div class="date">۱۳۹۴/۴/۲۳</div><div class="title">برجام</div></div>
+        <div class="brief-item"><div class="icon">🚪</div><div class="date">۱۳۹۷/۲/۱۸</div><div class="title">خروج از برجام</div></div>
+        <div class="brief-item"><div class="icon">🎯</div><div class="date">۱۳۹۸/۱۰/۱۳</div><div class="title">شهادت سلطیمانی</div></div>
+        <div class="brief-item"><div class="icon">🔬</div><div class="date">۱۳۹۹/۹/۷</div><div class="title">ترور فخری‌زاده</div></div>
+        <div class="brief-item"><div class="icon">🌪️</div><div class="date">۱۴۰۲/۷/۱۵</div><div class="title">طوفان الاقصی</div></div>
+        <div class="brief-item"><div class="icon">🚀</div><div class="date">۱۴۰۳/۱/۲۶</div><div class="title">وعده صادق ۱</div></div>
+        <div class="brief-item"><div class="icon">🎯</div><div class="date">۱۴۰۳/۵/۱۰</div><div class="title">ترور هنیه</div></div>
+        <div class="brief-item"><div class="icon">🎯</div><div class="date">۱۴۰۳/۷/۶</div><div class="title">ترور نصرالله</div></div>
+        <div class="brief-item"><div class="icon">📉</div><div class="date">۱۴۰۳/۹/۱۸</div><div class="title">سقوط اسد</div></div>
       </div>
     </div>
   </section>
 
-  <!-- Stats -->
-  <section style="padding: 3rem 0; background: var(--bg-card);">
-    <div class="container">
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-num">۱۷</div>
-          <div class="stat-label">رویداد تاریخی</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">۶۸+</div>
-          <div class="stat-label">کارت استراتژیک</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">۱۰</div>
-          <div class="stat-label">پایان محتمل</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">۶</div>
-          <div class="stat-label">شاخص حیاتی</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">۴</div>
-          <div class="stat-label">کمبو استراتژیک</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">۸</div>
-          <div class="stat-label">نوبت بازی</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Endings -->
-  <section id="endings">
+  <!-- Full history -->
+  <section id="full">
     <div class="container">
       <div class="section-header">
-        <h2>پایان‌های محتمل</h2>
-        <div class="section-divider"></div>
-        <p>بازی ۱۰ پایان مختلف دارد. ۴ پایان «برد» و ۶ پایان «باخت/وضع موجود». هر پایان با احتمال واقعی و مبنای تاریخی.</p>
+        <span class="section-num">بخش ۲</span>
+        <h2>تاریخچه کامل</h2>
+        <p>جزئیات ۱۷ رویداد تاریخی با تاریخ دقیق، طرف‌های درگیر، و منابع</p>
       </div>
-      <div class="endings-grid">
-        <div class="ending-card win">
-          <div class="ending-icon">☢️</div>
-          <h4>بازدارندگی هسته‌ای</h4>
-          <div class="ending-prob">۲۰-۲۵٪</div>
-          <p>ایران به بمب اتم می‌رسد - مثل کره شمالی</p>
+      <div class="full-timeline">
+
+        <div class="full-event">
+          <div class="date">۱۳۳۲/۵/۲۸ (۱۹ اوت ۱۹۵۳)</div>
+          <div class="title">💥 کودتای ۲۸ مرداد</div>
+          <span class="actor" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🇺🇸🇬🇧 آمریکا و انگلیس</span>
+          <div class="desc">سرنگونی دولت دکتر مصدق با کودتای آمریکا و انگلیس (عملیات آژاکس) پس از ملی شدن صنعت نفت. این رویداد نقطه آغاز دخالت مستقیم آمریکا در سیاست ایران و شکل‌گیری نخستین موج ضدآمریکایی در تاریخ معاصر ایران محسوب می‌شود.</div>
+          <div class="source">منبع: اسناد تاریخی آمریکا (Foreign Relations of the United States)، خاطرات کرمیت روزولت</div>
         </div>
-        <div class="ending-card win">
-          <div class="ending-icon">🕊️</div>
-          <h4>صلح جامع</h4>
-          <div class="ending-prob">۱۵-۲۰٪</div>
-          <p>توافق «Less for Less» با تضمین کنگره</p>
+
+        <div class="full-event">
+          <div class="date">۱۳۴۳/۷/۲۱ (۱۳ اکتبر ۱۹۶۴)</div>
+          <div class="title">⚖️ تصویب کاپیتولاسیون</div>
+          <span class="actor" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🇺🇸 آمریکا</span>
+          <div class="desc">تصویب لایحه وضعیت نیروهای آمریکایی در ایران (کاپیتولاسیون) توسط مجلس شورای ملی که مصونیت حقوقی برای شهروندان آمریکایی در ایران قائل می‌شد. این رویداد با اعتراض شدید آیت‌الله خمینی مواجه شد و از عوامل اصلی شکل‌گیری انقلاب اسلامی بود.</div>
+          <div class="source">منبع: اسناد مجلس شورای ملی، سخنرانی‌های آیت‌الله خمینی</div>
         </div>
-        <div class="ending-card win">
-          <div class="ending-icon">🚪</div>
-          <h4>خروج آمریکا</h4>
-          <div class="ending-prob">۱۰-۱۵٪</div>
-          <p>بازدارندگی ایران آن‌قدر بالا می‌رود که آمریکا عقب‌نشینی می‌کند</p>
+
+        <div class="full-event">
+          <div class="date">۱۳۵۷/۱۱/۲۲ (۱۱ فوریه ۱۹۷۹)</div>
+          <div class="title">🕌 پیروزی انقلاب اسلامی</div>
+          <span class="actor" style="background:rgba(16,185,129,0.15);color:#34d399;">🇮🇷 ایران</span>
+          <div class="desc">سرنگونی رژیم پهلوی و پیروزی انقلاب اسلامی به رهبری آیت‌الله خمینی. این رویداد نقطه عطف تاریخ معاصر ایران و خاورمیانه بود که منجر به قطع روابط دیپلماتیک آمریکا و ایران، تعطیلی سفارت آمریکا در تهران، و آغاز تقابل ایدئولوژیک ایران با غرب شد.</div>
+          <div class="source">منبع: آرشیو صداوسیما، اسناد دولت موقت</div>
         </div>
-        <div class="ending-card win">
-          <div class="ending-icon">📉</div>
-          <h4>انزوای اسرائیل</h4>
-          <div class="ending-prob">۸-۱۲٪</div>
-          <p>محور مقاومت اسرائیل را منزو می‌کند</p>
+
+        <div class="full-event">
+          <div class="date">۱۳۵۸/۸/۱۳ (۴ نوامبر ۱۹۷۹)</div>
+          <div class="title">🏛️ تسخیر لانه جاسوسی</div>
+          <span class="actor" style="background:rgba(16,185,129,0.15);color:#34d399;">🇮🇷 ایران</span>
+          <div class="desc">تسخیر سفارت آمریکا در تهران توسط دانشجویان پیرو خط امام و گروگان‌گیری ۵۲ دیپلمات آمریکایی به مدت ۴۴۴ روز. این رویداد منجر به قطع کامل روابط دیپلماتیک ایران و آمریکا، تحریم‌های اقتصادی اولیه، و آغاز تقابل مستقیم شد.</div>
+          <div class="source">منبع: خاطرات دانشجویان پیرو خط امام، اسناد سفارت آمریکا</div>
         </div>
-        <div class="ending-card neutral">
-          <div class="ending-icon">🌫️</div>
-          <h4>جنگ ترکیبی کنترل‌شده</h4>
-          <div class="ending-prob">۴۰٪ (محتمل‌ترین)</div>
-          <p>ادامه درگیری سایبری-اقتصادی-نیابتی برای دهه‌ها</p>
+
+        <div class="full-event">
+          <div class="date">۱۳۵۹/۶/۳۱ (۲۲ سپتامبر ۱۹۸۰)</div>
+          <div class="title">⚔️ هجوم صدام به ایران</div>
+          <span class="actor" style="background:rgba(249,115,22,0.15);color:#fb923c;">🇮🇶 عراق</span>
+          <div class="desc">هجوم ارتش عراق به ایران و آغاز جنگ هشت ساله ایران و عراق که با حمایت آمریکا، اتحاد جماهیر شوروی، و کشورهای عربی از عراق همراه بود. این جنگ با حدود یک میلیون کشته و مجروح به پایان رسید و تأثیر عمیقی بر اقتصاد و جامعه ایران گذاشت.</div>
+          <div class="source">منبع: اسناد سازمان ملل، گزارش‌های کمیته بین‌المللی صلیب سرخ</div>
         </div>
-        <div class="ending-card lose">
-          <div class="ending-icon">🎯</div>
-          <h4>شکست استراتژیک</h4>
-          <div class="ending-prob">۱۵-۲۰٪</div>
-          <p>حمله هوایی هماهنگ - برنامه تأخیر می‌خورد</p>
+
+        <div class="full-event">
+          <div class="date">۱۳۶۷/۴/۱۲ (۳ ژوئیه ۱۹۸۸)</div>
+          <div class="title">✈️ سرنگونی پرواز ۶۵۵</div>
+          <span class="actor" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🇺🇸 آمریکا</span>
+          <div class="desc">سرنگونی هواپیمای مسافربری ایران ایر پرواز ۶۵۵ بر فراز خلیج فارس توسط ناو آمریکایی یواس‌اس وینسنس که منجر به کشته شدن ۲۹۰ مسافر غیرنظامی شد. آمریکا این حمله را اشتباه تشخیص عنوان کرد اما هرگز عذرخواهی رسمی نکرد. این رویداد نماد عمیق‌ترین بی‌اعتمادی ایران به آمریکا شد.</div>
+          <div class="source">منبع: گزارش‌های سازمان هوانوردی بین‌المللی (ICAO)، اسناد پنتاگون</div>
         </div>
-        <div class="ending-card lose">
-          <div class="ending-icon">🔄</div>
-          <h4>تغییر رژیم</h4>
-          <div class="ending-prob">۳-۵٪</div>
-          <p>اقتصاد و حمایت داخلی هر دو سقوط می‌کنند</p>
+
+        <div class="full-event">
+          <div class="date">۱۳۸۱/۵/۲۳ (۱۴ اوت ۲۰۰۲)</div>
+          <div class="title">☢️ افشای غیرقانونی نطنز</div>
+          <span class="actor" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🇺🇸 آمریکا</span>
+          <div class="desc">افشای تأسیسات غنی‌سازی اورانیوم نطنز توسط گروه مخالف ایرانی (مجاهدین خلق) با حمایت اطلاعاتی آمریکا. این رویداد آغاز بحران هسته‌ای ایران بود که منجر به ارجاع پرونده ایران به شورای حکام آژانس بین‌المللی انرژی اتمی و تصویب قطعنامه‌های متعدد علیه ایران شد.</div>
+          <div class="source">منبع: گزارش‌های آژانس بین‌المللی انرژی اتمی (IAEA)، سخنرانی‌های شورای حکام</div>
         </div>
-        <div class="ending-card lose">
-          <div class="ending-icon">💥</div>
-          <h4>جنگ هسته‌ای</h4>
-          <div class="ending-prob">۳-۵٪</div>
-          <p>بدترین سناریو - حمله هسته‌ای متقابل</p>
+
+        <div class="full-event">
+          <div class="date">۱۳۸۹/۴ (ژوئن ۲۰۱۰)</div>
+          <div class="title">💻 سایبرتروریسم استاکس‌نت</div>
+          <span class="actor" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🇺🇸🇮🇱 آمریکا و اسرائیل</span>
+          <div class="desc">کشف ویروس کامپیوتری استاکس‌نت که به سانتریفیوژهای غنی‌سازی اورانیوم نطنز حمله کرده بود. این اولین حمله سایبری شناخته‌شده به تأسیسات صنعتی بود و به‌طور گسترده به آمریکا و اسرائیل نسبت داده شد. این رویداد آغاز عصر جنگ سایبری در خاورمیانه بود.</div>
+          <div class="source">منبع: تحقیقات Symantec، کتاب «Confront and Conceal» از دیوید سانگر</div>
         </div>
+
+        <div class="full-event">
+          <div class="date">۱۳۹۴/۴/۲۳ (۱۴ ژوئیه ۲۰۱۵)</div>
+          <div class="title">✍️ برجام (JCPOA)</div>
+          <span class="actor" style="background:rgba(16,185,129,0.15);color:#34d399;">🇮🇷🇺🇸 ایران و ۱+۵</span>
+          <div class="desc">امضای توافق جامع اقدام مشترک (برجام) بین ایران و ۶ قدرت جهانی (آمریکا، انگلیس، فرانسه، روسیه، چین، آلمان) در وین. بر اساس این توافق، ایران محدودیت‌هایی در برنامه هسته‌ای خود پذیرفت و در مقابل تحریم‌های اقتصادی رفع شد. این توافق مهم‌ترین توافق دیپلماتیک ایران با غرب در دهه‌های اخیر بود.</div>
+          <div class="source">منبع: متن رسمی توافق برجام، قطعنامه ۲۲۳۱ شورای امنیت سازمان ملل</div>
+        </div>
+
+        <div class="full-event">
+          <div class="date">۱۳۹۷/۲/۱۸ (۸ مه ۲۰۱۸)</div>
+          <div class="title">🚪 خروج یک‌جانبه آمریکا از برجام</div>
+          <span class="actor" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🇺🇸 آمریکا</span>
+          <div class="desc">خروج یک‌جانبه دونالد ترامپ از توافق برجام و بازگرداندن تحریم‌های اقتصادی علیه ایران. این اقدام برخلاف توافق بین‌المللی و برخلاف موضع سایر طرف‌های توافق (انگلیس، فرانسه، روسیه، چین، آلمان) بود. ایران در پاسخ گام‌به‌گام از تعهدات خود در برجام عقب‌نشینی کرد.</div>
+          <div class="source">منبع: بیانیه رسمی کاخ سفید، گزارش‌های آژانس بین‌المللی انرژی اتمی</div>
+        </div>
+
+        <div class="full-event">
+          <div class="date">۱۳۹۸/۱۰/۱۳ (۳ ژانویه ۲۰۲۰)</div>
+          <div class="title">🎯 شهادت سردار سلطیمانی</div>
+          <span class="actor" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🇺🇸 آمریکا</span>
+          <div class="desc">ترور سردار قاسم سلطیمانی، فرمانده سپاه قدس، در حمله پهپادی آمریکا نزدیک فرودگاه بغداد. این حمله به دستور مستقیم دونالد ترامپ انجام شد. ایران در پاسخ، پنج روز بعد با عملیات شهید سلطیمانی به پایگاه عین‌الاسد آمریکا در عراق حمله موشکی کرد.</div>
+          <div class="source">منبع: بیانیه پنتاگون، گزارش‌های رسمی سپاه پاسداران</div>
+        </div>
+
+        <div class="full-event">
+          <div class="date">۱۳۹۹/۹/۷ (۲۷ نوامبر ۲۰۲۰)</div>
+          <div class="title">🔬 ترور شهید فخری‌زاده</div>
+          <span class="actor" style="background:rgba(251,191,36,0.15);color:#fbbf24;">🇮🇱 اسرائیل</span>
+          <div class="desc">ترور محسن فخری‌زاده، دانشمند هسته‌ای ایران، در حمله مسلحانه در منطقه ابسرد تهران. این ترور به اسرائیل نسبت داده شد و در راستای ترورهای متعدد دانشمندان هسته‌ای ایران در سال‌های گذشته بود. ایران این حمله را ترور دولتی و نقض حقوق بین‌الملل دانست.</div>
+          <div class="source">منبع: گزارش‌های رسمی وزارت دفاع ایران، تحقیقات بین‌المللی</div>
+        </div>
+
+        <div class="full-event">
+          <div class="date">۱۴۰۲/۷/۱۵ (۷ اکتبر ۲۰۲۳)</div>
+          <div class="title">🌪️ طوفان الاقصی</div>
+          <span class="actor" style="background:rgba(236,72,153,0.15);color:#f472b6;">🇵🇸 فلسطین</span>
+          <div class="desc">عملیات طوفان الاقصی توسط حماس علیه اسرائیل که منجر به کشته شدن حدود ۱۴۰۰ اسرائیلی و اسارت صدها نفر شد. این عملیات آغازگر جنگ غزه شد و منطقه خاورمیانه را وارد فاز جدیدی از تنش کرد. ایران این عملیات را حمایت کرد ولی مسئولیت مستقیم آن را رد کرد.</div>
+          <div class="source">منبع: گزارش‌های سازمان ملل، رسانه‌های بین‌المللی</div>
+        </div>
+
+        <div class="full-event">
+          <div class="date">۱۴۰۳/۱/۲۶ (۱۳ آوریل ۲۰۲۴)</div>
+          <div class="title">🚀 عملیات وعده صادق ۱</div>
+          <span class="actor" style="background:rgba(16,185,129,0.15);color:#34d399;">🇮🇷 ایران</span>
+          <div class="desc">حمله موشکی و پهپادی ایران به اسرائیل در پاسخ به حمله اسرائیل به کنسولگری ایران در دمشق که منجر به شهادت فرمانندان سپاه قدس شده بود. بیش از ۳۰۰ پهپاد و موشک شلیک شد. این اولین حمله مستقیم ایران به اسرائیل از اسرائیل بود و نقطه عطفی در تقابل مستقیم ایران و اسرائیل محسوب می‌شود.</div>
+          <div class="source">منبع: بیانیه سپاه پاسداران، گزارش‌های ارتش اسرائیل</div>
+        </div>
+
+        <div class="full-event">
+          <div class="date">۱۴۰۳/۵/۱۰ (۳۱ ژوئیه ۲۰۲۴)</div>
+          <div class="title">🎯 ترور شهید هنیه در تهران</div>
+          <span class="actor" style="background:rgba(251,191,36,0.15);color:#fbbf24;">🇮🇱 اسرائیل</span>
+          <div class="desc">ترور اسماعیل هنیه، رهبر سیاسی حماس، در محل اقامتش در تهران پس از شرکت در مراسم تحلیف رئیس‌جمهور ایران. این ترور به اسرائیل نسبت داده شد و نقض آشکار حاکمیت ایران محسوب شد. ایران وعده انتقام داد و این رویداد شدت تنش با اسرائیل را به سطح بی‌سابقه‌ای رساند.</div>
+          <div class="source">منبع: گزارش‌های رسمی ایران، رسانه‌های بین‌المللی</div>
+        </div>
+
+        <div class="full-event">
+          <div class="date">۱۴۰۳/۷/۶ (۲۷ سپتامبر ۲۰۲۴)</div>
+          <div class="title">🎯 ترور شهید نصرالله</div>
+          <span class="actor" style="background:rgba(251,191,36,0.15);color:#fbbf24;">🇮🇱 اسرائیل</span>
+          <div class="desc">ترور سید حسن نصرالله، دبیرکل حزب‌الله لبنان، در بمباران ضاحیه بیروت توسط جنگنده‌های اسرائیلی. این ترور ضربه سنگینی به محور مقاومت وارد کرد و ایران وعده پاسخ داد. این رویداد منجر به عملیات وعده صادق ۲ (حمله موشکی ایران به اسرائیل در مهر ۱۴۰۳) شد.</div>
+          <div class="source">منبع: بیانیه حزب‌الله لبنان، گزارش‌های ارتش اسرائیل</div>
+        </div>
+
+        <div class="full-event">
+          <div class="date">۱۴۰۳/۹/۱۸ (۸ دسامبر ۲۰۲۴)</div>
+          <div class="title">📉 سقوط دولت بشار اسد</div>
+          <span class="actor" style="background:rgba(249,115,22,0.15);color:#fb923c;">🇸🇾 سوریه</span>
+          <div class="desc">سقوط دولت بشار اسد در سوریه با پیشروی سریع نیروهای مخالف و فرار اسد به روسیه. این رویداد ضربه استراتژیک بزرگ به محور مقاومت بود — سوریه مسیر اصلی انتقال سلاح از ایران به حزب‌الله لبنان بود. این رویداد موقعیت منطقه‌ای ایران را تضعیف کرد.</div>
+          <div class="source">منبع: گزارش‌های سازمان ملل، رسانه‌های بین‌المللی</div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- Paths to win -->
-  <section id="paths" style="background: var(--bg-card);">
+  <!-- Iran strategic cards -->
+  <section id="cards">
     <div class="container">
       <div class="section-header">
-        <h2>راه‌های برد</h2>
-        <div class="section-divider"></div>
-        <p>۴ مسیر برد و ۲ مسیر باخت. هر مسیر با استراتژی مشخص و دنباله کارت‌ها.</p>
+        <span class="section-num">بخش ۳</span>
+        <h2>گزینه‌های استراتژیک ایران</h2>
+        <p>۲۰ گزینه استراتژیک در اختیار ایران — بر اساس منابع رسمی ایرانی و تحلیل‌های معتبر</p>
       </div>
-      <div class="paths-grid">
-        <div class="path-card win">
-          <span class="path-badge">🥇 برد - نوبت ۷</span>
-          <h3>مسیر بمب اتم</h3>
-          <p class="strategy">خروج از NPT → افزایش غنی‌سازی → ساخت بمب. مسیر خطرناک اما قطعی.</p>
-          <div class="sequence">iran_npt_withdraw → patience → china → russia → nuclear_breakout</div>
-        </div>
-        <div class="path-card win">
-          <span class="path-badge">🥈 برد - نوبت ۳</span>
-          <h3>مسیر صلح جامع</h3>
-          <p class="strategy">دیپلماسی مداوم + صبر استراتژیک. سریع‌ترین مسیر برد.</p>
-          <div class="sequence">diplomacy → patience → diplomacy</div>
-        </div>
-        <div class="path-card win">
-          <span class="path-badge">🥉 برد - نوبت ۴</span>
-          <h3>مسیر خروج آمریکا</h3>
-          <p class="strategy">ائتلاف با روسیه و چین + فعال‌سازی محور مقاومت + کنترل جنگ.</p>
-          <div class="sequence">russia → china → hezbollah → patience</div>
-        </div>
-        <div class="path-card win">
-          <span class="path-badge">🏅 برد - نوبت ۵</span>
-          <h3>مسیر انزوای اسرائیل</h3>
-          <p class="strategy">فعال‌سازی کامل محور مقاومت + حمله موشکی.</p>
-          <div class="sequence">hezbollah → houthi → iraq_militias → missile → patience</div>
-        </div>
-        <div class="path-card lose">
-          <span class="path-badge">💀 باخت - نوبت ۶</span>
-          <h3>تهاجم بی‌رویه</h3>
-          <p class="strategy">اگر فقط کارت‌های تهاجمی بازی کنید، جنگ از کنترل خارج می‌شود.</p>
-          <div class="sequence">hezbollah → hormuz → missile → houthi → ...</div>
-        </div>
-        <div class="path-card lose">
-          <span class="path-badge">🔥 باخت - نوبت ۴</span>
-          <h3>فروپاشی اقتصادی</h3>
-          <p class="strategy">بستن هرمز + سلاح نفت = نابودی اقتصاد و تغییر رژیم.</p>
-          <div class="sequence">hormuz → oil_weapon → hormuz → oil_weapon</div>
-        </div>
+      <div class="cards-grid" id="cards-grid">
+        <!-- Cards will be inserted by JS -->
       </div>
     </div>
   </section>
 
-  <!-- Timeline -->
-  <section id="timeline">
+  <!-- Sources -->
+  <section id="sources">
     <div class="container">
       <div class="section-header">
-        <h2>خط زمانی تاریخ</h2>
-        <div class="section-divider"></div>
-        <p>۱۷ رویداد تاریخی از ۱۳۳۲ تا ۱۴۰۳ که در بازی گنجانده شده.</p>
+        <span class="section-num">بخش ۴</span>
+        <h2>منابع</h2>
+        <p>منابع رسمی ایرانی و بین‌المللی معتبر استفاده‌شده در این مرجع</p>
       </div>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-date">۱۳۳۲/۵/۲۸</div>
-          <div class="timeline-title">💥 کودتای ۲۸ مرداد</div>
-          <div class="timeline-desc">سرنگونی دولت مصدق با دخالت آمریکا و انگلیس</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۳۵۷/۱۱/۲۲</div>
-          <div class="timeline-title">🕌 پیروزی انقلاب اسلامی</div>
-          <div class="timeline-desc">سرنگونی رژیم پهلوی و تأسیس جمهوری اسلامی</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۳۵۹/۶/۳۱</div>
-          <div class="timeline-title">⚔️ هجوم صدام به ایران</div>
-          <div class="timeline-desc">آغاز جنگ هشت ساله ایران-عراق</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۳۶۷/۴/۱۲</div>
-          <div class="timeline-title">✈️ سرنگونی پرواز ۶۵۵</div>
-          <div class="timeline-desc">سرنگونی هواپیمای مسافربری ایران توسط ناو آمریکایی</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۳۹۴/۴/۲۳</div>
-          <div class="timeline-title">✍️ برجام (JCPOA)</div>
-          <div class="timeline-desc">توافق هسته‌ای ایران و ۱+۵</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۳۹۷/۲/۱۸</div>
-          <div class="timeline-title">🚪 خروج آمریکا از برجام</div>
-          <div class="timeline-desc">ترامپ به‌طور یک‌جانبه از توافق خارج شد</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۳۹۸/۱۰/۱۳</div>
-          <div class="timeline-title">🎯 شهادت سردار سلطیمانی</div>
-          <div class="timeline-desc">ترور فرمانده سپاه قدس توسط آمریکا</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۴۰۲/۷/۱۵</div>
-          <div class="timeline-title">🌪️ طوفان الاقصی</div>
-          <div class="timeline-desc">عملیات حماس علیه اسرائیل</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۴۰۳/۱/۲۶</div>
-          <div class="timeline-title">🚀 عملیات وعده صادق ۱</div>
-          <div class="timeline-desc">حمله موشکی-پهپادی ایران به اسرائیل</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۴۰۳/۵/۱۰</div>
-          <div class="timeline-title">🎯 ترور شهید هنیه در تهران</div>
-          <div class="timeline-desc">ترور رهبر حماس در پایتخت ایران</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۴۰۳/۷/۶</div>
-          <div class="timeline-title">🎯 ترور شهید نصرالله</div>
-          <div class="timeline-desc">ترور دبیرکل حزب‌الله در بیروت</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-date">۱۴۰۳/۹/۱۸</div>
-          <div class="timeline-title">📉 سقوط دولت بشار اسد</div>
-          <div class="timeline-desc">سقوط دولت سوریه و فرار اسد</div>
-        </div>
+      <div class="sources-list">
+        <h3>📚 منابع ایرانی</h3>
+        <ul>
+          <li>خبرگزاری تسنیم (۱۴۰۵/۰۲/۲۱): پنج سناریوی پیش روی آمریکا در جنگ با ایران</li>
+          <li>خبرگزاری تسنیم (۱۴۰۵/۰۴/۲۶): کالبدشکافی یک سناریوی جنگ ترکیبی از فشار اقتصادی تا آشوب</li>
+          <li>خبرگزاری تسنیم (۱۴۰۵/۰۴/۲۲): بازدارندگی نامتقارن و قدرت ایران بعد از جنگ منطقه</li>
+          <li>خبرآنلاین (۱۴۰۵): تفاهم برباد رفته / پنج سناریوی پیش روی ایران و آمریکا</li>
+          <li>فرارو (۱۴۰۵/۰۴): جنگ به کدام سو می‌رود؟ سه سناریوی پیش‌روی ایران و آمریکا</li>
+          <li>رسانا (Rasanah): آینده ایران در خاورمیانه — سناریوهای نقش‌های احتمالی</li>
+          <li>اندیشکده روابط بین‌الملل (irthink): پرونده هسته‌ای ایران</li>
+          <li>SID (پایگاه علوم ایران): قابلیت بازدارندگی هسته‌ای ایران از چشم‌انداز نو واقع‌گرایی</li>
+          <li>تابناک (۱۴۰۵): ایران را یک قدرت بازدارنده هسته‌ای بدانید</li>
+          <li>خبرگزاری ایسنا (۱۴۰۵): سناریوهای بروکینگز از آینده خاورمیانه</li>
+          <li>مرکز پژوهش‌های مجلس: پایش فضای سرمایه‌گذاری</li>
+          <li>خبرگزاری فارس: سناریوهای محتمل ترامپ</li>
+          <li>سازمان انرژی اتمی ایران: گزارش‌های رسمی غنی‌سازی</li>
+          <li>وزارت امور خارجه ایران: بیانیه‌های رسمی</li>
+          <li>خبری از khamenei.ir: سخنرانی‌های مقام معظم رهبری</li>
+        </ul>
       </div>
-    </div>
-  </section>
-
-  <!-- Source code -->
-  <section id="source">
-    <div class="container">
-      <div class="section-header">
-        <h2>سورس کد بازی</h2>
-        <div class="section-divider"></div>
-        <p>سورس کامل بازی به‌صورت متن‌باز در GitHub موجود است.</p>
-      </div>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">⚛️</div>
-          <h3>تکنولوژی‌ها</h3>
-          <p>Next.js 16، TypeScript، Tailwind CSS 4، Zustand، Framer Motion</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">📦</div>
-          <h3>ساختار پروژه</h3>
-          <p>App Router، Server Components، Client Components، API Routes</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🎮</div>
-          <h3>منطق بازی</h3>
-          <p>cardsData.ts (2000+ lines)، gameStore.ts (800+ lines)، endingsData.ts (560+ lines)</p>
-        </div>
-      </div>
-      <div style="text-align: center; margin-top: 2rem;">
-        <div style="margin-bottom: 1rem;">
-          <span class="tag">TypeScript</span>
-          <span class="tag">Next.js</span>
-          <span class="tag">React</span>
-          <span class="tag">Tailwind CSS</span>
-          <span class="tag">Zustand</span>
-          <span class="tag">Framer Motion</span>
-        </div>
-        <a href="https://github.com/betaversion490-del/IranWar" class="btn btn-primary" target="_blank" rel="noopener">
-          📦 مشاهده در GitHub
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section>
-    <div class="container">
-      <div class="cta">
-        <h2>آماده بازی هستید؟</h2>
-        <p>وارد دنیای استراتژی خاورمیانه شوید. تصمیم‌های شما آینده منطقه را تعیین می‌کند. آیا به بمب اتم می‌رسید، صلح می‌سازید، یا شکست می‌خورید؟</p>
-        <a href="https://preview-z.ai/" class="btn btn-primary" target="_blank" rel="noopener">
-          ⚔️ شروع بازی
-        </a>
+      <div class="sources-list" style="margin-top: 1.5rem;">
+        <h3>🌐 منابع بین‌المللی</h3>
+        <ul>
+          <li>آژانس بین‌المللی انرژی اتمی (IAEA): گزارش‌های فصلی بازرسی (GOV/2025/34)</li>
+          <li>قطعنامه ۲۲۳۱ شورای امنیت سازمان ملل (برجام)</li>
+          <li>سازمان بین‌المللی دریانوردی (IMO): گزارش‌های امنیت دریایی</li>
+          <li>Foreign Relations of the United States (FRUS): اسناد تاریخی دیپلماسی آمریکا</li>
+          <li>کرمیت روزولت: خاطرات عملیات آژاکس</li>
+          <li>Symantec: تحقیقات ویروس استاکس‌نت</li>
+          <li>دیوید سانگر: «Confront and Conceal» — کتاب درباره عملیات سایبری آمریکا</li>
+          <li>سازمان هوانوردی بین‌المللی (ICAO): گزارش سرنگونی پرواز ۶۵۵</li>
+          <li>سازمان ملل متحد: گزارش‌های مربوط به غزه و سوریه</li>
+          <li>کمیته بین‌المللی صلیب سرخ: گزارش‌های جنگ ایران و عراق</li>
+        </ul>
       </div>
     </div>
   </section>
@@ -561,21 +548,66 @@
   <!-- Footer -->
   <footer>
     <div class="container">
-      <div class="social">
-        <a href="https://github.com/betaversion490-del/IranWar" target="_blank" rel="noopener">GitHub</a>
-        <a href="#about">درباره</a>
-        <a href="#source">سورس</a>
-      </div>
       <div class="disclaimer">
-        ⚠️ <strong>سلب مسئولیت:</strong> این بازی یک شبیه‌سازی آموزشی-استراتژیک است و نه یک پیش‌بینی قطعی. تمام داده‌ها بر اساس منابع رسمی ایرانی (تسنیم، فارس، ایسنا، مرکز پژوهش‌های مجلس) و منابع بین‌المللی معتبر تنظیم شده است. هیچ داده فرضی وجود ندارد. این بازی نه حمایت از هیچ‌یک از طرفین است و نه تأیید هیچ سناریوی خاصی.
+        ⚠️ <strong>سلب مسئولیت:</strong> این مرجع صرفاً جنبه اطلاع‌رسانی و آموزشی دارد و بر اساس منابع رسمی ایرانی و بین‌المللی معتبر گردآوری شده است. تمام تاریخ‌ها با تقویم شمسی و بر اساس منابع معتبر تاریخی ثبت شده‌اند. این مرجع دیدگاه هیچ‌یک از طرفین را تأیید یا رد نمی‌کند و صرفاً ارائه اطلاعات است.
       </div>
       <div class="copyright">
-        © ۲۰۲۵ بازی بزرگ خاورمیانه • ساخته‌شده با ❤️ برای آموزش استراتژی
+        © ۲۰۲۵ مرجع اطلاعاتی خاورمیانه • گردآوری‌شده با استفاده از منابع رسمی
       </div>
     </div>
   </footer>
 
   <script>
+    // داده‌های کارت‌های استراتژیک ایران
+    const iranCards = [
+      { icon: "☢️", name: "ساخت بمب اتم", cat: "هسته‌ای", catClass: "cat-nuclear", desc: "خروج از NPT، غنی‌سازی ۹۰٪، ساخت و آزمایش اولین بمب اتم ایران.", detail: "تصمیم نهایی: خروج از پیمان منع گسترش سلاح‌های هسته‌ای (NPT)، غنی‌سازی اورانیوم به ۹۰٪، ساخت و آزمایش بمب اتم. تحقیقات نشان می‌دهد: اگر ایران این مرحله را با موفقیت طی کند، بازدارندگی ایجاد می‌کند (مثل کره شمالی). اما پنجره بحرانی ۱۸-۳۶ ماه اول خطرناک است — احتمال حمله پیش‌دگیرانه اسرائیل ۵۰-۶۵٪. پس از عبور از این پنجره، آمریکا به مدل «containment» (پذیرش) روی می‌آورد." },
+      { icon: "📜", name: "خروج کامل از NPT", cat: "هسته‌ای", catClass: "cat-nuclear", desc: "خروج رسمی از پیمان منع گسترش سلاح‌های هسته‌ای.", detail: "اقدام نمادین و حقوقی بحرانی: خروج از NPT. این اقدام اعلام غیررسمی ورود به باشگاه هسته‌ای است. کره شمالی (۲۰۰۳) و اسرائیل تنها کشورهای خارج از این پیمان هستند. پاسخ آمریکا و اسرائیل احتمالاً تشدید تحریم‌ها و افزایش آماده‌سازی حمله پیش‌دگیرانه است." },
+      { icon: "🤝", name: "دریافت کلاهک از کره شمالی", cat: "هسته‌ای", catClass: "cat-nuclear", desc: "خرید کلاهک هسته‌ای یا فناوری بمب از کره شمالی.", detail: "جایگزین سریع‌تر برای ساخت بمب: خرید کلاهک آماده یا فناوری از کره شمالی. تحقیقات نشان می‌دهد کره شمالی حاضر است در ازای نفت و پول، فناوری بمب را منتقل کند. ریسک: آژانس بین‌المللی و آمریکا احتمالاً متوجه انتقال می‌شوند و این می‌تواند بهانه حمله پیش‌دگیرانه شود." },
+      { icon: "🚀", name: "حمله موشکی به اسرائیل", cat: "نظامی", catClass: "cat-military", desc: "شلیک صدها موشک بالستیک به اهداف اسرائیلی.", detail: "حمله مستقیم موشکی به اسرائیل — مثل عملیات وعده صادق ۱ و ۲. ایران دارای بزرگ‌ترین زرادخانه موشک‌های بالستیک خاورمیانه است (۳۰۰۰+ موشک با برد ۲۰۰۰ کیلومتر). این اقدام بازدارندگی مستقیم ایجاد می‌کند ولی احتمال حمله متقابل اسرائیل را بالا می‌برد." },
+      { icon: "⚔️", name: "حمله زمینی به اسرائیل", cat: "نظامی", catClass: "cat-extreme", desc: "حمله زمینی مستقیم ارتش ایران به اسرائیل.", detail: "این گزینه عملاً غیرممکن است — فاصله ۱۰۰۰+ کیلومتر، عدم مرز مشترک، و برتری هوایی اسرائیل. حمله زمینی نیاز به عبور از عراق، سوریه، یا دریا دارد. تحلیلگران این را گزینه غیر واقع‌بینانه می‌دانند (احتمال کمتر از ۵٪)." },
+      { icon: "🛰️", name: "ساخت موشک قاره‌پیما", cat: "نظامی", catClass: "cat-military", desc: "توسعه موشک با برد ۵۵۰۰+ کیلومتر (ICBM).", detail: "توسعه موشک قاره‌پیما (ICBM) که قادر به رسیدن به آمریکا باشد. ایران در حال حاضر موشک خرمشهر-۴ با برد ۲۰۰۰ کیلومتر دارد. ICBM نیاز به فناوری پیشرفته‌تر دارد و احتمالاً ۵-۱۰ سال زمان می‌برد. این اقدام بازدارندگی استراتژیک علیه آمریکا ایجاد می‌کند." },
+      { icon: "🎯", name: "حمله به پایگاه‌های آمریکا", cat: "نظامی", catClass: "cat-military", desc: "حمله موشکی به پایگاه‌های آمریکا در عراق، سوریه، بحرین.", detail: "حمله به پایگاه‌های آمریکا در منطقه — مثل عملیات شهید سلطیمانی (۱۳۹۸/۱۱/۸) به عین‌الاسد. ایران می‌تواند به ۲۰+ پایگاه آمریکا در عراق، سوریه، بحرین، کویت، قطر و امارات حمله کند. این اقدام خروج آمریکا از منطقه را تسریع می‌کند ولی احتمال حمله متقابل را بالا می‌برد." },
+      { icon: "🛡️", name: "فعال‌سازی کامل حزب‌الله", cat: "نیابتی", catClass: "cat-proxy", desc: "فعال‌سازی کامل حزب‌الله لبنان برای جنگ با اسرائیل.", detail: "حزب‌الله با ۱۰۰٬۰۰۰+ راکت و موشک، بزرگ‌ترین نیروی نیابتی ایران است. فعال‌سازی کامل می‌تواند شمال اسرائیل را فلج کند. ولی پس از جنگ ۲۰۲۴، حزب‌الله ضعیف‌تر شده و در حال بازسازی است. ایران در حال انتقال بودجه برای بازسازی است." },
+      { icon: "🚢", name: "فعال‌سازی حوثی‌ها", cat: "نیابتی", catClass: "cat-proxy", desc: "فعال‌سازی انصارالله یمن برای حمله به کشتی‌ها و اسرائیل.", detail: "حوثی‌ها کنترل دریای سرخ و باب‌المندب را دارند و می‌توانند تجارت جهانی را مختل کنند. آن‌ها با موشک‌های ایرانی به اسرائیل حمله می‌کنند و کشتی‌های مرتبط با اسرائیل را هدف قرار می‌دهند. این گزینه فشار اقتصادی جهانی ایجاد می‌کند." },
+      { icon: "👥", name: "فعال‌سازی شبه‌نظامیان عراق", cat: "نیابتی", catClass: "cat-proxy", desc: "فعال‌سازی حشد الشعبی برای حمله به آمریکا.", detail: "شبه‌نظامیان عراقی (حشد الشعبی) با ۵۰٬۰۰۰+ نیرو می‌توانند به پایگاه‌های آمریکا در عراق حمله کنند. آن‌ها قبلاً چندین حمله به پایگاه عین‌الاسد انجام داده‌اند. این گزینه فشار مستقیم بر حضور آمریکا در عراق ایجاد می‌کند." },
+      { icon: "🕊️", name: "فعال‌سازی حماس و جهاد", cat: "نیابتی", catClass: "cat-proxy", desc: "حمایت از مقاومت فلسطین علیه اسرائیل.", detail: "حماس و جهاد اسلامی فلسطین با حمایت ایران، اسرائیل را در جبهه غربی درگیر نگه می‌دارند. پس از جنگ غزه، این گروه‌ها ضعیف شده‌اند ولی هنوز فعال‌اند. ایران بودجه و سلاح برای بازسازی آن‌ها فراهم می‌کند." },
+      { icon: "⚓", name: "بستن تنگه هرمز", cat: "نامتقارن", catClass: "cat-asymmetric", desc: "بستن تنگه هرمز و قطع صادرات نفت خلیج فارس.", detail: "۲۱ میلیون بشکه نفت در روز (۲۰٪ تجارت جهانی نفت) از تنگه هرمز عبور می‌کند. بستن آن می‌تواند قیمت نفت را به ۲۰۰+ دلار برساند. ولی آمریکا احتمالاً با عملیات نظامی پاسخ می‌دهد. این گزینه سلاح دو لبه است — اقتصاد ایران هم وابسته به این تنگه است." },
+      { icon: "🚢", name: "بستن تنگه باب‌المندب", cat: "نامتقارن", catClass: "cat-asymmetric", desc: "بستن باب‌المندب و قطع تجارت دریای سرخ.", detail: "۱۲٪ تجارت جهانی از باب‌المندب عبور می‌کند. حوثی‌ها می‌توانند این تنگه را مختل کنند. این گزینه فشار اقتصادی جهانی ایجاد می‌کند و آمریکا را مجبور به واکنش می‌کند." },
+      { icon: "🛩️", name: "حمله پهپادی انبوه", cat: "نامتقارن", catClass: "cat-asymmetric", desc: "حمله صدها پهپاد انتحاری به اهداف دشمن.", detail: "ایران دارای هزاران پهپاد شاهد-۱۳۶ با برد ۲۰۰۰+ کیلومتر است. حمله انبوه می‌تواند سامانه‌های پدافندی را فلج کند. این گزینه ارزان و مؤثر است ولی کمتر از موشک‌ها کشنده است." },
+      { icon: "💻", name: "حمله سایبری به زیرساخت‌ها", cat: "سایبری", catClass: "cat-cyber", desc: "حمله سایبری به زیرساخت‌های آمریکا و اسرائیل.", detail: "ایران یکی از قوی‌ترین قدرت‌های سایبری خاورمیانه است. گروه‌های APT ایرانی به زیرساخت‌های حیاتی آمریکا (آب، برق، حمل‌ونقل) نفوذ کرده‌اند. این گزینه غیرقابل ردگیری است ولی پاسخ سایبری متقابل را برمی‌انگیزد." },
+      { icon: "🕊️", name: "دیپلماسی فعال", cat: "دیپلماتیک", catClass: "cat-diplomatic", desc: "مذاکره مستقیم با آمریکا و توافق دیپلماتیک.", detail: "مسیر صلح و توافق — مثل برجام ۲۰۱۵. دیپلماسی می‌تواند به رفع تحریم‌ها و بهبود اقتصاد منجر شود. ولی تجربه برجام نشان داد آمریکا ممکن است از توافق خارج شود. این گزینه نیاز به اعتماد متقابل و تضمین دارد." },
+      { icon: "🤝", name: "اتحاد کامل با روسیه", cat: "ائتلاف", catClass: "cat-alliance", desc: "پیمان دفاعی مشترک با روسیه.", detail: "ایران و روسیه همکاری دفاعی گسترده دارند (موهب-۱، شاهید-۱۳۶، س-۴۰۰). اتحاد کامل می‌تواند چتر بازدارندگی ایران را تقویت کند. ولی روسیه ممکن است ایران را قربانی منافع خود با غرب کند." },
+      { icon: "🐉", name: "گسترش پکت ۲۵ ساله با چین", cat: "ائتلاف", catClass: "cat-alliance", desc: "گسترش همکاری اقتصادی-نظامی با چین.", detail: "توافق ۲۵ ساله ایران-چین (۱۴۰۰) شامل سرمایه‌گذاری ۴۰۰ میلیارد دلاری چین در ایران در ازای نفت ارزان است. چین ۵۰٪ نفت ایران را خریداری می‌کند. این گزینه اقتصاد ایران را تثبیت می‌کند ولی وابستگی به چین را افزایش می‌دهد." },
+      { icon: "🕌", name: "عادی‌سازی با عربستان", cat: "دیپلماتیک", catClass: "cat-diplomatic", desc: "تعمیق روابط با عربستان و قطع عادی‌سازی با اسرائیل.", detail: "توافق پکن ۲۰۲۳ بین ایران و عربستان را می‌توان تعمیق کرد. این می‌تواند از عادی‌سازی عربستان با اسرائیل جلوگیری کند و جایگاه ایران در جهان اسلام را تقویت کند." },
+      { icon: "👥", name: "مردم‌سازی و بسیج", cat: "داخلی", catClass: "cat-domestic", desc: "بسیج مردمی و افزایش آمادگی داخلی.", detail: "بسیج ۴۰ میلیون نفری و ارتش ۱۹۰٬۰۰۰ نفری + سپاه ۱۹۰٬۰۰۰ نفری. آمادگی داخلی برای مقاومت در برابر حمله و تحریم. این گزینه پایه تمام استراتژی‌های دیگر است." },
+      { icon: "⏳", name: "صبر استراتژیک", cat: "داخلی", catClass: "cat-domestic", desc: "صبر هوشمندانه و فرسایش دشمن.", detail: "دکترین «صبر استراتژیک» مقام معظم رهبری — اجازه ده دشمن فرسوده شود. این رویکرد مانند مدل چین (۱۹۹۰-۲۰۲۰) است که با صبر، قدرت خود را بدون جنگ افزایش داد. صبر می‌تواند زمان را به نفع ایران تغییر دهد." },
+    ];
+
+    // نمایش کارت‌ها
+    const grid = document.getElementById('cards-grid');
+    iranCards.forEach((card, i) => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <div class="card-header">
+          <div class="card-icon">${card.icon}</div>
+          <div>
+            <div class="card-title">${card.name}</div>
+            <span class="card-cat ${card.catClass}">${card.cat}</span>
+          </div>
+        </div>
+        <div class="card-desc">${card.desc}</div>
+        <div class="card-detail">${card.detail}</div>
+        <div class="card-toggle">+ جزئیات بیشتر</div>
+      `;
+      div.addEventListener('click', () => {
+        div.classList.toggle('open');
+        const toggle = div.querySelector('.card-toggle');
+        toggle.textContent = div.classList.contains('open') ? '− بستن جزئیات' : '+ جزئیات بیشتر';
+      });
+      grid.appendChild(div);
+    });
+
     // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
